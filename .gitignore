@@ -1,0 +1,16 @@
+# Python / Django
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+db.sqlite3
+.env
+.venv/
+
+# Node / React
+node_modules/
+dist/
+build/
+
+# VSCode
+.vscode/
