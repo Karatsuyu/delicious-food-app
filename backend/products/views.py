@@ -1,9 +1,6 @@
-from rest_framework import viewsets, permissions
-from .models import Producto, Ingrediente, Combo
-from .serializers import ProductoSerializer, IngredienteSerializer, ComboSerializer
-from rest_framework import generics, permissions
-from .models import ComboPersonalizado
-from .serializers_combo_personalizado import ComboPersonalizadoSerializer
+from rest_framework import viewsets, permissions, generics
+from .models import Producto, Ingrediente, Combo, ComboPersonalizado
+from .serializers import ProductoSerializer, IngredienteSerializer, ComboSerializer, ComboPersonalizadoSerializer
 
 class ProductoViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Producto.objects.all()
@@ -20,6 +17,16 @@ class ComboViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.AllowAny]
 
 
+
+class ComboPersonalizadoViewSet(viewsets.ModelViewSet):
+    serializer_class = ComboPersonalizadoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return ComboPersonalizado.objects.filter(usuario=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(usuario=self.request.user)
 
 class ComboPersonalizadoCreateView(generics.CreateAPIView):
     serializer_class = ComboPersonalizadoSerializer
