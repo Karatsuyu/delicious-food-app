@@ -1,0 +1,132 @@
+.menu-page {
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+.menu-header {
+  background: linear-gradient(135deg, #FF6B00 0%, #FF8C00 100%);
+  padding: 60px 40px;
+  text-align: center;
+  color: white;
+  margin-bottom: 30px;
+}
+
+.menu-header h1 {
+  font-family: 'Brush Script MT', cursive;
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.menu-header p {
+  font-size: 18px;
+  opacity: 0.95;
+}
+
+.menu-categories {
+  background: white;
+  padding: 20px 40px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.categories-filter {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+.filter-btn:hover {
+  border-color: #FF6B00;
+  background: #fff8f0;
+  transform: translateY(-2px);
+}
+
+.filter-btn.active {
+  background: #FF6B00;
+  border-color: #FF6B00;
+  color: white;
+}
+
+.filter-icon {
+  font-size: 20px;
+}
+
+.menu-products {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.products-grid-menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.loading,
+.no-products {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 18px;
+  color: #666;
+}
+
+.no-products p {
+  font-size: 20px;
+  color: #999;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .menu-header {
+    padding: 40px 20px;
+  }
+
+  .menu-header h1 {
+    font-size: 36px;
+  }
+
+  .menu-categories {
+    padding: 15px 20px;
+  }
+
+  .categories-filter {
+    gap: 10px;
+  }
+
+  .filter-btn {
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+
+  .filter-icon {
+    font-size: 18px;
+  }
+
+  .menu-products {
+    padding: 0 20px;
+  }
+
+  .products-grid-menu {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+}
