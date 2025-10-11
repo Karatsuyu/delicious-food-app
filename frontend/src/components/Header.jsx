@@ -6,11 +6,18 @@ function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   
-  // Aquí verificarás si hay usuario logueado (lo haremos después con contexto)
   const isLoggedIn = false; // Por ahora false
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleRegisterClick = () => {
+    navigate('/register');
+  };
+
+  const handleLoginClick = () => {
+    navigate('/login');
   };
 
   return (
@@ -51,12 +58,18 @@ function Header() {
             </div>
           ) : (
             <div className="auth-buttons">
-              <Link to="/login" className="btn btn-signin">
+              <button 
+                onClick={handleLoginClick} 
+                className="btn btn-signin"
+              >
                 Sign In
-              </Link>
-              <Link to="/register" className="btn btn-register">
+              </button>
+              <button 
+                onClick={handleRegisterClick} 
+                className="btn btn-register"
+              >
                 Register
-              </Link>
+              </button>
             </div>
           )}
         </div>

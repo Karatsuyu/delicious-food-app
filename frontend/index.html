@@ -1,224 +1,162 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delicious Food - El sabor que tú eliges</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Delicious Food App - Tu aplicación de comida favorita con los mejores platos y combos personalizados" />
+    <meta name="keywords" content="comida, restaurante, delivery, pedidos, comida deliciosa" />
+    <meta name="author" content="Delicious Food App" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Delicious Food App" />
+    <meta property="og:description" content="Descubre los mejores platos y combos personalizados" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://delicious-food-app.com" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Delicious Food App" />
+    <meta name="twitter:description" content="Descubre los mejores platos y combos personalizados" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="apple-touch-icon" href="/vite.svg" />
+    
+    <!-- Preload critical fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <title>Delicious Food App - Comida Deliciosa</title>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="logo-container">
-            <span class="menu-icon">☰</span>
-            <div class="logo">
-                Delicious<br><span>Food 🍔</span>
-            </div>
+    <!-- Loading Screen -->
+    <div id="loading-screen" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #FF8C00 0%, #FFA500 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        color: white;
+        font-family: 'Brush Script MT', cursive;
+    ">
+        <div style="font-size: 48px; margin-bottom: 20px;">🍽️</div>
+        <div style="font-size: 32px; margin-bottom: 10px;">Delicious Food</div>
+        <div style="font-size: 16px; opacity: 0.8;">Cargando los mejores sabores...</div>
+        <div style="
+            width: 200px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            margin-top: 20px;
+            overflow: hidden;
+        ">
+            <div id="loading-bar" style="
+                width: 0%;
+                height: 100%;
+                background: white;
+                border-radius: 2px;
+                transition: width 0.3s ease;
+            "></div>
         </div>
-        <div class="header-actions">
-            <span class="search-icon">🔍</span>
-            <span class="cart-icon">🛒</span>
-            <div class="auth-buttons">
-                <button class="btn btn-signin">Sign In</button>
-                <button class="btn btn-register">Register</button>
-            </div>
-        </div>
-    </header>
+    </div>
 
-    <!-- Carrusel de Combos -->
-    <section class="carousel-section">
-        <div class="carousel-container">
+    <!-- React App Root -->
+    <div id="root"></div>
+
+    <!-- Fallback content for non-JS users -->
+    <noscript>
+        <div style="
+            text-align: center;
+            padding: 50px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        ">
+            <h1 style="color: #FF8C00; margin-bottom: 20px;">🍽️ Delicious Food App</h1>
+            <p style="color: #666; font-size: 18px; margin-bottom: 30px;">
+                Para disfrutar de la mejor experiencia, por favor habilita JavaScript en tu navegador.
+            </p>
+            <div style="
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                max-width: 500px;
+            ">
+                <h2 style="color: #333; margin-bottom: 15px;">¿Cómo habilitar JavaScript?</h2>
+                <ul style="text-align: left; color: #666; line-height: 1.6;">
+                    <li><strong>Chrome:</strong> Configuración → Privacidad y seguridad → Configuración del sitio → JavaScript</li>
+                    <li><strong>Firefox:</strong> about:config → javascript.enabled → true</li>
+                    <li><strong>Safari:</strong> Preferencias → Seguridad → Habilitar JavaScript</li>
+                    <li><strong>Edge:</strong> Configuración → Cookies y permisos del sitio → JavaScript</li>
+                </ul>
+            </div>
+        </div>
+    </noscript>
+
+    <!-- Scripts -->
+    <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Loading animation script -->
+    <script>
+        // Simulate loading progress
+        let progress = 0;
+        const loadingBar = document.getElementById('loading-bar');
+        const loadingScreen = document.getElementById('loading-screen');
+        
+        const loadingInterval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 100) progress = 100;
             
-            <div class="carousel-slide active slide-orange">
-                <div class="carousel-content">
-                    <h1 class="combo-title">COMBO BBQ CRISPY</h1>
-                    <div class="combo-description">
-                        <p>2 BURGES ESPECIALES (RES O CERDO) + PAPAS</p>
-                        <p>CRUJIENTES + 2 GASEOSAS PERSONALES</p>
-                    </div>
-                </div>
-            </div>
-
+            loadingBar.style.width = progress + '%';
             
-            <div class="carousel-slide slide-orange">
-                <div class="carousel-content">
-                    <h1 class="combo-title">COMBO CLASICO BACON</h1>
-                    <div class="combo-description">
-                        <p>2 BURGES CLASICAS (RES O CERDO) CON</p>
-                        <p>TOCINETA Y VEGETALES FRESCOS + PAPAS</p>
-                        <p>CRUJIENTES + 2 GASEOSAS PERSONALES</p>
-                    </div>
-                </div>
-            </div>
-
-            
-            <div class="carousel-slide slide-red">
-                <div class="carousel-content">
-                    <h1 class="combo-title">COMBO PEPPERONI LOVERS</h1>
-                    <div class="combo-description">
-                        <p>Pizza especial con masa tradicional, extra queso</p>
-                        <p>y más. Acompañada de una rica gaseosa personal.</p>
-                    </div>
-                </div>
-            </div>
-
-            
-            <div class="carousel-slide slide-red">
-                <div class="carousel-content">
-                    <h1 class="combo-title">COMBO CROCANTE DELUXE</h1>
-                    <div class="combo-description">
-                        <p>Pan suave tipo brioche con salchicha americana asada</p>
-                        <p>Queso mozzarella gratinado y un topping delicioso.</p>
-                        <p>Acompañada de papas fritas y una gaseosa personal.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Flechas de navegación -->
-            <button class="carousel-arrow left" onclick="moveSlide(-1)">‹</button>
-            <button class="carousel-arrow right" onclick="moveSlide(1)">›</button>
-
-            
-            <div class="carousel-dots">
-                <span class="dot active" onclick="currentSlide(0)"></span>
-                <span class="dot" onclick="currentSlide(1)"></span>
-                <span class="dot" onclick="currentSlide(2)"></span>
-                <span class="dot" onclick="currentSlide(3)"></span>
-            </div>
-        </div>
-    </section>
-
-    <!-- Menú de Categorías -->
-    <section class="categories-section">
-        <div class="categories-container">
-            <div class="category-item">
-                <span class="category-icon">🍔</span>
-                <p>Hamburguesas</p>
-            </div>
-            <div class="category-item">
-                <span class="category-icon">🍕</span>
-                <p>Pizzas</p>
-            </div>
-            <div class="category-item">
-                <span class="category-icon">🍗</span>
-                <p>Pollo</p>
-            </div>
-            <div class="category-item">
-                <span class="category-icon">🌭</span>
-                <p>Perros</p>
-            </div>
-            <div class="category-item">
-                <span class="category-icon">🧁</span>
-                <p>Postres</p>
-            </div>
-            <div class="category-item">
-                <span class="category-icon">🍟</span>
-                <p>Papas</p>
-            </div>
-            <div class="category-item">
-                <span class="category-icon">🥤</span>
-                <p>Bebidas</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Personaliza tu pedido -->
-    <section class="customize-section">
-        <h2 class="section-title">Personaliza tu pedido!</h2>
-        <div class="products-grid">
-            <div class="product-card">
-                <div class="product-icon">🍔</div>
-                <p class="product-name">HAMBURGUESA</p>
-            </div>
-            <div class="product-card">
-                <div class="product-icon">🍕</div>
-                <p class="product-name">PIZZA</p>
-            </div>
-            <div class="product-card">
-                <div class="product-icon">🍗</div>
-                <p class="product-name">POLLO</p>
-            </div>
-            <div class="product-card">
-                <div class="product-icon">🌭</div>
-                <p class="product-name">PERRO</p>
-            </div>
-            <div class="product-card">
-                <div class="product-icon">🍨</div>
-                <p class="product-name">POSTRES</p>
-            </div>
-        </div>
-    </section>
-
-
-    <section class="reviews-section">
-        <h2 class="section-title">Reseñas</h2>
-        <div class="reviews-carousel">
-            <button class="review-arrow left" onclick="moveReview(-1)">‹</button>
-            
-            <div class="reviews-container">
-                <div class="review-card">
-                    <div class="review-header">
-                        <img src="https://via.placeholder.com/50" alt="Usuario" class="user-avatar">
-                        <div class="stars">⭐⭐⭐⭐⭐</div>
-                    </div>
-                    <p class="review-text">La comida llega rápida, excelente!!</p>
-                    <span class="review-badge">VERIFIED</span>
-                </div>
-
-                <div class="review-card">
-                    <div class="review-header">
-                        <img src="https://via.placeholder.com/50" alt="Usuario" class="user-avatar">
-                        <div class="stars">⭐⭐⭐⭐⭐</div>
-                    </div>
-                    <p class="review-text">Me encanta la pizza, muy buena.</p>
-                    <span class="review-badge">VERIFIED</span>
-                </div>
-
-                <div class="review-card">
-                    <div class="review-header">
-                        <img src="https://via.placeholder.com/50" alt="Usuario" class="user-avatar">
-                        <div class="stars">⭐⭐⭐⭐⭐</div>
-                    </div>
-                    <p class="review-text">La experiencia fue buena. El sabor de personalización es genial algo que las ingredientes de su amor y pasó del amor lo segundo. Excelente servicio.</p>
-                    <span class="review-badge">VERIFIED</span>
-                </div>
-            </div>
-
-            <button class="review-arrow right" onclick="moveReview(1)">›</button>
-        </div>
-    </section>
-
-
-    <footer>
-        <div class="footer-content">
-            <div class="footer-column">
-                <div class="logo">
-                    Delicious<br><span>Food 🍔</span>
-                </div>
-                <h3>Delicious Food - El sabor que tú eliges</h3>
-                <p>En Delicious Food disfrutas de nuestra variedad de productos.</p>
-                <p>Contamos con nuestro sistema de personalización de pedidos, donde eliges cada detalle de tu comida a tu gusto: (masa, salsas, ingredientes y acompañamientos).</p>
-                <p>Vive la mejor experiencia, hecha especialmente para ti!</p>
-            </div>
-
-            <div class="footer-column">
-                <h3>Contacto</h3>
-                <p><strong>Delicious Food S.A.S</strong></p>
-                <p>Calle 2a 00-00</p>
-                <p>En cualquier lugar del mundo</p>
-                <p>Ventas institucionales</p>
-                <p>Llámanos: 300 000 0000</p>
-                <p><a href="#">Contáctanos Aquí</a></p>
-                <p><a href="#">Descarga tu Factura</a></p>
-                <p><a href="#">Información nutricional</a></p>
-            </div>
-        </div>
-
-        <div class="footer-bottom">
-            <p>Delicious Food © 2025 - Todos los derechos reservados</p>
-        </div>
-    </footer>
-
-    <script src="script.js"></script>
+            if (progress >= 100) {
+                clearInterval(loadingInterval);
+                setTimeout(() => {
+                    loadingScreen.style.opacity = '0';
+                    loadingScreen.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                    }, 500);
+                }, 500);
+            }
+        }, 100);
+        
+        // Hide loading screen when React app is ready
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (loadingScreen.style.display !== 'none') {
+                    loadingScreen.style.opacity = '0';
+                    loadingScreen.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                    }, 500);
+                }
+            }, 1000);
+        });
+        
+        // Service Worker registration (for PWA capabilities)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>

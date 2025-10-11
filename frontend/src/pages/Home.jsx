@@ -13,14 +13,94 @@ function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Datos de ejemplo para el carrusel mientras configuras el backend
+        const combosEjemplo = [
+          {
+            id: 1,
+            nombre: "Combo Familiar",
+            descripcion: "Hamburguesa doble, papas grandes, 2 bebidas y postre",
+            precio_total: 25.99
+          },
+          {
+            id: 2,
+            nombre: "Combo Deluxe",
+            descripcion: "Pizza mediana, papas, bebida y ensalada",
+            precio_total: 18.50
+          },
+          {
+            id: 3,
+            nombre: "Combo Express",
+            descripcion: "Perro caliente especial, papas pequeñas y bebida",
+            precio_total: 12.99
+          }
+        ];
+
+        const productosEjemplo = [
+          { 
+            id: 1, 
+            nombre: "Hamburguesa Clásica", 
+            precio: 8.99, 
+            imagen: null,
+            descripcion: "Carne jugosa con lechuga, tomate y queso",
+            es_personalizable: true
+          },
+          { 
+            id: 2, 
+            nombre: "Pizza Margherita", 
+            precio: 15.99, 
+            imagen: null,
+            descripcion: "Mozzarella fresca, tomate y albahaca",
+            es_personalizable: true
+          },
+          { 
+            id: 3, 
+            nombre: "Pollo Frito", 
+            precio: 11.99, 
+            imagen: null,
+            descripcion: "Crujiente por fuera, jugoso por dentro",
+            es_personalizable: false
+          },
+          { 
+            id: 4, 
+            nombre: "Perro Caliente", 
+            precio: 6.99, 
+            imagen: null,
+            descripcion: "Salchicha premium con todos los ingredientes",
+            es_personalizable: true
+          },
+          { 
+            id: 5, 
+            nombre: "Papas Fritas", 
+            precio: 4.99, 
+            imagen: null,
+            descripcion: "Doradas y crujientes, perfectas para acompañar",
+            es_personalizable: false
+          },
+          { 
+            id: 6, 
+            nombre: "Bebida Refrescante", 
+            precio: 2.99, 
+            imagen: null,
+            descripcion: "Refrescante bebida de tu elección",
+            es_personalizable: false
+          }
+        ];
+        
+        setCombos(combosEjemplo);
+        setProductos(productosEjemplo);
+        setLoading(false);
+
+        // Comentado: código original para cuando tengas el backend funcionando
+        /*
         const [combosRes, productosRes] = await Promise.all([
           axios.get('http://localhost:8000/api/products/combos/'),
           axios.get('http://localhost:8000/api/products/productos/')
         ]);
         
         setCombos(combosRes.data);
-        setProductos(productosRes.data.slice(0, 6)); // Solo 6 productos destacados
+        setProductos(productosRes.data.slice(0, 6));
         setLoading(false);
+        */
       } catch (error) {
         console.error('Error cargando datos:', error);
         setLoading(false);

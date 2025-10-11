@@ -1,0 +1,452 @@
+.personalizador-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+  padding: 20px;
+}
+
+.personalizador-header {
+  text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(255, 140, 0, 0.3);
+}
+
+.back-button:hover {
+  background: var(--primary-dark);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.personalizador-title {
+  font-family: 'Brush Script MT', cursive;
+  color: var(--primary-color);
+  font-size: 48px;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.producto-id {
+  color: var(--text-light);
+  font-size: 14px;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+.personalizador-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.personalizador-options {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.option-section {
+  margin-bottom: 30px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid #eee;
+}
+
+.option-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.section-title {
+  color: var(--text-dark);
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: var(--primary-color);
+  border-radius: 2px;
+}
+
+/* Tamaño Options */
+.tamaño-options {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.tamaño-option {
+  flex: 1;
+  min-width: 120px;
+  cursor: pointer;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.tamaño-option:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 140, 0, 0.2);
+}
+
+.tamaño-option input[type="radio"] {
+  display: none;
+}
+
+.tamaño-option input[type="radio"]:checked + .tamaño-info {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.tamaño-option input[type="radio"]:checked {
+  border-color: var(--primary-color);
+  background: rgba(255, 140, 0, 0.1);
+}
+
+.tamaño-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.tamaño-nombre {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.tamaño-precio {
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+/* Ingredientes Grid */
+.ingredientes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.ingrediente-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.ingrediente-option:hover {
+  border-color: var(--primary-color);
+  background: rgba(255, 140, 0, 0.05);
+}
+
+.ingrediente-option input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-color);
+}
+
+.ingrediente-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.ingrediente-nombre {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.ingrediente-precio {
+  font-size: 12px;
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+
+.extras-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+.extra-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.extra-option:hover {
+  border-color: var(--secondary-color);
+  background: rgba(220, 20, 60, 0.05);
+}
+
+.extra-option input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--secondary-color);
+}
+
+.extra-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.extra-nombre {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.extra-precio {
+  font-size: 12px;
+  color: var(--secondary-color);
+  font-weight: bold;
+}
+
+
+.cantidad-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.cantidad-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cantidad-btn:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: scale(1.1);
+}
+
+.cantidad-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cantidad-display {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text-dark);
+  min-width: 40px;
+  text-align: center;
+}
+
+/* Observaciones */
+.observaciones-input {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+}
+
+.observaciones-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.observaciones-input::placeholder {
+  color: var(--text-light);
+  font-style: italic;
+}
+
+
+.personalizador-summary {
+  position: sticky;
+  top: 100px;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  border: 2px solid var(--primary-color);
+}
+
+.summary-title {
+  color: var(--text-dark);
+  font-size: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.summary-details {
+  margin-bottom: 20px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-item span:first-child {
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.summary-item span:last-child {
+  color: var(--text-dark);
+  font-weight: bold;
+}
+
+.precio-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-top: 2px solid var(--primary-color);
+  margin-top: 15px;
+}
+
+.precio-label {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--text-dark);
+}
+
+.precio-valor {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.agregar-carrito-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+  box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+}
+
+.agregar-carrito-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+}
+
+.agregar-carrito-btn:active {
+  transform: translateY(0);
+}
+
+
+@media (max-width: 768px) {
+  .personalizador-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .personalizador-title {
+    font-size: 36px;
+  }
+  
+  .back-button {
+    position: static;
+    transform: none;
+    margin-bottom: 20px;
+  }
+  
+  .tamaño-options {
+    flex-direction: column;
+  }
+  
+  .ingredientes-grid,
+  .extras-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .personalizador-summary {
+    position: static;
+  }
+}
+
+@media (max-width: 480px) {
+  .personalizador-container {
+    padding: 10px;
+  }
+  
+  .personalizador-options,
+  .summary-card {
+    padding: 20px;
+  }
+  
+  .personalizador-title {
+    font-size: 28px;
+  }
+}
