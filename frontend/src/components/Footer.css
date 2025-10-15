@@ -18,32 +18,38 @@
 }
 
 .footer-logo .logo-text {
-  color: #FF8C00;
+  color: #f28c1e;
   font-size: 28px;
   font-weight: bold;
 }
 
 .footer-logo .logo-sub {
-  color: #FF6B00;
+  color: #e8413d;
   font-size: 28px;
   font-weight: bold;
 }
 
 .footer-column h3 {
-  color: #333;
+  color: #000000;
   margin-bottom: 15px;
   font-size: 18px;
+  top: 0px;
+  left: 10px;
+  position: relative;
 }
 
 .footer-column p {
-  color: #666;
+  color: #000000;
   font-size: 14px;
   line-height: 1.6;
   margin-bottom: 8px;
+  top: 0px;
+  left: 10px;
+  position: relative;
 }
 
 .footer-column a {
-  color: #FF6B00;
+  color: #f28c1e;
   text-decoration: none;
   font-weight: bold;
 }
@@ -60,9 +66,10 @@
 }
 
 .footer-bottom p {
-  color: #666;
+  color: #000000;
   font-size: 12px;
 }
+
 
 /* Responsive */
 @media (max-width: 768px) {
