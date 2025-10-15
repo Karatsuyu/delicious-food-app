@@ -1,0 +1,335 @@
+.header {
+  position: fixed;
+  height: 88px;
+  background-color: #fcf8ec;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 30px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  position: relative;
+}
+
+.logo-image {
+  height: 150px;
+  width: auto;
+  object-fit: contain;
+  position: relative;
+  top: -35px;
+  left: 0px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lupa-image {
+  height: 80px;
+  width: auto;
+  object-fit: contain;
+  left: 0px;
+  position: relative;
+}
+
+.menu-icon {
+  background: none;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+  color: #e8413d;
+  top: -38px;
+  left: 12px;
+  position: relative;
+  font-weight: bold;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lupa-image {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  top: -10px;
+  left: 0px;
+  position: relative;
+}
+
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.search-icon:hover {
+  transform: scale(1.1);
+}
+
+/* === BARRA DE BÚSQUEDA FLOTANTE === */
+.search-bar {
+  position: absolute;
+  top: -14px;
+  right: 120%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  background: #fff9f6;
+  border: 2px solid #ff8a65;
+  border-radius: 25px;
+  padding: 5px 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.25s ease;
+}
+
+.search-bar input {
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 5px 8px;
+  width: 160px;
+  font-size: 14px;
+  color: #333;
+}
+
+.search-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.lupa-mini {
+  width: 18px;
+  height: 18px;
+}
+
+/* === ANIMACIÓN === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.3s;
+  top: -25px;
+  left: 0px;
+  position: relative;
+}
+
+.icon-btn:hover {
+  transform: scale(1.1);
+}
+
+.carrito-image {
+  height: 45px;
+  width: auto;
+  object-fit: contain;
+  top: -10px;
+  left: 0px;
+  position: relative;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  padding: 8px 20px;
+  border: 1px solid #ffffff;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.3s;
+  display: inline-block;
+}
+
+.btn-signin {
+  background: #ffffff;
+  color: #f28c1e;
+  top: -35px;
+  left: 0px;
+  position: relative;
+  font-weight: bold;
+}
+.btn-register {
+  background: white;
+  color: #e8413d;
+  top: -35px;
+  left: 0px;  
+  position: relative;
+  font-weight: bold;
+}
+
+.btn:hover {
+  background: #f28c1e;
+  color: white;
+}
+
+.btn-user {
+  background: #e8413d;
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header {
+    padding: 15px 20px;
+  }
+
+  .menu-icon {
+    display: block;
+  }
+
+  .nav-menu {
+    display: none;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    background: white;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-menu.active {
+    display: flex;
+  }
+
+  .auth-buttons {
+    flex-direction: column;
+  }
+}
+
+/* === Menú lateral flotante === */
+.side-menu {
+  position: fixed;
+  top: 0;
+  left: -300px; /* fuera de pantalla */
+  width: 280px;
+  height: 41vh;
+  background-color: #fff;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+  transition: left 0.3s ease;
+  z-index: 2000;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.side-menu.open {
+  left: 0; /* entra en pantalla */
+}
+
+.side-menu .close-btn {
+  top: auto;
+  right: 0px;
+  position: relative;
+  font-size: 24px;
+  background: none;
+  border: none;
+  color: #000000;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.side-menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 40px 0;
+  text-decoration: none;
+  color: #000000;
+  font-weight: bold;
+}
+
+.side-menu-link {
+  font-weight: bold;
+  text-decoration: none;
+  color: #f28c1e;
+  font-size: 1.1rem;
+  gap: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.side-menu-list li {
+  font-size: 18px;
+  margin:25px 0;
+  cursor: pointer;
+
+}
+
+.side-menu details {
+  margin: 45px 0;
+  
+}
+
+.side-menu summary {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.side-menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+}
+
+.side-menu-overlay.show {
+  display: block;
+}
+
+.producto-image {
+  width: 30px;
+  height: 30px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.combos-image {
+  width: 30px;
+  height: 30px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
