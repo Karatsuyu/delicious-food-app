@@ -15,6 +15,7 @@ class Producto(models.Model):
     precio = models.DecimalField(max_digits=7, decimal_places=2)
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
     es_personalizable = models.BooleanField(default=True)
+    categoria = models.CharField(max_length=50,blank=True, null=True)
     ingredientes = models.ManyToManyField(Ingrediente, through='ProductoIngrediente', blank=True)
 
     def __str__(self):
