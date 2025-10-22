@@ -5,10 +5,10 @@ import banner1 from '../assets/banner1.png';
 import banner2 from '../assets/banner2.png';
 import banner3 from '../assets/banner3.png';
 import banner4 from '../assets/banner4.png';
-import hamburguesa from '../assets/hamburguesa.png';
-import pizza from '../assets/pizza.png';
-import pollo from '../assets/pollo.png';
-import perro from '../assets/perro.png';
+import hamburguesa from '../assets/ham1.png';
+import pizza from '../assets/piz1.png';
+import pollo from '../assets/po1.png';
+import perro from '../assets/pe1.png';
 import postre from '../assets/postre.png';
 import './Home.css';
 

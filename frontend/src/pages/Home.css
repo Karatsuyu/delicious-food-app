@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Great+Vibes&family=Dancing+Script&family=Satisfy&family=Allura&family=Sacramento&family=Alex+Brush&family=Cookie&family=Parisienne&family=Marck+Script&display=swap');
+
 .home {
   margin: 0;
   padding: 0;
@@ -22,6 +24,7 @@ body {
   width: 100%;
   height: 400px;
   overflow: hidden;
+  
 }
 
 .banner-slide {
@@ -68,6 +71,7 @@ body {
   bottom: 15px;
   left: 50%;
   transform: translateX(-50%);
+  
 }
 
 .dot {
@@ -75,7 +79,7 @@ body {
   height: 12px;
   margin: 0 4px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgb(253, 253, 253);
   cursor: pointer;
   display: inline-block;
 }
@@ -117,6 +121,8 @@ body {
   font-size: 50px;
   display: block;
   margin-bottom: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .category-item p {
@@ -154,59 +160,49 @@ body {
 
 
 .section-title-custom {
+  background-color: #fff;
   display: inline-block;
-  font-family: 'Pacifico', cursive;
-  font-weight: bold;
-  padding: 10px 25px;
-  border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-  border: none;
-  cursor: pointer;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
-  transition: all 0.3s ease;
-  color: #F28c1e;
-
-}
-
-.customize-description {
-  font-size: 14px;
-  margin-bottom: 25px;
-  font-family: 'Pacifico', cursive;
-  padding: 10px 25px;
+  padding: 8px 25px;
+  border-radius: 12px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  font-family: "Pacifico", cursive;
+  font-size: 30px;
+  color: #f78c1f;
+  margin-bottom: 50px;
+  margin-left: 15px;
+  position: relative;
+  top: 5px;
 }
 
 .categories-container1 {
   display: flex;
-  justify-content: center;
   align-items: flex-start;
-  gap: 2rem; /* separa las categorías */
   flex-wrap: nowrap;
   text-align: center;
+  font-family: 'Pacifico', cursive;
 }
 
 /* ====== HAMBURGUESAS ====== */
 .category-item1 {
   text-decoration: none;
   text-align: center;
-  cursor: pointer;
   transition: transform 0.3s;
   color: #e8413d;
   position: relative;
   left: 0px;
-  top: -2px; /* ajusta la posición del bloque */
+  top: -80px; /* ajusta la posición del bloque */
 }
 
 .hamburguesa-img {
-  width: 350px;
+  width: 500px;
   height: auto;
   display: block;
-  margin: 0 auto;
   border-radius: 15px;
   transition: transform 0.25s ease;
 }
 
 .category-item1 p {
-  margin-top: 8px; /* distancia entre imagen y texto */
+  margin-top: -70px; /* distancia entre imagen y texto */
   font-weight: bold;
   color: #e8413d;
 }
@@ -223,18 +219,12 @@ body {
 }
 
 .pizza-img {
-  width: 350px;
+  width: 500px; /* puedes ajustar libremente este valor */
   height: auto;
   display: block;
   margin: 0 auto;
   border-radius: 15px;
   transition: transform 0.25s ease;
-}
-
-.category-item2 p {
-  margin-top: 8px;
-  font-weight: bold;
-  color: #e8413d;
 }
 
 /* ====== POLLO ====== */
@@ -249,7 +239,7 @@ body {
 }
 
 .pollo-img {
-  width: 350px;
+  width: 500px;
   height: auto;
   display: block;
   margin: 0 auto;
@@ -275,7 +265,7 @@ body {
 }
 
 .perro-img {
-  width: 350px;
+  width: 500px;
   height: auto;
   display: block;
   margin: 0 auto;
@@ -301,7 +291,7 @@ body {
 }
 
 .postre-img {
-  width: 350px;
+  width: 500px;
   height: auto;
   display: block;
   margin: 0 auto;
@@ -315,14 +305,43 @@ body {
   color: #e8413d;
 }
 
-/* ====== RESPONSIVE ====== */
-@media (max-width: 768px) {
-  .hamburguesa-img,
-  .pizza-img,
-  .pollo-img,
-  .perro-img,
-  .postre-img {
-    width: 60%;
-    max-width: 240px;
-  }
+/* 🔹 Ajuste para que las imágenes estén más juntas sin usar gap */
+.category-item1,
+.category-item2,
+.category-item3,
+.category-item4,
+.category-item5 {
+  margin-right: -140px; 
+}
+
+.category-item5 {
+  margin-right: 0;
+}
+
+/* 🔹 Hover sin fondo blanco */
+.category-item1:hover,
+.category-item2:hover,
+.category-item3:hover,
+.category-item4:hover,
+.category-item5:hover {
+  transform: translateY(-5px);
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.category-item1:hover p,
+.category-item2:hover p,
+.category-item3:hover p,
+.category-item4:hover p,
+.category-item5:hover p {
+  color: #F28c1e; 
+}
+
+
+body, html {
+  background-color: #ffffff !important;
+}
+
+footer, .footer {
+  background-color: #ffffff !important;
 }

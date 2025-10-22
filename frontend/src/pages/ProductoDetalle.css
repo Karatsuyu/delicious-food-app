@@ -1,0 +1,257 @@
+/* ProductoDetalle Styles */
+.producto-detalle-container {
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 20px;
+}
+
+.producto-detalle-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding: 20px 0;
+}
+
+.btn-volver {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.btn-volver:hover {
+  background: #5a6268;
+}
+
+.producto-titulo {
+  color: #333;
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.producto-detalle-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.producto-imagen {
+  width: 100%;
+  height: 400px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.producto-imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.producto-info {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.producto-nombre {
+  color: #333;
+  margin: 0 0 15px 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.producto-descripcion {
+  color: #666;
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0 0 15px 0;
+}
+
+.producto-categoria {
+  color: #888;
+  font-size: 14px;
+  margin: 0 0 20px 0;
+  text-transform: capitalize;
+}
+
+.producto-precio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.precio-label {
+  font-size: 16px;
+  color: #666;
+}
+
+.precio-valor {
+  font-size: 24px;
+  font-weight: bold;
+  color: #FF6B00;
+}
+
+.producto-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn-agregar-carrito,
+.btn-personalizar {
+  flex: 1;
+  padding: 15px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-agregar-carrito {
+  background: #FF6B00;
+  color: white;
+}
+
+.btn-agregar-carrito:hover {
+  background: #FF8C00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
+}
+
+.btn-personalizar {
+  background: transparent;
+  color: #FF6B00;
+  border: 2px solid #FF6B00;
+}
+
+.btn-personalizar:hover {
+  background: #FF6B00;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Loading States */
+.producto-detalle-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #FF6B00;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error States */
+.producto-detalle-error {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: 40px auto;
+}
+
+.producto-detalle-error h2 {
+  color: #dc3545;
+  margin: 0 0 15px 0;
+  font-size: 24px;
+}
+
+.producto-detalle-error p {
+  color: #666;
+  margin: 0 0 30px 0;
+  font-size: 16px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .producto-detalle-container {
+    padding: 15px;
+  }
+  
+  .producto-detalle-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .producto-imagen {
+    height: 250px;
+  }
+  
+  .producto-info {
+    padding: 20px;
+  }
+  
+  .producto-titulo {
+    font-size: 24px;
+  }
+  
+  .producto-nombre {
+    font-size: 20px;
+  }
+  
+  .producto-actions {
+    flex-direction: column;
+  }
+  
+  .btn-agregar-carrito,
+  .btn-personalizar {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .producto-detalle-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .producto-titulo {
+    font-size: 20px;
+  }
+  
+  .producto-precio {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .precio-valor {
+    font-size: 20px;
+  }
+}
+

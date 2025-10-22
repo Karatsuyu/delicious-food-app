@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 import './ProductCard.css';
 
 function ProductCard({ producto }) {
   const navigate = useNavigate();
+  const { addToCart } = useCart();
 
   const handleClick = () => {
     navigate(`/producto/${producto.id}`);
@@ -11,6 +13,12 @@ function ProductCard({ producto }) {
   const handlePersonalizar = (e) => {
     e.stopPropagation();
     navigate(`/personalizar/${producto.id}`);
+  };
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    const message = addToCart(producto);
+    alert(message);
   };
 
   return (
@@ -25,15 +33,15 @@ function ProductCard({ producto }) {
       
       <div className="product-info">
         <h3 className="product-title">{producto.nombre}</h3>
-        {producto.descripcion && (
-          <p className="product-description">{producto.descripcion}</p>
-        )}
         <p className="product-price">
           ${producto.precio.toLocaleString('es-CO')}
         </p>
         
         <div className="product-actions">
-          <button className="btn-add-cart">
+          <button 
+            className="btn-add-cart"
+            onClick={handleAddToCart}
+          >
             Agregar al carrito
           </button>
           {producto.es_personalizable && (
