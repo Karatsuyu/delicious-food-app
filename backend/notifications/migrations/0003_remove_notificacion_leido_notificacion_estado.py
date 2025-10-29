@@ -7,8 +7,8 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('notifications', '0002_initial'),
-        ('orders', '0003_estado_rename_telefono_pedido_telefono_contacto_and_more'),
+        ('notifications', '0001_initial'),
+        ('orders', '0001_initial'),
     ]
 
     operations = [

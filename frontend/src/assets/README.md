@@ -115,3 +115,4 @@ import pizzaImage from '../assets/pizza.png';
 - Considerar usar un CDN para producción
 - Mantener consistencia en dimensiones por categoría
 
+

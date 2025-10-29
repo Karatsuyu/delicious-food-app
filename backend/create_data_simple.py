@@ -146,3 +146,4 @@ print(f"Usuario admin: admin/admin123")
 print(f"Productos nuevos creados: {productos_creados}")
 print(f"Combos nuevos creados: {combos_creados}")
 
+
