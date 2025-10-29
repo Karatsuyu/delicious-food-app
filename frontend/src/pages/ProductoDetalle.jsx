@@ -27,11 +27,11 @@ function ProductoDetalle() {
           
           // Si el backend no está disponible, usar datos locales
           const productosLocales = {
-            'ham-1': { id: 'ham-1', nombre: 'Hamburguesa Clásica', precio: 15900, descripcion: 'Hamburguesa tradicional', categoria: 'hamburguesas', es_personalizable: true },
-            'ham-2': { id: 'ham-2', nombre: 'Hamburguesa con Queso', precio: 18900, descripcion: 'Deliciosa hamburguesa con queso derretido', categoria: 'hamburguesas', es_personalizable: true },
-            'pizza-1': { id: 'pizza-1', nombre: 'Pizza Hawaiana', precio: 32000, descripcion: 'Pizza con jamón y piña', categoria: 'pizzas', es_personalizable: true },
-            'pollo-1': { id: 'pollo-1', nombre: 'Alitas Simples', precio: 12000, descripcion: 'Alitas de pollo tradicionales', categoria: 'pollo', es_personalizable: true },
-            'perro-1': { id: 'perro-1', nombre: 'Perro Clásico', precio: 9000, descripcion: 'Perro caliente tradicional', categoria: 'perros', es_personalizable: true },
+            'hamburguesa1': { id: 'hamburguesa1', nombre: 'Hamburguesa Clásica', precio: 15900, descripcion: 'Hamburguesa tradicional', categoria: 'hamburguesas', es_personalizable: true },
+            'hamburguesa2': { id: 'hamburguesa2', nombre: 'Hamburguesa con Queso', precio: 18900, descripcion: 'Deliciosa hamburguesa con queso derretido', categoria: 'hamburguesas', es_personalizable: true },
+            'pizza1': { id: 'pizza1', nombre: 'Pizza Hawaiana', precio: 32000, descripcion: 'Pizza con jamón y piña', categoria: 'pizzas', es_personalizable: true },
+            'pollo1': { id: 'pollo1', nombre: 'Alitas Simples', precio: 12000, descripcion: 'Alitas de pollo tradicionales', categoria: 'pollo', es_personalizable: true },
+            'perro1': { id: 'perro1', nombre: 'Perro Clásico', precio: 9000, descripcion: 'Perro caliente tradicional', categoria: 'perros', es_personalizable: true },
           };
           
           const productoLocal = productosLocales[id];

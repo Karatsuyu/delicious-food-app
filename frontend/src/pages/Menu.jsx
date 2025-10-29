@@ -6,37 +6,61 @@ import { useCart } from '../context/CartContext';
 import './Menu.css';
 
 // Importar imágenes de hamburguesas
-import hamburguesa1 from '../assets/ham1.png';
-import hamburguesa2 from '../assets/ham2.png';
-import hamburguesa3 from '../assets/ham3.png';
-import hamburguesa4 from '../assets/ham4.png';
-import hamburguesa5 from '../assets/ham5.png';
-import hamburguesa6 from '../assets/ham6.png';
-import hamburguesa7 from '../assets/ham7.png';
-import hamburguesa8 from '../assets/ham8.png';
+import hamburguesa1 from '../assets/hamburguesa1.png';
+import hamburguesa2 from '../assets/hamburguesa2.png';
+import hamburguesa3 from '../assets/hamburguesa3.png';
+import hamburguesa4 from '../assets/hamburguesa4.png';
+import hamburguesa5 from '../assets/hamburguesa5.png';
+import hamburguesa6 from '../assets/hamburguesa6.png';
+import hamburguesa7 from '../assets/hamburguesa7.png';
+import hamburguesa8 from '../assets/hamburguesa8.png';
 
 // Importar imágenes de pizzas
-import pizza1 from '../assets/piz1.png';
-import pizza2 from '../assets/piz2.png';
-import pizza3 from '../assets/piz3.png';
-import pizza4 from '../assets/piz4.png';
-import pizza5 from '../assets/piz5.png';
-import pizza6 from '../assets/piz6.png';
-import pizza7 from '../assets/piz7.png';
+import pizza1 from '../assets/pizza1.png';
+import pizza2 from '../assets/pizza2.png';
+import pizza3 from '../assets/pizza3.png';
+import pizza4 from '../assets/pizza4.png';
+import pizza5 from '../assets/pizza5.png';
+import pizza6 from '../assets/pizza6.png';
+import pizza7 from '../assets/pizza7.png';
 
 // Importar imágenes de pollo
-import pollo1 from '../assets/po1.png';
-import pollo2 from '../assets/po2.png';
-import pollo3 from '../assets/po3.png';
-import pollo4 from '../assets/po4.png';
-import pollo5 from '../assets/po5.png';
-import pollo6 from '../assets/po6.png';
+import pollo1 from '../assets/pollo1.png';
+import pollo2 from '../assets/pollo2.png';
+import pollo3 from '../assets/pollo3.png';
+import pollo4 from '../assets/pollo4.png';
+import pollo5 from '../assets/pollo5.png';
+import pollo6 from '../assets/pollo6.png';
 
 // Importar imágenes de perros
-import perro1 from '../assets/pe1.png';
-import perro2 from '../assets/pe2.png';
-import perro3 from '../assets/pe1.png';
-import perro4 from '../assets/pe2.png';
+import perro1 from '../assets/perro1.png';
+import perro2 from '../assets/perro2.png';
+import perro3 from '../assets/perro3.png';
+import perro4 from '../assets/perro4.png';
+import perro5 from '../assets/perro5.png';
+
+import postres1 from '../assets/postres1.png'
+import postres2 from '../assets/postres2.png'
+import postres3 from '../assets/postres3.png'
+import postres4 from '../assets/postres4.png'
+import postres5 from '../assets/postres5.png'
+import postres6 from '../assets/postres6.png'
+import postres7 from '../assets/postres7.png'
+import postres8 from '../assets/postres8.png'
+
+import papas1 from '../assets/papas1.png'
+import papas2 from '../assets/papas2.png'
+import papas3 from '../assets/papas3.png'
+
+import bebida1 from '../assets/bebida1.png'
+import bebida2 from '../assets/bebida2.png'
+import bebida3 from '../assets/bebida3.png'
+import bebida4 from '../assets/bebida4.png'
+import bebida5 from '../assets/bebida5.png'
+import bebida6 from '../assets/bebida6.png'
+import bebida7 from '../assets/bebida7.png'
+import bebida8 from '../assets/bebida8.png'
+import bebida9 from '../assets/bebida9.png'
 
 function Menu() {
   const [searchParams] = useSearchParams();
@@ -61,43 +85,74 @@ function Menu() {
 
   // Datos de las hamburguesas con imágenes
   const hamburguesasData = [
-    { id: 'ham-1', nombre: 'Hamburguesa Clásica', precio: 15900, imagen: hamburguesa1, descripcion: 'Hamburguesa tradicional' },
-    { id: 'ham-2', nombre: 'Hamburguesa con Queso', precio: 18900, imagen: hamburguesa2, descripcion: 'Deliciosa hamburguesa con queso derretido' },
-    { id: 'ham-3', nombre: 'Hamburguesa Deluxe', precio: 22900, imagen: hamburguesa3, descripcion: 'Hamburguesa premium' },
-    { id: 'ham-4', nombre: 'BBQ Crispy', precio: 19900, imagen: hamburguesa4, descripcion: 'Hamburguesa con barbecue y crujiente' },
-    { id: 'ham-5', nombre: 'Clásico Bacon', precio: 21900, imagen: hamburguesa5, descripcion: 'Hamburguesa con tocino crujiente' },
-    { id: 'ham-6', nombre: 'Madurita Burger', precio: 17900, imagen: hamburguesa6, descripcion: 'Hamburguesa con ingredientes frescos' },
-    { id: 'ham-7', nombre: 'BBQ Crunch Burger', precio: 24900, imagen: hamburguesa7, descripcion: 'Hamburguesa BBQ con ingredientes crujientes' },
-    { id: 'ham-8', nombre: 'Double Smash', precio: 28900, imagen: hamburguesa8, descripcion: 'Doble hamburguesa jugosa' },
+    { id: 'hamburguesa1', nombre: 'Hamburguesa Clásica', precio: 15900, imagen: hamburguesa1, descripcion: 'Hamburguesa tradicional' },
+    { id: 'hamburguesa2', nombre: 'Hamburguesa con Queso', precio: 18900, imagen: hamburguesa2, descripcion: 'Deliciosa hamburguesa con queso derretido' },
+    { id: 'hamburguesa3', nombre: 'Hamburguesa Deluxe', precio: 22900, imagen: hamburguesa3, descripcion: 'Hamburguesa premium' },
+    { id: 'hamburguesa4', nombre: 'BBQ Crispy', precio: 19900, imagen: hamburguesa4, descripcion: 'Hamburguesa con barbecue y crujiente' },
+    { id: 'hamburguesa5', nombre: 'Clásico Bacon', precio: 21900, imagen: hamburguesa5, descripcion: 'Hamburguesa con tocino crujiente' },
+    { id: 'hamburguesa6', nombre: 'Madurita Burger', precio: 17900, imagen: hamburguesa6, descripcion: 'Hamburguesa con ingredientes frescos' },
+    { id: 'hamburguesa7', nombre: 'BBQ Crunch Burger', precio: 24900, imagen: hamburguesa7, descripcion: 'Hamburguesa BBQ con ingredientes crujientes' },
+    { id: 'hamburguesa8', nombre: 'Double Smash', precio: 28900, imagen: hamburguesa8, descripcion: 'Doble hamburguesa jugosa' },
   ];
 
   // Datos de las pizzas con imágenes
   const pizzasData = [
-    { id: 'pizza-1', nombre: 'Pizza Hawaiana', precio: 32000, imagen: pizza1, descripcion: 'Pizza con jamón y piña' },
-    { id: 'pizza-2', nombre: 'Pizza de Queso', precio: 34900, imagen: pizza2, descripcion: 'Pizza con queso derretido' },
-    { id: 'pizza-3', nombre: 'Pizza de Pepperoni', precio: 36900, imagen: pizza3, descripcion: 'Pizza con pepperoni' },
-    { id: 'pizza-4', nombre: 'Pizza Aromática de Pepperoni', precio: 38000, imagen: pizza4, descripcion: 'Pizza de pepperoni con hierbas aromáticas' },
-    { id: 'pizza-5', nombre: 'Pizza de Pollo y Champiñones', precio: 38000, imagen: pizza5, descripcion: 'Pizza con pollo y champiñones' },
-    { id: 'pizza-6', nombre: 'Pepperoni Lovers', precio: 40900, imagen: pizza6, descripcion: 'Pizza cargada de pepperoni' },
-    { id: 'pizza-7', nombre: 'Pizza Campesina', precio: 41500, imagen: pizza7, descripcion: 'Pizza con ingredientes del campo' },
+    { id: 'pizza1', nombre: 'Pizza Hawaiana', precio: 32000, imagen: pizza1, descripcion: 'Pizza con jamón y piña' },
+    { id: 'pizza2', nombre: 'Pizza de Queso', precio: 34900, imagen: pizza2, descripcion: 'Pizza con queso derretido' },
+    { id: 'pizza3', nombre: 'Pizza de Pepperoni', precio: 36900, imagen: pizza3, descripcion: 'Pizza con pepperoni' },
+    { id: 'pizza4', nombre: 'Pizza Aromática de Pepperoni', precio: 38000, imagen: pizza4, descripcion: 'Pizza de pepperoni con hierbas aromáticas' },
+    { id: 'pizza5', nombre: 'Pizza de Pollo y Champiñones', precio: 38000, imagen: pizza5, descripcion: 'Pizza con pollo y champiñones' },
+    { id: 'pizza6', nombre: 'Pepperoni Lovers', precio: 40900, imagen: pizza6, descripcion: 'Pizza cargada de pepperoni' },
+    { id: 'pizza7', nombre: 'Pizza Campesina', precio: 41500, imagen: pizza7, descripcion: 'Pizza con ingredientes del campo' },
   ];
 
   // Datos de pollo con imágenes
   const polloData = [
-    { id: 'pollo-1', nombre: 'Alitas Simples', precio: 12000, imagen: pollo1, descripcion: 'Alitas de pollo tradicionales' },
-    { id: 'pollo-2', nombre: 'Alitas Crocantes', precio: 12900, imagen: pollo2, descripcion: 'Alitas extra crujientes' },
-    { id: 'pollo-3', nombre: 'Alitas BBQ', precio: 16000, imagen: pollo3, descripcion: 'Alitas con salsa BBQ' },
-    { id: 'pollo-4', nombre: 'Alitas Teriyaki', precio: 16500, imagen: pollo4, descripcion: 'Alitas con salsa teriyaki' },
-    { id: 'pollo-5', nombre: 'Alitas Ajo Parmesano', precio: 18000, imagen: pollo5, descripcion: 'Alitas con ajo y parmesano' },
-    { id: 'pollo-6', nombre: 'Alitas Barbacoa', precio: 18000, imagen: pollo6, descripcion: 'Alitas con salsa barbacoa' },
+    { id: 'pollo1', nombre: 'Alitas Simples', precio: 12000, imagen: pollo1, descripcion: 'Alitas de pollo tradicionales' },
+    { id: 'pollo2', nombre: 'Alitas Crocantes', precio: 12900, imagen: pollo2, descripcion: 'Alitas extra crujientes' },
+    { id: 'pollo3', nombre: 'Alitas BBQ', precio: 16000, imagen: pollo3, descripcion: 'Alitas con salsa BBQ' },
+    { id: 'pollo4', nombre: 'Alitas Teriyaki', precio: 16500, imagen: pollo4, descripcion: 'Alitas con salsa teriyaki' },
+    { id: 'pollo5', nombre: 'Alitas Ajo Parmesano', precio: 18000, imagen: pollo5, descripcion: 'Alitas con ajo y parmesano' },
+    { id: 'pollo6', nombre: 'Alitas Barbacoa', precio: 18000, imagen: pollo6, descripcion: 'Alitas con salsa barbacoa' },
   ];
 
   // Datos de perros calientes con imágenes
   const perrosData = [
-    { id: 'perro-1', nombre: 'Perro Clásico', precio: 9000, imagen: perro1, descripcion: 'Perro caliente tradicional' },
-    { id: 'perro-2', nombre: 'Perro Supremo', precio: 12000, imagen: perro2, descripcion: 'Perro caliente con ingredientes premium' },
-    { id: 'perro-3', nombre: 'Perro Crocante', precio: 16000, imagen: perro3, descripcion: 'Perro caliente crujiente' },
-    { id: 'perro-4', nombre: 'Alitas Teriyaki', precio: 16500, imagen: perro4, descripcion: 'Alitas con salsa teriyaki' },
+    { id: 'perro1', nombre: 'Perro Clásico', precio: 7000, imagen: perro1, descripcion: 'Perro Caliente Tradicional' },
+    { id: 'perro2', nombre: 'Perro Crocante', precio: 12000, imagen: perro2, descripcion: 'Perro Caliente Crujiente' },
+    { id: 'perro3', nombre: 'Perro Supremo', precio: 14000, imagen: perro3, descripcion: 'Perro Caliente Supremo' },
+    { id: 'perro4', nombre: 'Perro Crunch Teriyaki', precio: 16000, imagen: perro4, descripcion: 'Perro Crunch' },
+    { id: 'perro5', nombre: 'Perro Fresh', precio: 18000, imagen: perro5, descripcion: 'Perro Caliente Fresh' }
+  ];
+
+  // Datos de postres con imágenes
+  const postreData =[
+    { id: 'postres1', nombre: 'Cono de Vainilla', precio: 4500, imagen: postres1, descripcion: 'Cono de Vainilla'},
+    { id: 'postres2', nombre: 'Cono de Vainilla y Chocolate', precio: 4500, imagen: postres2, descripcion: 'Cono de Vainilla y Chocolate'},
+    { id: 'postres3', nombre: 'Cono de Fresa', precio: 4500, imagen:postres3, descripcion: 'Cono de Fresa'},
+    { id: 'postres4', nombre: 'Cono de Chocolate', precio: 4500, imagen: postres4, descripcion: 'Cono de Chocolate'},
+    { id: 'postres5', nombre: 'Sundae de Arequipe', precio: 6000, imagen: postres5, descripcion: 'Sundae de Arequipe'},
+    { id: 'postres6', nombre: 'Sundae de Fresa', precio: 6000, imagen: postres6, descripcion: 'Sundae de Fresa'},
+    { id: 'postres7', nombre:'Sundae de Chocolate', precio: 6000, imagen: postres7, descripcion: 'Sundae de Chocolate'},
+    { id: 'postres8', nombre: 'Sundae de Caramelo', precio: 6000, imagen: postres8, descripcion: 'Sundae de Caramelo'}
+  ];
+
+  const papasData =[
+    { id: 'papas1', nombre: 'Papas Fritas', precio: 3500, imagen: papas1, descripcion: 'Papas Fritas'},
+    { id: 'papas2', nombre: 'Aros de Cebolla', precio: 3500, imagen: papas2, descripcion: 'Aros de Cebolla'},
+    { id: 'papas3', nombre: 'Nuggets de Pollo', precio: 3500, imagen: papas3, descripcion: 'Nuggets de Pollo'}
+  ];
+
+  const bebidasData =[
+    { id: 'bebida1', nombre: 'Coca-Cola Personal', precio: 4000, imagen: bebida1, descripcion: 'Bebida Gaseosa CocaCola Personal'},
+    { id: 'bebida2', nombre: 'Coca-Cola En Lata', precio: 4500, imagen: bebida2, descripcion: 'Bebida Gaseosa CocaCola En Lata'},
+    { id: 'bebida3', nombre: 'Coca-Cola 3L', precio: 7500, imagen: bebida3, descripcion: 'Bebida Gaseosa CocaCola 3L'},
+    { id: 'bebida4', nombre: 'Sprite Personal', precio: 4000, imagen: bebida4, descripcion: 'Bebida Gaseosa Sprite Personal'},
+    { id: 'bebida5', nombre: 'Sprite En Lata', precio: 4500, imagen: bebida5, descripcion: 'Bebida Gaseosa Sprite En Lata'},
+    { id: 'bebida6', nombre: 'Sprite 3L', precio: 7500, imagen: bebida6, descripcion: 'Bebida Gaseosa Sprite 3L'},
+    { id: 'bebida7', nombre:'Pepsi Personal', precio: 4000, imagen: bebida7, descripcion: 'Bebida Gaseosa Pepsi Personal'},
+    { id: 'bebida8', nombre: 'Pepsi En Lata', precio: 4500, imagen: bebida8, descripcion: 'Bebida Gaseosa Pepsi En Lata'},
+    { id: 'bebida9', nombre: 'Pepsi 3L', precio: 7500, imagen: bebida9, descripcion: 'Bebida Gaseosa Pepsi 3L'}
   ];
 
   useEffect(() => {
@@ -174,6 +229,21 @@ function Menu() {
     
     if (categoriaActual === 'perros') {
       console.log('Categoría perros - usando array especial');
+      return [];
+    }
+
+    if (categoriaActual === 'postres') {
+      console.log('Categoría postres - usando array especial');
+      return [];
+    }
+
+    if (categoriaActual === 'papas') {
+      console.log('Categoría papas - usando array especial');
+      return [];
+    }
+
+    if (categoriaActual === 'bebidas') {
+      console.log('Categoría bebidas - usando array especial');
       return [];
     }
     
@@ -289,6 +359,45 @@ function Menu() {
       nombre: perro.nombre,
       precio: perro.precio,
       imagen: perro.imagen,
+      es_personalizable: true
+    };
+    const message = addToCart(productoData);
+    alert(message);
+  };
+
+  const handPostresAddToCart = (e, postres) => {
+    e.stopPropagation();
+    const productoData = {
+      id: postres.id,
+      nombre: postres.nombre,
+      precio: postres.precio,
+      imagen: postres.imagen,
+      es_personalizable: true
+    };
+    const message = addToCart(productoData);
+    alert(message);
+  };
+
+   const handlePapasAddToCart = (e, postres) => {
+    e.stopPropagation();
+    const productoData = {
+      id: postres.id,
+      nombre: postres.nombre,
+      precio: postres.precio,
+      imagen: postres.imagen,
+      es_personalizable: true
+    };
+    const message = addToCart(productoData);
+    alert(message);
+  };
+
+  const handleBebidasAddToCart = (e, bebidas) => {
+    e.stopPropagation();
+    const productoData = {
+      id: bebidas.id,
+      nombre: bebidas.nombre,
+      precio: bebidas.precio,
+      imagen: bebidas.imagen,
       es_personalizable: true
     };
     const message = addToCart(productoData);
@@ -437,7 +546,6 @@ function Menu() {
             ))}
           </div>
         ) : categoriaActual === 'perros' ? (
-          // Mostrar perros especiales con imágenes
           <div className="hamburguesas-grid">
             {perrosData.map(perro => (
               <div 
@@ -450,7 +558,9 @@ function Menu() {
                 </div>
                 <div className="hamburguesa-info">
                   <h3 className="hamburguesa-title">{perro.nombre}</h3>
-                  <p className="hamburguesa-price">${perro.precio.toLocaleString('es-CO')}</p>
+                  <p className="hamburguesa-price">
+                    ${perro.precio.toLocaleString('es-CO')}
+                  </p>
                 </div>
                 <div className="hamburguesa-actions">
                   <button 
@@ -464,6 +574,117 @@ function Menu() {
                     onClick={(e) => {
                       e.stopPropagation();
                       handlePerroClick(perro);
+                    }}
+                  >
+                    Personalizar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : categoriaActual === 'postres' ? (
+          <div className="hamburguesas-grid">
+            {postreData.map(postre => (
+              <div 
+                key={postre.id} 
+                className="hamburguesa-card"
+                onClick={() => handlePostresClick(postre)}
+              >
+                <div className="hamburguesa-image">
+                  <img src={postre.imagen} alt={postre.nombre} />
+                </div>
+                <div className="hamburguesa-info">
+                  <h3 className="hamburguesa-title">{postre.nombre}</h3>
+                  <p className="hamburguesa-price">
+                    ${postre.precio.toLocaleString('es-CO')}
+                  </p>
+                </div>
+                <div className="hamburguesa-actions">
+                  <button 
+                    className="btn-hamburguesa-cart"
+                    onClick={(e) => handPostresAddToCart(e, postre)}
+                  >
+                    Agregar al carrito
+                  </button>
+                  <button 
+                    className="btn-hamburguesa-customize"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePostresClick(postre);
+                    }}
+                  >
+                    Personalizar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : categoriaActual === 'papas' ? (
+          <div className="hamburguesas-grid">
+            {papasData.map(papas => (
+              <div 
+                key={papas.id} 
+                className="hamburguesa-card"
+                onClick={() => handlePapasClick(papas)}
+              >
+                <div className="hamburguesa-image">
+                  <img src={papas.imagen} alt={papas.nombre} />
+                </div>
+                <div className="hamburguesa-info">
+                  <h3 className="hamburguesa-title">{papas.nombre}</h3>
+                  <p className="hamburguesa-price">
+                    ${papas.precio.toLocaleString('es-CO')}
+                  </p>
+                </div>
+                <div className="hamburguesa-actions">
+                  <button 
+                    className="btn-hamburguesa-cart"
+                    onClick={(e) => handPapasAddToCart(e, papas)}
+                  >
+                    Agregar al carrito
+                  </button>
+                  <button 
+                    className="btn-hamburguesa-customize"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handPapasAddToCart(postre);
+                    }}
+                  >
+                    Personalizar
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : categoriaActual === 'bebidas' ? (
+          <div className="hamburguesas-grid">
+            {bebidasData.map(bebidas => (
+              <div 
+                key={bebidas.id} 
+                className="hamburguesa-card"
+                onClick={() => handlePostresClick(bebidas)}
+              >
+                <div className="hamburguesa-image">
+                  <img src={bebidas.imagen} alt={bebidas.nombre} />
+                </div>
+                <div className="hamburguesa-info">
+                  <h3 className="hamburguesa-title">{bebidas.nombre}</h3>
+                  <p className="hamburguesa-price">
+                    ${bebidas.precio.toLocaleString('es-CO')}
+                  </p>
+                </div>
+                <div className="hamburguesa-actions">
+                  <button 
+                    className="btn-hamburguesa-cart"
+                    onClick={(e) => handleBebidasAddToCart(e, papas)}
+                  >
+                    Agregar al carrito
+                  </button>
+                  <button 
+                    className="btn-hamburguesa-customize"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePostresClick(postre);
                     }}
                   >
                     Personalizar

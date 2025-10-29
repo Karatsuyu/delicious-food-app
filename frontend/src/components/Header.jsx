@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import './Header.css';
+import CartModal from '../components/CartModal';
 import logo from '../assets/logo.png';
 import lupa from '../assets/lupa.png';
 import carrito from '../assets/carrito.png';
@@ -12,6 +13,7 @@ function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const [isCartOpen, setIsCartOpen] = useState(false); 
 
   const isLoggedIn = false;
 
@@ -74,13 +76,9 @@ function Header() {
           </div>
 
           {/* 🛒 BOTÓN CARRITO */}
-          <button
-            className="icon-btn cart-icon"
-            onClick={() => navigate('/carrito')}
-            title="Carrito"
-          >
-            <img src={carrito} alt="Carrito de Compras" className="carrito-image" />
-          </button>
+          <button className="icon-btn cart-icon" title="Carrito" onClick={() => setIsCartOpen(true)}>
+              <img src={carrito} alt="Carrito de Compras" className="carrito-image" />
+            </button>
 
           {/* 👤 LOGIN / REGISTER */}
           {isLoggedIn ? (
@@ -128,6 +126,10 @@ function Header() {
           <p>Lee nuestras condiciones de uso.</p>
         </details>
       </aside>
+      <CartModal
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+      />
     </header>
   );
 }

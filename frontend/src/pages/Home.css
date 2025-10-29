@@ -71,7 +71,7 @@ body {
   bottom: 15px;
   left: 50%;
   transform: translateX(-50%);
-  
+
 }
 
 .dot {
@@ -160,18 +160,14 @@ body {
 
 
 .section-title-custom {
-  background-color: #fff;
   display: inline-block;
-  padding: 8px 25px;
-  border-radius: 12px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-  font-family: "Pacifico", cursive;
-  font-size: 30px;
-  color: #f78c1f;
-  margin-bottom: 50px;
-  margin-left: 15px;
-  position: relative;
-  top: 5px;
+  font-family: 'Pacifico', cursive;
+  padding: 10px 25px;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  border: none;
+  cursor: pointer;
+  color: #F28c1e;
 }
 
 
@@ -191,7 +187,7 @@ body {
   color: #e8413d;
   position: relative;
   left: 0px;
-  top: -80px; /* ajusta la posición del bloque */
+  top: -40px; /* ajusta la posición del bloque */
 }
 
 .hamburguesa-img {
@@ -215,8 +211,9 @@ body {
   cursor: pointer;
   color: #e8413d;
   position: relative;
-  left: -0px;
-  top: -2px; /* sube el texto */
+  left: 0px;
+  top: -40px; /* sube el texto */
+  font-weight: bold;
 }
 
 .pizza-img {
@@ -228,6 +225,13 @@ body {
   transition: transform 0.25s ease;
 }
 
+.category-item2 p {
+  margin-top: -70px; /* distancia entre imagen y texto */
+  font-weight: bold;
+  color: #e8413d;
+  font-size: 18px;
+}
+
 /* ====== POLLO ====== */
 .category-item3 {
   text-decoration: none;
@@ -235,8 +239,9 @@ body {
   cursor: pointer;
   color: #e8413d;
   position: relative;
-  top: -2px;
+  top: -40px;
   left: 0px; 
+  font-weight: bold;
 }
 
 .pollo-img {
@@ -249,9 +254,10 @@ body {
 }
 
 .category-item3 p {
-  margin-top: 8px;
+  margin-top: -70px;
   font-weight: bold;
   color: #e8413d;
+  font-size: 18px;
 }
 
 /* ====== PERRO ====== */
@@ -261,7 +267,7 @@ body {
   cursor: pointer;
   color: #e8413d;
   position: relative;
-  top: -2px;
+  top: -40px;
   left: 0px;
 }
 
@@ -275,9 +281,10 @@ body {
 }
 
 .category-item4 p {
-  margin-top: 8px;
+  margin-top: -70px;
   font-weight: bold;
   color: #e8413d;
+  font-size: 18px;
 }
 
 /* ====== POSTRES ====== */
@@ -287,7 +294,7 @@ body {
   cursor: pointer;
   color: #e8413d;
   position: relative;
-  top: -2px;
+  top: -40px;
   left: 0px;
 }
 
@@ -301,9 +308,10 @@ body {
 }
 
 .category-item5 p {
-  margin-top: 8px;
+  margin-top: -70px;
   font-weight: bold;
   color: #e8413d;
+  font-size: 18px;
 }
 
 /* 🔹 Ajuste para que las imágenes estén más juntas sin usar gap */
@@ -329,6 +337,7 @@ body {
   background: transparent !important;
   box-shadow: none !important;
 }
+
 
 .category-item1:hover p,
 .category-item2:hover p,

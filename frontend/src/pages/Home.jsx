@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import ProductCard from '../components/ProductCard';
+
 import banner1 from '../assets/banner1.png';
 import banner2 from '../assets/banner2.png';
 import banner3 from '../assets/banner3.png';
 import banner4 from '../assets/banner4.png';
-import hamburguesa from '../assets/ham1.png';
-import pizza from '../assets/piz1.png';
-import pollo from '../assets/po1.png';
-import perro from '../assets/pe1.png';
+import hamburguesa from '../assets/hamburguesa.png';
+import pizza from '../assets/pizza.png';
+import pollo from '../assets/pollo.png';
+import perro from '../assets/perro.png';
 import postre from '../assets/postre.png';
 import './Home.css';
 
@@ -102,30 +102,26 @@ function Home() {
       {/* Personaliza tu pedido */}
       <section className="customize-section">
         <h2 className="section-title-custom">Personaliza tu pedido!</h2>
-        <p className="customize-description">
-          Crea tu producto ideal eligiendo cada ingrediente!
-        </p>
-
         <div className="categories-container1">
           <Link to="/menu?categoria=hamburguesas" className="category-item1">
               <img src={hamburguesa}  alt="Hamburguesa" className="hamburguesa-img" />
-              <p>Hamburguesas</p>
+              <p>HAMBURGUESAS</p>
           </Link>
           <Link to="/menu?categoria=pizzas" className="category-item2">
               <img src={pizza}  alt="Pizza" className="pizza-img" />
-              <p>Pizzas</p>
+              <p>PIZZAS</p>
             </Link>
             <Link to="/menu?categoria=pollo" className="category-item3">
               <img src={pollo}  alt="Pollo" className="pollo-img" />
-              <p>Pollo</p>
+              <p>POLLO</p>
             </Link>
             <Link to="/menu?categoria=perros" className="category-item4">
               <img src={perro}  alt="Perro" className="perro-img" />
-              <p>Perros</p>
+              <p>PERROS</p>
             </Link>
             <Link to="/menu?categoria=postres" className="category-item5">
               <img src={postre}  alt="Postre" className="postre-img" />
-              <p>Postres</p>
+              <p>POSTRES</p>
           </Link> 
         </div>
      </section>
