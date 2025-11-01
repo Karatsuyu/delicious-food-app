@@ -62,6 +62,11 @@ class ComboPersonalizado(models.Model):
     )
     precio_total = models.DecimalField(max_digits=10, decimal_places=2)
     creado_en = models.DateTimeField(auto_now_add=True)
+    publicado = models.BooleanField(default=False, help_text="Si está publicado, otros usuarios pueden comprarlo")
+    veces_comprado = models.PositiveIntegerField(default=0, help_text="Cantidad de veces que otros han comprado este combo")
+    
+    class Meta:
+        ordering = ['-creado_en']
 
     def __str__(self):
         return self.nombre if self.nombre else f"Combo {self.id} de {self.usuario.email}"

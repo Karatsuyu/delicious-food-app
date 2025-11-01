@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Carrito from './pages/Carrito';
 import ProductoDetalle from './pages/ProductoDetalle';
 import Personalizador from './pages/Personalizador';
+import Perfil from './pages/Perfil';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -28,6 +29,14 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/producto/:id" element={<ProductoDetalle />} />
                 <Route path="/personalizar/:id" element={<Personalizador />} />
+                <Route 
+                  path="/perfil" 
+                  element={
+                    <ProtectedRoute>
+                      <Perfil />
+                    </ProtectedRoute>
+                  } 
+                />
                 <Route 
                   path="/carrito" 
                   element={

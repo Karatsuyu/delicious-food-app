@@ -160,6 +160,16 @@ export const authService = {
     }
   },
   
+  getStats: async () => {
+    try {
+      const response = await api.get('users/estadisticas/');
+      return response.data;
+    } catch (error) {
+      console.error('Error obteniendo estadísticas:', error);
+      throw error;
+    }
+  },
+  
   updateProfile: async (userData) => {
     try {
       const response = await api.patch('profile/', userData);

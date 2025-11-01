@@ -26,15 +26,15 @@ class ComboPersonalizadoProductoSerializer(serializers.ModelSerializer):
         fields = ["producto", "cantidad"]
 
 class ComboPersonalizadoSerializer(serializers.ModelSerializer):
-    productos = ComboPersonalizadoProductoSerializer(many=True, write_only=True)
+    productos = ComboPersonalizadoProductoSerializer(many=True, write_only=True, required=False)
 
     class Meta:
         model = ComboPersonalizado
-        fields = ["id", "usuario", "nombre", "precio_total", "creado_en", "productos"]
-        read_only_fields = ["usuario", "precio_total", "creado_en"]
+        fields = ["id", "usuario", "nombre", "precio_total", "creado_en", "productos", "publicado", "veces_comprado"]
+        read_only_fields = ["usuario", "precio_total", "creado_en", "veces_comprado"]
 
     def create(self, validated_data):
-        productos_data = validated_data.pop("productos")
+        productos_data = validated_data.pop("productos", [])
         combo = ComboPersonalizado.objects.create(**validated_data)
         total = 0
         for prod_data in productos_data:
@@ -43,7 +43,7 @@ class ComboPersonalizadoSerializer(serializers.ModelSerializer):
             ComboPersonalizadoProducto.objects.create(
                 combo=combo, producto=producto, cantidad=cantidad
             )
-            total += producto.precio_base * cantidad
+            total += producto.precio * cantidad
         combo.precio_total = total
         combo.save()
         return combo

@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ProductoViewSet, IngredienteViewSet, ComboViewSet, ComboPersonalizadoViewSet,ComboPersonalizadoCreateView, ComboPersonalizadoListView
+from .views import ProductoViewSet, IngredienteViewSet, ComboViewSet, ComboPersonalizadoViewSet,ComboPersonalizadoCreateView, ComboPersonalizadoListView, ComboPersonalizadoPublicosView
 
 router = DefaultRouter()
 router.register(r'productos', ProductoViewSet, basename='producto')
@@ -12,4 +12,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('combos-personalizados/create/',ComboPersonalizadoCreateView.as_view(), name='combo-personalizado-create'),
     path('combos-personalizados/list/',ComboPersonalizadoListView.as_view(), name='combo-personalizo-list'),
+    path('combos-personalizados/publicos/',ComboPersonalizadoPublicosView.as_view(), name='combo-personalizado-publicos'),
 ]

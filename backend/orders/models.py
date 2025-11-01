@@ -16,6 +16,14 @@ class CarritoItem(models.Model):
     carrito = models.ForeignKey(Carrito, related_name='items', on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, null=True, blank=True)
     combo = models.ForeignKey(Combo, on_delete=models.CASCADE, null=True, blank=True)
+    combo_personalizado = models.ForeignKey(
+        'products.ComboPersonalizado',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='items_carrito',
+        help_text="Combo personalizado publicado agregado al carrito"
+    )
     cantidad = models.IntegerField(default=1)
     ingredientes = models.ManyToManyField(Ingrediente, blank=True)
     precio_total = models.DecimalField(max_digits=9, decimal_places=2, default=0)
@@ -36,6 +44,14 @@ class PedidoItem(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='items', on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, null=True, blank=True)
     combo = models.ForeignKey(Combo, on_delete=models.CASCADE, null=True, blank=True)
+    combo_personalizado = models.ForeignKey(
+        'products.ComboPersonalizado',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='pedidos_realizados',
+        help_text="Combo personalizado publicado que fue comprado"
+    )
     cantidad = models.PositiveIntegerField()
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
 

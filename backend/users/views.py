@@ -243,18 +243,48 @@ class UserViewSet(viewsets.ModelViewSet):
     def estadisticas(self, request):
         """Obtener estadísticas del usuario"""
         user = request.user
-        from orders.models import Pedido
+        from orders.models import Pedido, PedidoItem
         from reviews.models import Review
+        from products.models import ComboPersonalizado
+        from django.db.models import Sum
         
         pedidos_count = Pedido.objects.filter(usuario=user).count()
         reviews_count = Review.objects.filter(usuario=user).count()
+        
+        # Estadísticas de combos personalizados
+        combos_personalizados = ComboPersonalizado.objects.filter(usuario=user)
+        combos_publicados = combos_personalizados.filter(publicado=True).count()
+        total_veces_comprados = combos_personalizados.aggregate(
+            total=Sum('veces_comprado')
+        )['total'] or 0
+        
+        # Calcular puntos ganados por ventas de combos personalizados
+        # Buscar todos los pedidos que compraron combos del usuario
+        items_vendidos = PedidoItem.objects.filter(
+            combo_personalizado__usuario=user,
+            combo_personalizado__publicado=True
+        )
+        puntos_ganados_ventas = 0
+        for item in items_vendidos:
+            valor_compra = float(item.precio_unitario * item.cantidad)
+            puntos_ganados_ventas += int(valor_compra * 0.40)
+        
+        # Total gastado en pedidos
+        total_gastado = Pedido.objects.filter(usuario=user).aggregate(
+            total=Sum('total')
+        )['total'] or 0
         
         return Response({
             'usuario': user.username,
             'email': user.email,
             'puntos': user.points,
+            'puntos_ganados_ventas': puntos_ganados_ventas,
             'fecha_registro': user.date_joined,
             'total_pedidos': pedidos_count,
             'total_reviews': reviews_count,
+            'total_gastado': float(total_gastado),
+            'combos_personalizados_creados': combos_personalizados.count(),
+            'combos_publicados': combos_publicados,
+            'total_veces_comprados': total_veces_comprados,
             'cuenta_activa': user.is_active
         })

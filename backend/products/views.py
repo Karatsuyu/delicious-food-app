@@ -40,5 +40,17 @@ class ComboPersonalizadoListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return ComboPersonalizado.objects.filter(usuario=self.request.user)
+        # Si es el usuario autenticado, mostrar todos sus combos
+        # Si es otro usuario o público, mostrar solo los publicados
+        user = self.request.user
+        if self.request.query_params.get('mis_combos') == 'true' or self.request.user.is_authenticated:
+            return ComboPersonalizado.objects.filter(usuario=user).order_by('-creado_en')
+        else:
+            return ComboPersonalizado.objects.filter(publicado=True).order_by('-veces_comprado', '-creado_en')
+
+class ComboPersonalizadoPublicosView(generics.ListAPIView):
+    """Vista para listar combos personalizados publicados para que otros usuarios los compren"""
+    serializer_class = ComboPersonalizadoSerializer
+    permission_classes = [permissions.AllowAny]
+    queryset = ComboPersonalizado.objects.filter(publicado=True).order_by('-veces_comprado', '-creado_en')
 

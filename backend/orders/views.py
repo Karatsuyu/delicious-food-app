@@ -120,15 +120,50 @@ class PedidoViewSet(viewsets.ModelViewSet):
             **serializer.validated_data
         )
         
-        # Crear PedidoItems desde CarritoItems
+        # Crear PedidoItems desde CarritoItems y otorgar puntos si es combo personalizado publicado
+        from products.models import ComboPersonalizado
+        from django.contrib.auth import get_user_model
+        
+        User = get_user_model()
+        
         for carrito_item in carrito.items.all():
-            PedidoItem.objects.create(
+            pedido_item = PedidoItem.objects.create(
                 pedido=pedido,
                 producto=carrito_item.producto,
                 combo=carrito_item.combo,
+                combo_personalizado=carrito_item.combo_personalizado if hasattr(carrito_item, 'combo_personalizado') else None,
                 cantidad=carrito_item.cantidad,
-                precio_unitario=carrito_item.precio_total / carrito_item.cantidad
+                precio_unitario=carrito_item.precio_total / carrito_item.cantidad if carrito_item.cantidad > 0 else 0
             )
+            
+            # Si es un combo personalizado publicado, otorgar puntos al creador
+            if hasattr(carrito_item, 'combo_personalizado') and carrito_item.combo_personalizado:
+                combo_personalizado = carrito_item.combo_personalizado
+                if combo_personalizado.publicado and combo_personalizado.usuario != user:
+                    # Calcular puntos: 40% del valor de la compra
+                    valor_compra = float(carrito_item.precio_total)
+                    puntos_ganados = int(valor_compra * 0.40)
+                    
+                    # Otorgar puntos al creador del combo
+                    creador = combo_personalizado.usuario
+                    creador.points += puntos_ganados
+                    creador.save()
+                    
+                    # Incrementar contador de veces comprado
+                    combo_personalizado.veces_comprado += carrito_item.cantidad
+                    combo_personalizado.save()
+                    
+                    # Crear notificación al creador
+                    try:
+                        from notifications.models import Notificacion
+                        estado_info, _ = Estado.objects.get_or_create(descripcion='Información')
+                        Notificacion.objects.create(
+                            usuario=creador,
+                            mensaje=f"¡Has ganado {puntos_ganados} puntos! Alguien compró tu combo personalizado '{combo_personalizado.nombre}' por ${valor_compra:,.0f}.",
+                            estado=estado_info
+                        )
+                    except ImportError:
+                        pass
         
         # Limpiar carrito
         carrito.items.all().delete()
