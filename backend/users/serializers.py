@@ -1,8 +1,106 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.password_validation import validate_password
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 User = get_user_model()
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """Serializer personalizado que permite login con email o username"""
+    
+    def to_internal_value(self, data):
+        # Mapear 'username' del frontend al campo correcto
+        # Si viene 'username' pero el modelo usa 'email' como USERNAME_FIELD,
+        # necesitamos mapearlo correctamente
+        if 'username' in data and 'email' not in data:
+            # Si el frontend envía 'username', copiarlo también como 'email'
+            # para que el serializer base pueda procesarlo
+            username_value = data.get('username', '').strip()
+            if username_value:
+                # El serializer base puede usar 'email' como username_field
+                # cuando USERNAME_FIELD = 'email', así que mapeamos ambos
+                data = data.copy()
+                data['email'] = username_value
+        return super().to_internal_value(data)
+    
+    def validate(self, attrs):
+        # El campo puede venir como 'username' o el serializer base puede haberlo mapeado
+        # Primero intentar obtener del campo username (que es lo que envía el frontend)
+        username_or_email = ''
+        if attrs.get('username'):
+            username_or_email = str(attrs.get('username')).strip()
+        
+        # Si no hay username, puede ser que el serializer base lo haya puesto en otro campo
+        # dependiendo del USERNAME_FIELD del modelo
+        if not username_or_email:
+            # Intentar obtenerlo de cualquier campo que pueda tener el valor
+            # El serializer base usa username_field que puede ser 'email' cuando USERNAME_FIELD = 'email'
+            for field_name in ['email', 'username']:
+                if attrs.get(field_name):
+                    username_or_email = str(attrs.get(field_name)).strip()
+                    break
+        
+        password = attrs.get('password', '').strip() if attrs.get('password') else ''
+        
+        if not username_or_email:
+            raise serializers.ValidationError({
+                'non_field_errors': ['Se requiere usuario o email para iniciar sesión']
+            })
+        
+        if not password:
+            raise serializers.ValidationError({
+                'non_field_errors': ['Se requiere contraseña']
+            })
+        
+        # Intentar autenticación primero con email
+        user = None
+        try:
+            user = User.objects.get(email=username_or_email)
+            if not user.check_password(password):
+                user = None
+        except User.DoesNotExist:
+            pass
+        except User.MultipleObjectsReturned:
+            # Si hay múltiples usuarios con el mismo email (no debería pasar pero por si acaso)
+            user = User.objects.filter(email=username_or_email, is_active=True).first()
+            if user and not user.check_password(password):
+                user = None
+        
+        # Si no funciona con email, intentar con username
+        if not user:
+            try:
+                user = User.objects.get(username=username_or_email)
+                if not user.check_password(password):
+                    user = None
+            except User.DoesNotExist:
+                user = None
+        
+        if not user:
+            raise serializers.ValidationError({
+                'non_field_errors': ['Usuario o contraseña incorrectos']
+            })
+        
+        if not user.is_active:
+            raise serializers.ValidationError({
+                'non_field_errors': ['Tu cuenta está inactiva. Contacta al soporte.']
+            })
+        
+        # Usar el método del padre para obtener los tokens correctamente
+        refresh = self.get_token(user)
+        
+        data = {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+            }
+        }
+        
+        return data
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,8 +123,15 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('password_confirm')
-        user = User.objects.create_user(**validated_data)
-        return user
+        try:
+            # create_user hashea la contraseña automáticamente
+            user = User.objects.create_user(**validated_data)
+            return user
+        except Exception as e:
+            # Si hay un error (por ejemplo, email duplicado), re-lanzar como ValidationError
+            raise serializers.ValidationError({
+                'detail': f'Error al crear usuario: {str(e)}'
+            })
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:

@@ -392,3 +392,5 @@ print(f"🧪 Total ingredientes: {Ingrediente.objects.count()}")
 print(f"🍽️ Total combos: {Combo.objects.count()}")
 print(f"👤 Usuario admin creado: admin/admin123")
 
+
+

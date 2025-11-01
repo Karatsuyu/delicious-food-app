@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 import './Header.css';
 import CartModal from '../components/CartModal';
 import logo from '../assets/logo.png';
@@ -13,9 +14,8 @@ function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
-  const [isCartOpen, setIsCartOpen] = useState(false); 
-
-  const isLoggedIn = false;
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const { isAuthenticated, user, logout } = useContext(AuthContext);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -41,6 +41,19 @@ function Header() {
       setSearchTerm('');
       setIsSearchOpen(false);
     }
+  };
+
+  const handleCartClick = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    setIsCartOpen(true);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   return (
@@ -76,14 +89,17 @@ function Header() {
           </div>
 
           {/* 🛒 BOTÓN CARRITO */}
-          <button className="icon-btn cart-icon" title="Carrito" onClick={() => setIsCartOpen(true)}>
-              <img src={carrito} alt="Carrito de Compras" className="carrito-image" />
-            </button>
+          <button className="icon-btn cart-icon" title="Carrito" onClick={handleCartClick}>
+            <img src={carrito} alt="Carrito de Compras" className="carrito-image" />
+          </button>
 
-          {/* 👤 LOGIN / REGISTER */}
-          {isLoggedIn ? (
+          {/* 👤 LOGIN / REGISTER / USER MENU */}
+          {isAuthenticated ? (
             <div className="user-menu">
-              <button className="btn btn-user">Mi Cuenta</button>
+              <Link to="/perfil" className="btn btn-user">
+                {user?.first_name || user?.username || 'Mi Cuenta'}
+              </Link>
+              <button onClick={handleLogout} className="btn btn-logout">Salir</button>
             </div>
           ) : (
             <div className="auth-buttons">

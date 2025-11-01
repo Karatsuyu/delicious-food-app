@@ -1,9 +1,11 @@
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import check_password
 from .serializers import (
+    CustomTokenObtainPairSerializer,
     UserSerializer, 
     UserRegistrationSerializer, 
     UserProfileUpdateSerializer,
@@ -11,6 +13,10 @@ from .serializers import (
 )
 
 User = get_user_model()
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    """Vista personalizada que permite login con email o username"""
+    serializer_class = CustomTokenObtainPairSerializer
 
 class UserRegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()

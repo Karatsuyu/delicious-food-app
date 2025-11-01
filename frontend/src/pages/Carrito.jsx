@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { AuthContext } from '../context/AuthContext';
 import './Carrito.css';
 
 function Carrito() {
+  const { isAuthenticated } = useContext(AuthContext);
+  const navigate = useNavigate();
   const { 
     cartItems, 
     isOpen, 
@@ -14,7 +18,15 @@ function Carrito() {
     toggleCart 
   } = useCart();
 
-  if (!isOpen) return null;
+  // Si no está autenticado y el carrito está abierto, redirigir al login
+  useEffect(() => {
+    if (isOpen && !isAuthenticated) {
+      toggleCart(); // Cerrar el carrito
+      navigate('/login');
+    }
+  }, [isOpen, isAuthenticated, navigate, toggleCart]);
+
+  if (!isOpen || !isAuthenticated) return null;
 
   return (
     <div className="cart-overlay">

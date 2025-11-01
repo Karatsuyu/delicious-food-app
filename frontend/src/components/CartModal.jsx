@@ -1,9 +1,13 @@
 // src/components/CartModal.jsx
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import './CartModal.css';
 import carrito1 from '../assets/carrito1.png';
 
 const CartModal = ({ isOpen, onClose }) => {
+  const { isAuthenticated } = useContext(AuthContext);
+  const navigate = useNavigate();
   const modalRef = useRef(null);
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
@@ -24,7 +28,15 @@ const CartModal = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  // Si no está autenticado, redirigir al login
+  useEffect(() => {
+    if (isOpen && !isAuthenticated) {
+      onClose();
+      navigate('/login');
+    }
+  }, [isOpen, isAuthenticated, navigate, onClose]);
+
+  if (!isOpen || !isAuthenticated) return null;
 
   const handleExploreMenu = () => {
     onClose();
