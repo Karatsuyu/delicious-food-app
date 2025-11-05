@@ -15,9 +15,9 @@ urlpatterns = [
     # Rutas de la API
     path('api/', include('products.urls')),
     path('api/products/', include('products.urls')),
-    path('api/', include('users.urls')),
-    path('api/', include('reviews.urls')),
-    path('api/', include('notifications.urls')),
+    path('api/users/', include('users.urls')),
+    path('api/reviews/', include('reviews.urls')),
+    path('api/notification/', include('notifications.urls')),
     path('api/orders/', include('orders.urls')),
 ]
 

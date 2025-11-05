@@ -28,7 +28,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/producto/:id" element={<ProductoDetalle />} />
-                <Route path="/personalizar/:id" element={<Personalizador />} />
+                <Route path="/personalizador/:categoria" element={<Personalizador />} />
                 <Route 
                   path="/perfil" 
                   element={
