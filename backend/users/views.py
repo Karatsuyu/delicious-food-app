@@ -11,6 +11,8 @@ from .serializers import (
     UserProfileUpdateSerializer,
     ChangePasswordSerializer
 )
+from .models import Profile
+from .serializers import ProfileSerializer
 
 User = get_user_model()
 
@@ -288,3 +290,11 @@ class UserViewSet(viewsets.ModelViewSet):
             'total_veces_comprados': total_veces_comprados,
             'cuenta_activa': user.is_active
         })
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

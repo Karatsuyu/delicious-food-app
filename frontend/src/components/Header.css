@@ -231,8 +231,8 @@
 }
 
 .btn-user {
-  background: #e8413d;
-  color: white;
+  background: #ffffff;
+  color: #f28c1e;
 }
 
 /* Responsive */
@@ -359,4 +359,51 @@
   height: 30px;
   margin-right: 8px;
   vertical-align: middle;
+}
+
+
+.user-menu {
+  display: flex;
+  align-items: center; /* centra verticalmente */
+  justify-content: space-between;
+  padding: 10px 30px;
+  font-weight: bold;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: -80px; /* súbelos un poco visualmente */
+}
+
+.btn btn-user {
+  background-color: #f28c1e;
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn btn-user:hover {
+  background-color: #f28c1e;
+  color: white;
+}
+
+.btn-logout {
+  background-color: #fff;
+  color: #e8413d;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: bold;
+}
+
+.btn-logout:hover {
+  background-color: #e8413d;
+  color: white;
 }

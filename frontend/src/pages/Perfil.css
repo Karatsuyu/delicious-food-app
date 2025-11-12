@@ -1,7 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Great+Vibes&family=Dancing+Script&family=Satisfy&family=Allura&family=Sacramento&family=Alex+Brush&family=Cookie&family=Parisienne&family=Marck+Script&display=swap');
+
 .perfil-page {
   min-height: calc(100vh - 200px);
   padding: 2rem 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  
 }
 
 .perfil-container {
@@ -11,8 +13,13 @@
 
 .perfil-header {
   text-align: center;
-  color: white;
+  color: #F28c1e;
   margin-bottom: 2rem;
+  font-family: 'Pacifico', cursive;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
 }
 
 .perfil-header h1 {
@@ -28,7 +35,7 @@
 
 .perfil-content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(650px, 1fr));
   gap: 2rem;
 }
 
@@ -46,9 +53,12 @@
 }
 
 .perfil-card-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #F28c1e 0%, #e8413d 100%);
   color: white;
   padding: 1.5rem;
+  font-family: 'Open san', cursive;
+  overflow: hidden;
+  cursor: pointer;
 }
 
 .perfil-card-header h2 {
@@ -58,6 +68,73 @@
 
 .perfil-card-body {
   padding: 1.5rem;
+}
+
+.foto-container{
+  display: flex;
+  align-items: center;
+  align-items: center;
+}
+
+.btn-subir-foto {
+  background-color: #F28c1e;
+  color: #e8413d;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+  margin-bottom: 20px;
+  margin-right: 8px;
+}
+
+.btn-subir-foto:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(90deg, #e96f09, #d1322f);
+}
+
+.btn-guardar-foto {
+  margin-top: -1.2rem;
+  padding: 10px 15px;
+  background-color: #F28c1e;
+  color: #e8413d;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Pacifico', cursive;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-right: 0px;
+}
+
+.btn-guardar-foto:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(90deg, #e96f09, #d1322f);
+}
+
+.perfil-foto{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.perfil-foto img{
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  margin-bottom: 20px;
+}
+
+/* input oculto */
+.perfil-foto input {
+  display: none;
 }
 
 .info-row {
@@ -74,7 +151,7 @@
 
 .info-label {
   font-weight: 600;
-  color: #666;
+  color: #414141;
 }
 
 .info-value {
@@ -102,7 +179,7 @@
 .puntos-number {
   font-size: 4rem;
   font-weight: bold;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, #e8413d 0%, #F28c1e 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -110,8 +187,9 @@
 
 .puntos-label {
   font-size: 1.2rem;
-  color: #666;
+  color: #F28c1e;
   font-weight: 500;
+  font-family: 'Pacifico', cursive;
 }
 
 .puntos-desglose {
@@ -142,13 +220,13 @@
 
 .puntos-titulo {
   font-weight: 600;
-  color: #333;
+  color: #000000;
 }
 
 .puntos-valor {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #667eea;
+  color: #e8413d;
 }
 
 .puntos-explicacion {
@@ -220,24 +298,25 @@
   text-align: center;
   padding: 2rem;
   color: #666;
+  font-family: 'Open sans', cursive;
 }
 
 .btn-crear-combo {
   margin-top: 1rem;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #F28c1e 0%, #e8413d 100%);
   color: white;
   border: none;
   border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: 'Pacifico', cursive;
 }
 
 .btn-crear-combo:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
 .combos-list {

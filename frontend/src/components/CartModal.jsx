@@ -11,6 +11,9 @@ const CartModal = ({ isOpen, onClose }) => {
   const modalRef = useRef(null);
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
+  const handleExplorarMenu = () => {
+    navigate('/menu?categoria=hamburguesas');
+  };
   // Cuando el modal se abre, calcula la posición del botón del carrito
   useEffect(() => {
     if (isOpen) {
@@ -40,10 +43,7 @@ const CartModal = ({ isOpen, onClose }) => {
 
   const handleExploreMenu = () => {
     onClose();
-    const menuSection = document.getElementById('menu');
-    if (menuSection) {
-      menuSection.scrollIntoView({ behavior: 'smooth' });
-    }
+    navigate('/menu?categoria=hamburguesas');
   };
 
   return (

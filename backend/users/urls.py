@@ -6,9 +6,11 @@ from .views import (
     ChangePasswordView,
     UserViewSet
 )
+from .views import ProfileViewSet
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
+router.register(r'profile', ProfileViewSet, basename='profile')
 
 urlpatterns = [
     path('register/', UserRegistrationView.as_view(), name='register'),

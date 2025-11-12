@@ -12,19 +12,8 @@ function Perfil() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [combosPersonalizados, setCombosPersonalizados] = useState([]);
   const [loadingCombos, setLoadingCombos] = useState(true);
-
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      navigate('/login');
-    }
-  }, [loading, isAuthenticated, navigate]);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadStats();
-      loadCombosPersonalizados();
-    }
-  }, [isAuthenticated]);
+  const [imagenPerfil, setImagenPerfil] = useState("ruta/de/tu/foto.png");
+  const [nuevaImagen, setNuevaImagen] = useState(null);
 
   const loadStats = async () => {
     try {
@@ -48,6 +37,31 @@ function Perfil() {
     }
   };
 
+  const cargarImagenPerfil = async () => {
+    try {
+      const response = await api.get("perfil/1/"); // O el perfil del usuario actual
+      if (response.data.imagen) {
+        setImagenPerfil(response.data.imagen);
+      }
+    } catch (error) {
+      console.error("Error cargando la imagen del perfil:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate('/login');
+    }
+  }, [loading, isAuthenticated, navigate]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadStats();
+      loadCombosPersonalizados();
+      cargarImagenPerfil();
+    }
+  }, [isAuthenticated]);
+
   const togglePublicar = async (comboId, publicado) => {
     try {
       const response = await api.patch(`combos-personalizados/${comboId}/`, {
@@ -62,6 +76,33 @@ function Perfil() {
     } catch (error) {
       console.error('Error actualizando estado de publicación:', error);
       alert('Error al actualizar el estado de publicación');
+    }
+  };
+
+  const handleImagenChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNuevaImagen(file);
+      setImagenPerfil(URL.createObjectURL(file)); // Vista previa
+    }
+  };
+
+  const guardarImagenPerfil = async () => {
+    if (!nuevaImagen) return;
+    const formData = new FormData();
+    formData.append("imagen", nuevaImagen);
+
+    try {
+      await api.put(`perfil/${user.id}/`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      alert("✅ Imagen de perfil actualizada correctamente");
+      setNuevaImagen(null);
+    } catch (error) {
+      console.error("Error guardando la imagen:", error);
+      alert("❌ Hubo un problema al guardar la imagen");
     }
   };
 
@@ -81,7 +122,32 @@ function Perfil() {
     <div className="perfil-page">
       <div className="perfil-container">
         <div className="perfil-header">
-          <h1>👤 Mi Perfil</h1>
+          <div className="perfil-foto">
+            <img
+              src={imagenPerfil || "/static/img/default-avatar.png"}
+              className="foto-perfil"
+              alt="Foto de perfil"
+            />
+          </div>
+          <div className="foto-container">
+            <input
+              id="input-foto"
+              type="file"
+              accept="image/*"
+              onChange={handleImagenChange}
+              style={{ display: "none" }}
+            />
+            <label htmlFor="input-foto" className="btn-subir-foto">
+              {nuevaImagen ? "Cambiar Foto" : "Seleccionar Foto"}
+            </label>
+            {/* 👇 Este botón solo se muestra si hay una nueva imagen seleccionada */}
+            {nuevaImagen && (
+              <button onClick={guardarImagenPerfil} className="btn-guardar-foto">
+                Guardar Imagen
+              </button>
+            )}
+          </div>
+          <h1> Mi Perfil</h1>
           <p>Gestiona tu cuenta y revisa tus estadísticas</p>
         </div>
 

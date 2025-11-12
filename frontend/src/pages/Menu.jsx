@@ -72,8 +72,7 @@ function Menu() {
   const [categoriaActual, setCategoriaActual] = useState(categoriaUrl || 'todos');
   const [loading, setLoading] = useState(true);
 
-  const categorias = [
-    { id: 'todos', nombre: 'Todos', icon: '🍽️' },
+  const categorias = [  
     { id: 'hamburguesas', nombre: 'Hamburguesas', icon: '🍔' },
     { id: 'pizzas', nombre: 'Pizzas', icon: '🍕' },
     { id: 'pollo', nombre: 'Pollo', icon: '🍗' },
@@ -85,14 +84,14 @@ function Menu() {
 
   // Datos de las hamburguesas con imágenes
   const hamburguesasData = [
-    { id: 'hamburguesa1', nombre: 'Hamburguesa Clásica', precio: 15900, imagen: hamburguesa1, descripcion: 'Hamburguesa tradicional' },
-    { id: 'hamburguesa2', nombre: 'Hamburguesa con Queso', precio: 18900, imagen: hamburguesa2, descripcion: 'Deliciosa hamburguesa con queso derretido' },
-    { id: 'hamburguesa3', nombre: 'Hamburguesa Deluxe', precio: 22900, imagen: hamburguesa3, descripcion: 'Hamburguesa premium' },
-    { id: 'hamburguesa4', nombre: 'BBQ Crispy', precio: 19900, imagen: hamburguesa4, descripcion: 'Hamburguesa con barbecue y crujiente' },
-    { id: 'hamburguesa5', nombre: 'Clásico Bacon', precio: 21900, imagen: hamburguesa5, descripcion: 'Hamburguesa con tocino crujiente' },
-    { id: 'hamburguesa6', nombre: 'Madurita Burger', precio: 17900, imagen: hamburguesa6, descripcion: 'Hamburguesa con ingredientes frescos' },
-    { id: 'hamburguesa7', nombre: 'BBQ Crunch Burger', precio: 24900, imagen: hamburguesa7, descripcion: 'Hamburguesa BBQ con ingredientes crujientes' },
-    { id: 'hamburguesa8', nombre: 'Double Smash', precio: 28900, imagen: hamburguesa8, descripcion: 'Doble hamburguesa jugosa' },
+    { id: 'hamburguesa1', nombre: 'Hamburguesa Clásica', precio: 7900, imagen: hamburguesa1, descripcion: 'Hamburguesa tradicional' },
+    { id: 'hamburguesa2', nombre: 'Hamburguesa con Queso', precio: 8900, imagen: hamburguesa2, descripcion: 'Deliciosa hamburguesa con queso derretido' },
+    { id: 'hamburguesa3', nombre: 'Hamburguesa Deluxe', precio: 10900, imagen: hamburguesa3, descripcion: 'Hamburguesa premium' },
+    { id: 'hamburguesa4', nombre: 'BBQ Crispy', precio: 18000, imagen: hamburguesa4, descripcion: 'Hamburguesa con barbecue y crujiente' },
+    { id: 'hamburguesa5', nombre: 'Clásico Bacon', precio: 22500, imagen: hamburguesa5, descripcion: 'Hamburguesa con tocino crujiente' },
+    { id: 'hamburguesa6', nombre: 'Madurita Burger', precio: 24500, imagen: hamburguesa6, descripcion: 'Hamburguesa con ingredientes frescos' },
+    { id: 'hamburguesa7', nombre: 'BBQ Crunch Burger', precio: 27000, imagen: hamburguesa7, descripcion: 'Hamburguesa BBQ con ingredientes crujientes' },
+    { id: 'hamburguesa8', nombre: 'Double Smash', precio: 30000, imagen: hamburguesa8, descripcion: 'Doble hamburguesa jugosa' },
   ];
 
   // Datos de las pizzas con imágenes
@@ -293,10 +292,7 @@ function Menu() {
   // Obtener el nombre de la categoría actual para mostrar en el título
   const categoriaActualNombre = categorias.find(cat => cat.id === categoriaActual)?.nombre || 'Todos';
 
-  // Funciones para manejar las hamburguesas
-  const handleHamburguesaClick = (hamburguesa) => {
-    navigate(`/personalizar/${hamburguesa.id}`);
-  };
+
 
   const handleHamburguesaAddToCart = (e, hamburguesa) => {
     e.stopPropagation();
@@ -311,10 +307,6 @@ function Menu() {
     alert(message);
   };
 
-  // Funciones para manejar pizzas
-  const handlePizzaClick = (pizza) => {
-    navigate(`/personalizar/${pizza.id}`);
-  };
 
   const handlePizzaAddToCart = (e, pizza) => {
     e.stopPropagation();
@@ -329,11 +321,6 @@ function Menu() {
     alert(message);
   };
 
-  // Funciones para manejar pollo
-  const handlePolloClick = (pollo) => {
-    navigate(`/personalizar/${pollo.id}`);
-  };
-
   const handlePolloAddToCart = (e, pollo) => {
     e.stopPropagation();
     const productoData = {
@@ -345,11 +332,6 @@ function Menu() {
     };
     const message = addToCart(productoData);
     alert(message);
-  };
-
-  // Funciones para manejar perros
-  const handlePerroClick = (perro) => {
-    navigate(`/personalizar/${perro.id}`);
   };
 
   const handlePerroAddToCart = (e, perro) => {
@@ -385,7 +367,6 @@ function Menu() {
       nombre: postres.nombre,
       precio: postres.precio,
       imagen: postres.imagen,
-      es_personalizable: true
     };
     const message = addToCart(productoData);
     alert(message);
@@ -398,7 +379,6 @@ function Menu() {
       nombre: bebidas.nombre,
       precio: bebidas.precio,
       imagen: bebidas.imagen,
-      es_personalizable: true
     };
     const message = addToCart(productoData);
     alert(message);
@@ -407,6 +387,41 @@ function Menu() {
   const handleCategoriaChange = (categoriaId) => {
     console.log('Cambiando a categoría:', categoriaId);
     setCategoriaActual(categoriaId);
+  };
+
+  const handleHamburguesaClick = (hamburguesa) => {
+    sessionStorage.setItem('ultimaCategoria', 'hamburguesas');
+    navigate(`/producto/${hamburguesa.id}`);
+  };
+  
+  const handlePizzaClick = (pizza) => {
+    sessionStorage.setItem('ultimaCategoria', 'pizzas');
+    navigate(`/producto/${pizza.id}`);
+  };
+  
+  const handlePolloClick = (pollo) => {
+    sessionStorage.setItem('ultimaCategoria', 'pollo');
+    navigate(`/producto/${pollo.id}`);
+  };
+  
+  const handlePerroClick = (perro) => {
+    sessionStorage.setItem('ultimaCategoria', 'perros');
+    navigate(`/producto/${perro.id}`);
+  };
+  
+  const handlePostresClick = (postre) => {
+    sessionStorage.setItem('ultimaCategoria', 'postres');
+    navigate(`/producto/${postre.id}`);
+  };
+  
+  const handlePapasClick = (papas) => {
+    sessionStorage.setItem('ultimaCategoria', 'papas');
+    navigate(`/producto/${papas.id}`);
+  };
+  
+  const handleBebidasClick = (bebida) => {
+    sessionStorage.setItem('ultimaCategoria', 'bebidas');
+    navigate(`/producto/${bebida.id}`);
   };
 
   return (
@@ -460,15 +475,6 @@ function Menu() {
                   >
                     Agregar al carrito
                   </button>
-                  <button 
-                    className="btn-hamburguesa-customize"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleHamburguesaClick(hamburguesa);
-                    }}
-                  >
-                    Personalizar
-                  </button>
                 </div>
               </div>
             ))}
@@ -496,15 +502,6 @@ function Menu() {
                   >
                     Agregar al carrito
                   </button>
-                  <button 
-                    className="btn-hamburguesa-customize"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePizzaClick(pizza);
-                    }}
-                  >
-                    Personalizar
-                  </button>
                 </div>
               </div>
             ))}
@@ -531,15 +528,6 @@ function Menu() {
                     onClick={(e) => handlePolloAddToCart(e, pollo)}
                   >
                     Agregar al carrito
-                  </button>
-                  <button 
-                    className="btn-hamburguesa-customize"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePolloClick(pollo);
-                    }}
-                  >
-                    Personalizar
                   </button>
                 </div>
               </div>
@@ -569,15 +557,6 @@ function Menu() {
                   >
                     Agregar al carrito
                   </button>
-                  <button 
-                    className="btn-hamburguesa-customize"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePerroClick(perro);
-                    }}
-                  >
-                    Personalizar
-                  </button>
                 </div>
               </div>
             ))}
@@ -605,15 +584,6 @@ function Menu() {
                     onClick={(e) => handPostresAddToCart(e, postre)}
                   >
                     Agregar al carrito
-                  </button>
-                  <button 
-                    className="btn-hamburguesa-customize"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePostresClick(postre);
-                    }}
-                  >
-                    Personalizar
                   </button>
                 </div>
               </div>
@@ -643,15 +613,6 @@ function Menu() {
                   >
                     Agregar al carrito
                   </button>
-                  <button 
-                    className="btn-hamburguesa-customize"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handPapasAddToCart(postre);
-                    }}
-                  >
-                    Personalizar
-                  </button>
                 </div>
               </div>
             ))}
@@ -662,7 +623,7 @@ function Menu() {
               <div 
                 key={bebidas.id} 
                 className="hamburguesa-card"
-                onClick={() => handlePostresClick(bebidas)}
+                onClick={() => handleBebidasClick(bebidas)}
               >
                 <div className="hamburguesa-image">
                   <img src={bebidas.imagen} alt={bebidas.nombre} />
@@ -676,18 +637,9 @@ function Menu() {
                 <div className="hamburguesa-actions">
                   <button 
                     className="btn-hamburguesa-cart"
-                    onClick={(e) => handleBebidasAddToCart(e, papas)}
+                    onClick={(e) => handleBebidasAddToCart(e, bebidas)}
                   >
                     Agregar al carrito
-                  </button>
-                  <button 
-                    className="btn-hamburguesa-customize"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePostresClick(postre);
-                    }}
-                  >
-                    Personalizar
                   </button>
                 </div>
               </div>
