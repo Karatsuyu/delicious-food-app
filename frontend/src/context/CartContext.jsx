@@ -5,7 +5,7 @@ const CartContext = createContext();
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {
-    throw new Error('useCart debe ser usado dentro de un CartProvider');
+    throw new Error('useCart debe usarse dentro de un CartProvider');
   }
   return context;
 };
@@ -14,58 +14,60 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Cargar el carrito desde localStorage al inicializar
+  // Cargar carrito desde localStorage al iniciar
   useEffect(() => {
     const savedCart = localStorage.getItem('cart');
     if (savedCart) {
-      try {
-        setCartItems(JSON.parse(savedCart));
-      } catch (error) {
-        console.error('Error cargando carrito desde localStorage:', error);
-      }
+      setCartItems(JSON.parse(savedCart));
     }
   }, []);
 
-  // Guardar el carrito en localStorage cuando cambie
+  // Guardar carrito en localStorage cuando cambie
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product, customizations = {}) => {
-    const cartItem = {
-      id: `${product.id}_${Date.now()}`, // ID único para cada item
-      productId: product.id,
-      nombre: product.nombre,
-      precio: product.precio,
-      imagen: product.imagen,
-      cantidad: customizations.cantidad || 1,
-      personalizacion: customizations,
-      precioTotal: (product.precio + (customizations.precioExtras || 0)) * (customizations.cantidad || 1)
-    };
-
-    setCartItems(prev => [...prev, cartItem]);
-    
-    // Mostrar notificación
-    return `¡${product.nombre} agregado al carrito!`;
+  const addToCart = (producto) => {
+    setCartItems(prev => {
+      const existe = prev.find(item => item.id === producto.id);
+      
+      if (existe) {
+        return prev.map(item =>
+          item.id === producto.id 
+            ? { 
+                ...item, 
+                cantidad: item.cantidad + 1, 
+                precioTotal: (item.precio * (item.cantidad + 1))
+              }
+            : item
+        );
+      } else {
+        return [...prev, { 
+          ...producto, 
+          cantidad: 1, 
+          precioTotal: producto.precio 
+        }];
+      }
+    });
   };
 
-  const removeFromCart = (itemId) => {
-    setCartItems(prev => prev.filter(item => item.id !== itemId));
+  const removeFromCart = (id) => {
+    setCartItems(prev => prev.filter(item => item.id !== id));
   };
 
-  const updateQuantity = (itemId, newQuantity) => {
-    if (newQuantity <= 0) {
-      removeFromCart(itemId);
+  const updateQuantity = (id, nuevaCantidad) => {
+    if (nuevaCantidad < 1) {
+      removeFromCart(id);
       return;
     }
-
-    setCartItems(prev => 
-      prev.map(item => 
-        item.id === itemId 
+    
+    setCartItems(prev =>
+      prev.map(item =>
+        item.id === id
           ? { 
               ...item, 
-              cantidad: newQuantity,
-              precioTotal: (item.precio + (item.personalizacion.precioExtras || 0)) * newQuantity
+              cantidad: nuevaCantidad,
+              precioTotal: item.precio * nuevaCantidad
             }
           : item
       )
@@ -81,35 +83,41 @@ export const CartProvider = ({ children }) => {
   };
 
   const getTotalPrice = () => {
-    return cartItems.reduce((total, item) => {
-      const basePrice = item.precio;
-      const extrasPrice = item.personalizacion.precioExtras || 0;
-      return total + ((basePrice + extrasPrice) * item.cantidad);
-    }, 0);
+    return cartItems.reduce((total, item) => total + item.precioTotal, 0);
   };
 
   const toggleCart = () => {
     setIsOpen(!isOpen);
   };
 
-  const value = {
-    cartItems,
-    isOpen,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    getTotalItems,
-    getTotalPrice,
-    toggleCart,
-    setIsOpen
+  // Ejemplo de estructura de un item en el carrito
+  const ejemploItem = {
+    id: 'hamburguesa1',
+    nombre: 'Hamburguesa Clásica',
+    precio: 7900,
+    imagen: 'ruta/imagen.png',
+    cantidad: 1,
+    precioTotal: 7900,
+    categoria: 'hamburguesas',
+    // Para pizzas:
+    tamaño: 'Mediana 6 partes' // opcional
   };
 
   return (
-    <CartContext.Provider value={value}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        isOpen,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        getTotalItems,
+        getTotalPrice,
+        toggleCart
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
 };
-
-

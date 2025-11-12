@@ -1,9 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Great+Vibes&family=Dancing+Script&family=Satisfy&family=Allura&family=Sacramento&family=Alex+Brush&family=Cookie&family=Parisienne&family=Marck+Script&display=swap');
+
 .menu-page {
   min-height: 100vh;
   padding-bottom: 40px;
   background: white;
   width: 100%;
   max-width: 100vw;
+
 }
 
 .menu-categories {
@@ -42,7 +45,7 @@
   color: white;
   white-space: nowrap;
   position: relative;
-  z-index: 1001;
+  z-index: 1000;
   pointer-events: auto;
 }
 
@@ -53,7 +56,7 @@
 
 .filter-btn.active {
   background: white;
-  color: #333;
+  color: #333;  
   border: 2px solid #FF6B00;
   box-shadow: 0 2px 8px rgba(255, 107, 0, 0.2);
 }
@@ -70,13 +73,13 @@
 /* Título de sección */
 .section-title-container {
   text-align: center;
-  padding: 40px 0 30px;
+  padding: 20px 0 30px;
 }
 
 .section-title {
   font-size: 36px;
-  color: #FF6B00;
-  margin: 0 0 10px 0;
+  color: #f28c1e;
+  margin: 0 0 20px 0;
   font-weight: 600;
 }
 
@@ -172,7 +175,7 @@
 }
 
 .hamburguesa-info {
-  padding: 20px;
+  padding: 40px;
   text-align: center;
   flex: 1;
   display: flex;
@@ -191,7 +194,7 @@
 
 .hamburguesa-price {
   font-size: 20px;
-  color: #FF6B00;
+  color: #f28c1e;
   font-weight: bold;
   margin: 0 0 15px 0;
 }
@@ -219,12 +222,13 @@
 }
 
 .btn-hamburguesa-cart {
-  background: #FF6B00;
+  background: #f28c1e;
   color: white;
+  font-weight: bold;
 }
 
 .btn-hamburguesa-cart:hover {
-  background: #FF8C00;
+  background: #f28c1e;
   transform: translateY(-2px);
 }
 
@@ -237,6 +241,7 @@
 .btn-hamburguesa-customize:hover {
   background: #FF6B00;
   color: white;
+  font-weight: bold;
   transform: translateY(-2px);
 }
 

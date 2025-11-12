@@ -5,7 +5,7 @@ import Home from './pages/Home';
 import Menu from './pages/Menu';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Carrito from './pages/Carrito';
+import Carrito from './components/Carrito';
 import ProductoDetalle from './pages/ProductoDetalle';
 import Personalizador from './pages/Personalizador';
 import Perfil from './pages/Perfil';
@@ -34,14 +34,6 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <Perfil />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/carrito" 
-                  element={
-                    <ProtectedRoute>
-                      <Carrito />
                     </ProtectedRoute>
                   } 
                 />

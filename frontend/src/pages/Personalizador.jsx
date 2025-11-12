@@ -21,7 +21,7 @@ const Personalizador = () => {
     tamaño: '',
     pan: '',
     masa: '',
-    carnes: '',
+    carnes: [],
     ingredientes: [],
     extras: [],
     cantidad: 1,
@@ -44,7 +44,7 @@ const Personalizador = () => {
           } else {
             // Si no se encuentra, usar datos locales como fallback
             const productosLocales = {
-              'hamburguesas': { id: 'hamburguesa1', nombre: 'Hamburguesa Clásica', precio: 15900, descripcion: 'Hamburguesa tradicional', categoria: 'hamburguesas' },
+              'hamburguesas': { id: 'hamburguesa1', nombre: 'Hamburguesa Clásica', precio: 0, descripcion: 'Hamburguesa tradicional', categoria: 'hamburguesas' },
               'pizzas': { id: 'pizza1', nombre: 'Pizza Hawaiana', precio: 32000, descripcion: 'Pizza con jamón y piña', categoria: 'pizzas' },
               'pollo': { id: 'pollo1', nombre: 'Alitas Simples', precio: 12000, descripcion: 'Alitas de pollo tradicionales', categoria: 'pollo' },
               'perros': { id: 'perro1', nombre: 'Perro Clásico', precio: 9000, descripcion: 'Perro caliente tradicional', categoria: 'perros' },
@@ -63,13 +63,12 @@ const Personalizador = () => {
           console.error('Error cargando desde API:', apiError);
           // Fallback a datos locales
           const productosLocales = {
-            'hamburguesas': { id: 'hamburguesa1', nombre: 'Hamburguesa Clásica', precio: 15900, descripcion: 'Hamburguesa tradicional', categoria: 'hamburguesas' },
-            'pizzas': { id: 'pizza1', nombre: 'Pizza Hawaiana', precio: 32000, descripcion: 'Pizza con jamón y piña', categoria: 'pizzas' },
-            'pollo': { id: 'pollo1', nombre: 'Alitas Simples', precio: 12000, descripcion: 'Alitas de pollo tradicionales', categoria: 'pollo' },
-            'perros': { id: 'perro1', nombre: 'Perro Clásico', precio: 9000, descripcion: 'Perro caliente tradicional', categoria: 'perros' },
-            'perro': { id: 'perro1', nombre: 'Perro Clásico', precio: 9000, descripcion: 'Perro caliente tradicional', categoria: 'perros' },
-            'postres': { id: 'postre1', nombre: 'Brownie Clásico', precio: 8000, descripcion: 'Delicioso brownie casero', categoria: 'postres' },
-            'postre': { id: 'postre1', nombre: 'Brownie Clásico', precio: 8000, descripcion: 'Delicioso brownie casero', categoria: 'postres' },
+            'hamburguesas': { id: 'hamburguesa1', nombre: 'Hamburguesa Clásica', precio: 0, descripcion: 'Hamburguesa tradicional', categoria: 'hamburguesas' },
+            'pizzas': { id: 'pizza1', nombre: 'Pizza Hawaiana', precio: 0, descripcion: 'Pizza con jamón y piña', categoria: 'pizzas' },
+            'pollo': { id: 'pollo1', nombre: 'Alitas Simples', precio: 0, descripcion: 'Alitas de pollo tradicionales', categoria: 'pollo' },
+            'perros': { id: 'perro1', nombre: 'Perro Clásico', precio: 0, descripcion: 'Perro caliente tradicional', categoria: 'perros' },
+            'perro': { id: 'perro1', nombre: 'Perro Clásico', precio: 0, descripcion: 'Perro caliente tradicional', categoria: 'perros' },
+            'postres': { id: 'postre1', nombre: 'Brownie Clásico', precio: 0, descripcion: 'Delicioso brownie casero', categoria: 'postres' },
           };
           const productoSeleccionado = productosLocales[categoria] || productosLocales[categoriaParam];
           if (productoSeleccionado) {
@@ -92,49 +91,50 @@ const Personalizador = () => {
   }, [categoria, categoriaParam]);
 
   const pan = [
-    { id: 'pan brioche', nombre: 'Pan brioche francés', precio: 0},
-    { id: 'pan clasico', nombre: 'Pan clasico con semillas sésamo', precio: 0},
-    { id: 'pan de papa', nombre: 'Pan de papa suave', precio: 0 },
-    { id: 'pan pretzel', nombre: 'Pan pretzel', precio: 0},
-    { id: 'pan masa madre', nombre: 'Pan de masa madre', precio: 0},
-    { id: 'pan multigrano', nombre: 'Pan multigrano', precio: 0},
-    { id: 'pan muffin', nombre: 'Pan ingles Muffin', precio: 0},
-    { id: 'pan sin gluten', nombre: 'Pan sin gluten', precio: 0},
-    { id: 'pan vegano', nombre: 'Pan Vegano', precio: 0}
+    { id: 'pan brioche', nombre: 'Pan brioche francés', precio: 1200},
+    { id: 'pan clasico', nombre: 'Pan clasico con semillas sésamo', precio: 1000},
+    { id: 'pan de papa', nombre: 'Pan de papa suave', precio: 1000 },
+    { id: 'pan pretzel', nombre: 'Pan pretzel', precio: 1300},
+    { id: 'pan masa madre', nombre: 'Pan de masa madre', precio: 1400},
+    { id: 'pan multigrano', nombre: 'Pan multigrano', precio: 1300},
+    { id: 'pan muffin', nombre: 'Pan ingles Muffin', precio: 1200},
+    { id: 'pan sin gluten', nombre: 'Pan sin gluten', precio: 1500},
+    { id: 'pan vegano', nombre: 'Pan Vegano', precio: 1400}
   ];
 
   const carnes = [
-    { id: 'carne de res', nombre: 'Carne de Res', precio: 1000},
-    { id: 'carne de pavo', nombre: 'Carne de Pavo', precio: 1000},
-    { id: 'carne de bisonte', nombre: 'Carne de Bisonte', precio: 1000},
-    { id: 'carne de cordero', nombre: 'Carne de Cordero', precio: 1000},
-    { id: 'carne de venado', nombre: 'Carne de Venado', precio: 1000},
-    { id: 'carne de cerdo', nombre: 'Carne de Cerdo', precio: 1000},
-    { id: 'carne vegana', nombre: 'Carne de Garbanzos Vegana', precio: 1000},
-    { id: 'carne vegana1', nombre: 'Carne de Lentejas Vegana', precio: 1000},
-    { id: 'carne de seitan', nombre: 'Carne de Seitán', precio: 1000}
+    { id: 'carne de res', nombre: 'Carne de Res', precio: 1800},
+    { id: 'carne de pavo', nombre: 'Carne de Pavo', precio: 2800},
+    { id: 'carne de bisonte', nombre: 'Carne de Bisonte', precio: 3200},
+    { id: 'carne de cordero', nombre: 'Carne de Cordero', precio: 2500},
+    { id: 'carne de venado', nombre: 'Carne de Venado', precio: 2800},
+    { id: 'carne de cerdo', nombre: 'Carne de Cerdo', precio: 2000},
+    { id: 'carne vegana', nombre: 'Carne de Garbanzos Vegana', precio: 900},
+    { id: 'carne vegana1', nombre: 'Carne de Lentejas Vegana', precio: 900},
+    { id: 'carne de seitan', nombre: 'Carne de Seitán', precio: 1500}
   ];
 
-  const tamaños = [
-    { id: 'pequeño', nombre: 'Pequeño', precio: 0 },
-    { id: 'mediano', nombre: 'Mediano', precio: 5000 },
-    { id: 'grande', nombre: 'Grande', precio: 9000 }
-  ];
 
   // === PIZZAS ===
   const masasPizza = [
     { id: 'tradicional', nombre: 'Masa Tradicional', precio: 0 },
-    { id: 'fina', nombre: 'Masa Fina', precio: 0 },
-    { id: 'gruesa', nombre: 'Masa Gruesa', precio: 0 },
-    { id: 'sin_gluten', nombre: 'Masa Sin Gluten', precio: 0 },
-    { id: 'integral', nombre: 'Masa Integral', precio: 0 },
+    { id: 'fina', nombre: 'Masa Fina', precio: 800 },
+    { id: 'gruesa', nombre: 'Masa Gruesa', precio: 800 },
+    { id: 'sin_gluten', nombre: 'Masa Sin Gluten', precio: 1500 },
+    { id: 'integral', nombre: 'Masa Integral', precio: 1000 },
+  ];
+
+  const tamaños = [
+    { id: 'pequeño', nombre: 'Pequeño', precio: 0 },
+    { id: 'mediano', nombre: 'Mediano', precio: 3500 },
+    { id: 'grande', nombre: 'Grande', precio: 5000 }
   ];
 
   const quesosPizza = [
-    { id: 'mozzarella', nombre: 'Mozzarella', precio: 0 },
-    { id: 'cheddar', nombre: 'Cheddar', precio: 1000 },
-    { id: 'parmesano', nombre: 'Parmesano', precio: 1000 },
-    { id: 'vegano', nombre: 'Queso Vegano', precio: 1000 },
+    { id: 'mozzarella', nombre: 'Mozzarella', precio: 500 },
+    { id: 'cheddar', nombre: 'Cheddar', precio: 800 },
+    { id: 'parmesano', nombre: 'Parmesano', precio: 900 },
+    { id: 'vegano', nombre: 'Queso Vegano', precio: 1200 },
   ];
 
   const carnesPizza = [
@@ -147,10 +147,10 @@ const Personalizador = () => {
 
   // === POLLO ===
   const tiposPollo = [
-    { id: 'alitas', nombre: 'Alitas', precio: 0 },
-    { id: 'muslos', nombre: 'Muslos', precio: 0 },
-    { id: 'pechuga', nombre: 'Pechuga a la parrilla', precio: 0 },
-    { id: 'nuggets', nombre: 'Nuggets', precio: 0 },
+    { id: 'alitas', nombre: 'Alitas', precio: 1500 },
+    { id: 'muslos', nombre: 'Muslos', precio: 1700 },
+    { id: 'pechuga', nombre: 'Pechuga a la parrilla', precio: 2000 },
+    { id: 'nuggets', nombre: 'Nuggets', precio: 1200 },
   ];
 
   const salsasPollo = [
@@ -164,10 +164,10 @@ const Personalizador = () => {
   // === PERROS CALIENTES ===
   const tiposPerro = [
     { id: 'clasico', nombre: 'Clásico', precio: 0 },
-    { id: 'ranchero', nombre: 'Ranchero', precio: 0 },
-    { id: 'hawaiano', nombre: 'Hawaiano', precio: 0 },
+    { id: 'ranchero', nombre: 'Ranchero', precio: 800 },
+    { id: 'hawaiano', nombre: 'Hawaiano', precio: 800 },
     { id: 'tocineta', nombre: 'Con tocineta', precio: 1000 },
-    { id: 'vegetariano', nombre: 'Vegetariano', precio: 0 },
+    { id: 'vegetariano', nombre: 'Vegetariano', precio: 500 },
   ];
 
   const complementosPerro = [
@@ -175,15 +175,30 @@ const Personalizador = () => {
     { id: 'tocineta', nombre: 'Tocineta crujiente', precio: 1000 },
     { id: 'piña', nombre: 'Piña', precio: 500 },
     { id: 'champiñones', nombre: 'Champiñones', precio: 500 },
+    { id: 'cebolla morada', nombre: 'Cebolla morada', precio: 500 },
+    { id: 'aceitunas', nombre: 'Aceitunas', precio: 500 },
+    { id: 'cebolla', nombre: 'Cebolla Gratinada', precio: 500 },
+  ];
+
+  const salsasPerros = [
+    { id: 'bbq', nombre: 'BBQ', precio: 500 },
+    { id: 'ajo', nombre: 'Ajo', precio: 500 },
+    { id: 'picante', nombre: 'Picante', precio: 500 },
+    { id: 'miel_mostaza', nombre: 'Miel y mostaza', precio: 500 },
+    { id: 'ranch', nombre: 'Ranch', precio: 500 },
+    { id: 'rosada', nombre: 'Rosada', precio: 500 },
+    { id: 'chimichurri', nombre: 'Chimichurri', precio: 500 },
+    { id: 'barbacoa', nombre: 'Barbacoa', precio: 500 },
+    { id: 'tomate', nombre: 'Tomate', precio: 500 },
   ];
 
   // === POSTRES ===
   const tiposPostre = [
-    { id: 'brownie', nombre: 'Brownie', precio: 8000 },
-    { id: 'flan', nombre: 'Flan', precio: 6000 },
-    { id: 'helado', nombre: 'Helado (2 bolas)', precio: 7000 },
-    { id: 'tiramisu', nombre: 'Tiramisú', precio: 9000 },
-    { id: 'cheesecake', nombre: 'Cheesecake', precio: 9500 },
+    { id: 'Conos con bolas', nombre: 'Helado 2 bolas', precio: 4500 },
+    { id: 'Sundae de arequipe', nombre: 'Sundae sabor a arequipe', precio: 6000 },
+    { id: 'Sundae de fresa', nombre: 'Sundae sabor a fresa', precio: 6000 },
+    { id: 'Sundae de chocolate', nombre: 'Sundae sabor a chocolate', precio: 6000 },
+    { id: 'Sundae de caramelo', nombre: 'Sundae sabor a caramelo', precio: 6000 },
   ];
 
   const agregadosPostre = [
@@ -191,6 +206,10 @@ const Personalizador = () => {
     { id: 'frutas', nombre: 'Frutas frescas', precio: 1000 },
     { id: 'chocolate', nombre: 'Salsa de chocolate', precio: 500 },
     { id: 'caramelo', nombre: 'Salsa de caramelo', precio: 500 },
+    { id: 'mora', nombre: 'Salsa de mora', precio: 500 },
+    { id: 'frutos rojos', nombre: 'Frutos rojos', precio: 1000 },
+    { id: 'frutos secos', nombre: 'Frutos secos', precio: 1000 },
+    { id: 'Mani', nombre: 'Mani', precio: 500 },
   ];
 
   const ingredientesDisponibles = [
@@ -218,7 +237,7 @@ const Personalizador = () => {
 
   
   const calcularPrecio = () => {
-    if (!producto) return 0;
+    if (!producto) {console.log('producto no encontrado'); return 0;}
   
     const precioBase = parseFloat(producto.precio) || 0;
     const precioTamaño = tamaños.find(t => t.id === personalizacion.tamaño)?.precio || 0;
@@ -228,7 +247,10 @@ const Personalizador = () => {
     if (categoria === 'pizzas') {
       const precioMasa = masasPizza.find(m => m.id === personalizacion.masa)?.precio || 0;
       const precioQueso = quesosPizza.find(q => q.id === personalizacion.ingredientes[0])?.precio || 0;
-      const precioCarne = carnesPizza.find(c => c.id === personalizacion.carnes)?.precio || 0;
+      const precioCarne = personalizacion.carnes.reduce((sum, cId) => {
+        const c = carnes.find(carne => carne.id === cId);
+        return sum + (c?.precio || 0);
+      }, 0);
       precioExtrasTotal = precioMasa + precioQueso + precioCarne;
     } 
     else if (categoria === 'pollo') {
@@ -239,11 +261,11 @@ const Personalizador = () => {
       precioExtrasTotal = precioSalsas;
     }
     else if (categoria === 'perros') {
-      const precioComplementos = personalizacion.extras.reduce((sum, eId) => {
-        const c = complementosPerro.find(c => c.id === eId);
+      const precioSalsas = personalizacion.extras.reduce((sum, eId) => {
+        const c = salsasPerros.find(c => c.id === eId);
         return sum + (c?.precio || 0);
       }, 0);
-      precioExtrasTotal = precioComplementos;
+      precioExtrasTotal = precioSalsas;
     }
     else if (categoria === 'postres') {
       const precioAgregados = personalizacion.extras.reduce((sum, eId) => {
@@ -255,7 +277,10 @@ const Personalizador = () => {
     else {
       // hamburguesas
       const precioPan = pan.find(p => p.id === personalizacion.pan)?.precio || 0;
-      const precioCarne = carnes.find(c => c.id === personalizacion.carnes)?.precio || 0;
+      const precioCarne = personalizacion.carnes.reduce((sum, cId) => {
+        const c = carnes.find(carne => carne.id === cId);
+        return sum + (c?.precio || 0);
+      }, 0);
       const precioIngredientes = personalizacion.ingredientes.reduce((sum, iId) => {
         const i = ingredientesDisponibles.find(ing => ing.id === iId);
         return sum + (i?.precio || 0);
@@ -278,8 +303,25 @@ const Personalizador = () => {
     setPersonalizacion(prev => ({ ...prev, tamaño }));
   };
 
-  const handleCarnesChange = (carnes) => {
-    setPersonalizacion(prev => ({ ...prev, carnes}));
+  const handleCarnesChange = (carneId) => {
+    setPersonalizacion(prev => {
+      const carnesActuales = prev.carnes || [];
+      const yaSeleccionada = carnesActuales.includes(carneId);
+      
+      let nuevasCarnes;
+      if (yaSeleccionada) {
+        // Quitar la carne
+        nuevasCarnes = carnesActuales.filter(id => id !== carneId);
+      } else {
+        // Agregar la carne
+        nuevasCarnes = [...carnesActuales, carneId];
+      }
+      
+      return {
+        ...prev,
+        carnes: nuevasCarnes
+      };
+    });
   };
 
   const handleIngredienteToggle = (ingredienteId) => {
@@ -345,6 +387,15 @@ const Personalizador = () => {
     }));
   };
 
+  const handleSalsaPerroToggle = (salsaId) => {
+    setPersonalizacion(prev => ({
+      ...prev,
+      extras: prev.extras.includes(salsaId)
+        ? prev.extras.filter(id => id !== salsaId)
+        : [...prev.extras, salsaId]
+    }));
+  };
+
   // POSTRES
   const handleTipoPostreChange = (tipo) => {
     setPersonalizacion(prev => ({ ...prev, carnes: tipo }));
@@ -400,32 +451,32 @@ const Personalizador = () => {
       <div className="personalizador-content">
         {/* ✅ Reemplazado: bloque condicional completo */}
         <div className="personalizador-options">
-          {/* Tamaño (común a todos) */}
-          <div className="option-section">
-            <h3 className="section-title">Tamaño</h3>
-            <div className="panhamburguesa-grid">
-              {tamaños.map(tamaño => (
-                <label key={tamaño.id} className="pan-option">
-                  <input
-                    type="radio"
-                    name="tamaño"
-                    value={tamaño.id}
-                    checked={personalizacion.tamaño === tamaño.id}
-                    onChange={() => handleTamañoChange(tamaño.id)}
-                  />
-                  <span className="pan-info">
-                    <span className="pan-nombre">{tamaño.nombre}</span>
-                    <span className="pan-precio">
-                      {tamaño.precio > 0 ? `+$${tamaño.precio}` : '+'}
-                    </span>
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-
           {categoria === 'pizzas' ? (
             <>
+              {/* Tamaño (solo pizzas) */}
+              <div className="option-section">
+                <h3 className="section-title">Tamaño</h3>
+                <div className="panhamburguesa-grid">
+                  {tamaños.map(tamaño => (
+                    <label key={tamaño.id} className="pan-option">
+                      <input
+                        type="radio"
+                        name="tamaño"
+                        value={tamaño.id}
+                        checked={personalizacion.tamaño === tamaño.id}
+                        onChange={() => handleTamañoChange(tamaño.id)}
+                      />
+                      <span className="pan-info">
+                        <span className="pan-nombre">{tamaño.nombre}</span>
+                        <span className="pan-precio">
+                          {tamaño.precio > 0 ? `+$${tamaño.precio}` : '+'}
+                        </span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
               <div className="option-section">
                 <h3 className="section-title">Masa</h3>
                 <div className="panhamburguesa-grid">
@@ -478,10 +529,10 @@ const Personalizador = () => {
                   {carnesPizza.map(carne => (
                     <label key={carne.id} className="pan-option">
                       <input
-                        type="radio"
+                        type="checkbox"
                         name="carne"
                         value={carne.id}
-                        checked={personalizacion.carnes === carne.id}
+                        checked={personalizacion.carnes.includes(carne.id)}
                         onChange={() => handleCarnesChange(carne.id)}
                       />
                       <span className="pan-info">
@@ -558,6 +609,24 @@ const Personalizador = () => {
                         <span className="pan-precio">
                           {tipo.precio > 0 ? `+$${tipo.precio}` : '+'}
                         </span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className="option-section">
+                <h3 className="section-title">Salsas</h3>
+                <div className="ingredientes-grid">
+                  {salsasPerros.map(salsa => (
+                    <label key={salsa.id} className="ingrediente-option">
+                      <input
+                        type="checkbox"
+                        checked={personalizacion.extras.includes(salsa.id)}
+                        onChange={() => handleSalsaPerroToggle(salsa.id)}
+                      />
+                      <span className="ingrediente-info">
+                        <span className="ingrediente-nombre">{salsa.nombre}</span>
+                        <span className="ingrediente-precio">+${salsa.precio}</span>
                       </span>
                     </label>
                   ))}

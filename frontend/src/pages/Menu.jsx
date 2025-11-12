@@ -86,7 +86,7 @@ function Menu() {
   const hamburguesasData = [
     { id: 'hamburguesa1', nombre: 'Hamburguesa Clásica', precio: 7900, imagen: hamburguesa1, descripcion: 'Hamburguesa tradicional' },
     { id: 'hamburguesa2', nombre: 'Hamburguesa con Queso', precio: 8900, imagen: hamburguesa2, descripcion: 'Deliciosa hamburguesa con queso derretido' },
-    { id: 'hamburguesa3', nombre: 'Hamburguesa Deluxe', precio: 9900, imagen: hamburguesa3, descripcion: 'Hamburguesa premium' },
+    { id: 'hamburguesa3', nombre: 'Hamburguesa Deluxe', precio: 10900, imagen: hamburguesa3, descripcion: 'Hamburguesa premium' },
     { id: 'hamburguesa4', nombre: 'BBQ Crispy', precio: 18000, imagen: hamburguesa4, descripcion: 'Hamburguesa con barbecue y crujiente' },
     { id: 'hamburguesa5', nombre: 'Clásico Bacon', precio: 22500, imagen: hamburguesa5, descripcion: 'Hamburguesa con tocino crujiente' },
     { id: 'hamburguesa6', nombre: 'Madurita Burger', precio: 24500, imagen: hamburguesa6, descripcion: 'Hamburguesa con ingredientes frescos' },
@@ -144,11 +144,11 @@ function Menu() {
 
   const bebidasData =[
     { id: 'bebida1', nombre: 'Coca-Cola Personal', precio: 4000, imagen: bebida1, descripcion: 'Bebida Gaseosa CocaCola Personal'},
-    { id: 'bebida2', nombre: 'Coca-Cola 3L', precio: 4500, imagen: bebida2, descripcion: 'Bebida Gaseosa CocaCola En Lata'},
-    { id: 'bebida3', nombre: 'Coca-Cola En Lata', precio: 7500, imagen: bebida3, descripcion: 'Bebida Gaseosa CocaCola 3L'},
+    { id: 'bebida2', nombre: 'Coca-Cola En Lata', precio: 4500, imagen: bebida2, descripcion: 'Bebida Gaseosa CocaCola En Lata'},
+    { id: 'bebida3', nombre: 'Coca-Cola 3L', precio: 7500, imagen: bebida3, descripcion: 'Bebida Gaseosa CocaCola 3L'},
     { id: 'bebida4', nombre: 'Sprite Personal', precio: 4000, imagen: bebida4, descripcion: 'Bebida Gaseosa Sprite Personal'},
-    { id: 'bebida5', nombre: 'Sprite 3L', precio: 4500, imagen: bebida5, descripcion: 'Bebida Gaseosa Sprite En Lata'},
-    { id: 'bebida6', nombre: 'Sprite En Lata', precio: 7500, imagen: bebida6, descripcion: 'Bebida Gaseosa Sprite 3L'},
+    { id: 'bebida5', nombre: 'Sprite En Lata', precio: 4500, imagen: bebida5, descripcion: 'Bebida Gaseosa Sprite En Lata'},
+    { id: 'bebida6', nombre: 'Sprite 3L', precio: 7500, imagen: bebida6, descripcion: 'Bebida Gaseosa Sprite 3L'},
     { id: 'bebida7', nombre:'Pepsi Personal', precio: 4000, imagen: bebida7, descripcion: 'Bebida Gaseosa Pepsi Personal'},
     { id: 'bebida8', nombre: 'Pepsi En Lata', precio: 4500, imagen: bebida8, descripcion: 'Bebida Gaseosa Pepsi En Lata'},
     { id: 'bebida9', nombre: 'Pepsi 3L', precio: 7500, imagen: bebida9, descripcion: 'Bebida Gaseosa Pepsi 3L'}
@@ -389,6 +389,41 @@ function Menu() {
     setCategoriaActual(categoriaId);
   };
 
+  const handleHamburguesaClick = (hamburguesa) => {
+    sessionStorage.setItem('ultimaCategoria', 'hamburguesas');
+    navigate(`/producto/${hamburguesa.id}`);
+  };
+  
+  const handlePizzaClick = (pizza) => {
+    sessionStorage.setItem('ultimaCategoria', 'pizzas');
+    navigate(`/producto/${pizza.id}`);
+  };
+  
+  const handlePolloClick = (pollo) => {
+    sessionStorage.setItem('ultimaCategoria', 'pollo');
+    navigate(`/producto/${pollo.id}`);
+  };
+  
+  const handlePerroClick = (perro) => {
+    sessionStorage.setItem('ultimaCategoria', 'perros');
+    navigate(`/producto/${perro.id}`);
+  };
+  
+  const handlePostresClick = (postre) => {
+    sessionStorage.setItem('ultimaCategoria', 'postres');
+    navigate(`/producto/${postre.id}`);
+  };
+  
+  const handlePapasClick = (papas) => {
+    sessionStorage.setItem('ultimaCategoria', 'papas');
+    navigate(`/producto/${papas.id}`);
+  };
+  
+  const handleBebidasClick = (bebida) => {
+    sessionStorage.setItem('ultimaCategoria', 'bebidas');
+    navigate(`/producto/${bebida.id}`);
+  };
+
   return (
     <div className="menu-page">
       {/* Filtros de categoría */}
@@ -588,7 +623,7 @@ function Menu() {
               <div 
                 key={bebidas.id} 
                 className="hamburguesa-card"
-                onClick={() => handlePostresClick(bebidas)}
+                onClick={() => handleBebidasClick(bebidas)}
               >
                 <div className="hamburguesa-image">
                   <img src={bebidas.imagen} alt={bebidas.nombre} />
@@ -602,7 +637,7 @@ function Menu() {
                 <div className="hamburguesa-actions">
                   <button 
                     className="btn-hamburguesa-cart"
-                    onClick={(e) => handleBebidasAddToCart(e, papas)}
+                    onClick={(e) => handleBebidasAddToCart(e, bebidas)}
                   >
                     Agregar al carrito
                   </button>

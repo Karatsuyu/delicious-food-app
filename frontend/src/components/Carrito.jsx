@@ -127,10 +127,8 @@ function Carrito() {
                 </button>
                 
                 <button 
+                  onClick={() => navigate('/checkout')}
                   className="btn-checkout"
-                  onClick={() => {
-                    alert('¡Funcionalidad de checkout en desarrollo!');
-                  }}
                 >
                   💳 Proceder al Pago
                 </button>

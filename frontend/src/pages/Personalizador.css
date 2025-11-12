@@ -27,7 +27,7 @@
 }
 
 .back-button:hover {
-  background: #FF8C00;
+  background: #f28c1e;
 }
 
 .back-button:active {
@@ -338,7 +338,7 @@
 }
 
 .agregar-carrito-btn:hover {
-  background: #FF8C00;
+  background: #f28c1e;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(255, 107, 0, 0.3);
 }
