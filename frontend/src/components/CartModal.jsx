@@ -88,7 +88,30 @@ const CartModal = ({ isOpen, onClose }) => {
 								<h2 className="cart-modal-title">Carrito</h2>
 								<div className="cart-modal-items">
 									{cartItems.map((item) => (
-										<div key={item.id} className="cart-modal-item">
+										<div
+											key={item.id}
+											className="cart-modal-item"
+											onClick={() => {
+												// Inferir categoría para restaurar contexto de navegación
+												const prefixMap = {
+													hamburguesa: 'hamburguesas',
+													pizza: 'pizzas',
+													pollo: 'pollo',
+													perro: 'perros',
+													postres: 'postres',
+													papas: 'papas',
+													bebida: 'bebidas'
+												};
+												const foundKey = Object.keys(prefixMap).find(k => item.id.startsWith(k));
+												if (foundKey) {
+													sessionStorage.setItem('ultimaCategoria', prefixMap[foundKey]);
+												}
+												onClose();
+												navigate(`/producto/${item.id}`);
+											}}
+											role="button"
+											aria-label={`Ver detalle de ${item.nombre}`}
+										>
 											<img src={item.imagen} alt={item.nombre} className="cart-modal-item-img" />
 											<div className="cart-modal-item-info">
 												<div className="cart-modal-item-name" title={item.nombre}>{item.nombre}</div>

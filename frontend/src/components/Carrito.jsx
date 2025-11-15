@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
@@ -48,8 +48,31 @@ function Carrito() {
             <>
               <div className="cart-items">
                 {cartItems.map(item => (
-                  <div key={item.id} className="cart-item">
-                    <div className="item-image">
+                  <div
+                    key={item.id}
+                    className="cart-item"
+                    onClick={() => {
+                      const prefixMap = {
+                        hamburguesa: 'hamburguesas',
+                        pizza: 'pizzas',
+                        pollo: 'pollo',
+                        perro: 'perros',
+                        postres: 'postres',
+                        papas: 'papas',
+                        bebida: 'bebidas'
+                      };
+                      const foundKey = Object.keys(prefixMap).find(k => item.id.startsWith(k));
+                      if (foundKey) {
+                        sessionStorage.setItem('ultimaCategoria', prefixMap[foundKey]);
+                      }
+                      navigate(`/producto/${item.id}`);
+                      toggleCart();
+                    }}
+                    role="button"
+                    aria-label={`Ver detalle de ${item.nombre}`}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="item-image" onClick={e => e.stopPropagation()}>
                       <img src={item.imagen} alt={item.nombre} />
                     </div>
                     <div className="item-details">
@@ -66,21 +89,21 @@ function Carrito() {
                         </div>
                       )}
                     </div>
-                    <div className="item-controls">
+                    <div className="item-controls" onClick={e => e.stopPropagation()}>
                       <div className="quantity-controls">
                         <button
-                          onClick={() => updateQuantity(item.id, item.cantidad - 1)}
+                          onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, item.cantidad - 1); }}
                           className="quantity-btn"
                           disabled={item.cantidad <= 1}
                         >−</button>
-                        <span className="quantity">{item.cantidad}</span>
+                        <span className="quantity" onClick={e => e.stopPropagation()}>{item.cantidad}</span>
                         <button
-                          onClick={() => updateQuantity(item.id, item.cantidad + 1)}
+                          onClick={(e) => { e.stopPropagation(); updateQuantity(item.id, item.cantidad + 1); }}
                           className="quantity-btn"
                         >+</button>
                       </div>
                       <button
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={(e) => { e.stopPropagation(); removeFromCart(item.id); }}
                         className="remove-btn"
                         aria-label={`Eliminar ${item.nombre}`}
                       >🗑️</button>

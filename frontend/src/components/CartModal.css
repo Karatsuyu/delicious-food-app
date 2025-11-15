@@ -15,12 +15,11 @@
   background: white;
   border-radius: 12px;
   border: 2px solid #f28c1e; /* borde naranja como los botones */
-  padding: 76px;
+  padding: 28px 26px 24px; /* reducido para acercar el contenido al icono */
   width: 450px;
   text-align: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin: -15px auto;
-
+  margin: -4px auto; /* menos desplazamiento vertical */
   position: relative;
   z-index: 6000; /* sobre el overlay */
 }
@@ -126,18 +125,19 @@
 
 /* Lista de productos en el modal (sin cambiar tamaño del cuadro) */
 .cart-modal-items {
-  margin: 8px 0 6px;
-  max-height: 220px;
+  margin: 10px 0 10px;
+  max-height: 240px;
   overflow-y: auto;
   text-align: left;
+  width: 100%;
 }
 
 .cart-modal-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 4px;
-  border-bottom: 1px solid #f4f4f4;
+  gap: 14px;
+  padding: 10px 6px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .cart-modal-item:last-child {
@@ -145,11 +145,12 @@
 }
 
 .cart-modal-item-img {
-  width: 42px;
-  height: 42px;
+  width: 60px;
+  height: 60px;
   object-fit: contain;
-  border-radius: 6px;
+  border-radius: 10px;
   flex-shrink: 0;
+  background: #fff;
 }
 
 .cart-modal-item-info {
@@ -161,7 +162,8 @@
 }
 
 .cart-modal-item-name {
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 600;
   color: #333;
   white-space: nowrap;
   overflow: hidden;
@@ -169,9 +171,9 @@
 }
 
 .cart-modal-item-price {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
-  color: #333;
+  color: #f28c1e;
 }
 
 .cart-modal-message.resumen {
