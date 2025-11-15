@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useCallback } from 'react';
-import { authService } from '../api/api';
+import { authService, absolutizeMediaUrl } from '../api/api';
 
 export const AuthContext = createContext();
 
@@ -7,18 +7,24 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const normalizeUser = (u) => {
+    if (!u) return u;
+    const profile_image = absolutizeMediaUrl(u.profile_image);
+    return { ...u, profile_image };
+  };
+
   const loadUser = useCallback(async () => {
     const token = localStorage.getItem('access_token');
     if (token) {
       try {
         const profile = await authService.getProfile();
-        setUser(profile);
+        setUser(normalizeUser(profile));
       } catch (error) {
         console.error('Error cargando perfil:', error);
         // Intentar con el endpoint alternativo
         try {
           const profile = await authService.getMe();
-          setUser(profile);
+          setUser(normalizeUser(profile));
         } catch (error2) {
           console.error('Error cargando perfil alternativo:', error2);
           localStorage.removeItem('access_token');
@@ -42,17 +48,17 @@ export function AuthProvider({ children }) {
       // Obtener perfil del usuario
       try {
         const profile = await authService.getProfile();
-        setUser(profile);
+        setUser(normalizeUser(profile));
       } catch (profileError) {
         // Si falla getProfile, intentar con getMe
         try {
           const profile = await authService.getMe();
-          setUser(profile);
+          setUser(normalizeUser(profile));
         } catch (meError) {
           console.error('Error obteniendo perfil:', meError);
           // Si también falla, usar la información del token
           if (response.user) {
-            setUser(response.user);
+            setUser(normalizeUser(response.user));
           }
         }
       }
@@ -126,7 +132,7 @@ export function AuthProvider({ children }) {
   };
 
   const updateUser = (userData) => {
-    setUser(userData);
+    setUser(normalizeUser(userData));
   };
 
   return (

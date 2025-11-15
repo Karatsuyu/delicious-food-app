@@ -8,6 +8,7 @@ import lupa from '../assets/lupa.png';
 import carrito from '../assets/carrito.png';
 import producto from '../assets/producto.png';
 import combos from '../assets/combos.png';
+import defaultAvatar from '../assets/icono-perfil-vacio-inicio.jpg';
 
   function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -96,8 +97,12 @@ import combos from '../assets/combos.png';
             {/* 👤 LOGIN / REGISTER / USER MENU */}
             {isAuthenticated ? (
               <div className="user-menu">
-                <Link to="/perfil" className="btn btn-user">
-                  {user?.first_name || user?.username || 'Mi Cuenta'}
+                <Link to="/perfil" className="avatar-wrapper" title="Mi perfil" aria-label="Mi perfil">
+                  <img
+                    src={user?.profile_image || defaultAvatar}
+                    alt="Foto de perfil"
+                    className="avatar-image"
+                  />
                 </Link>
                 <button onClick={handleLogout} className="btn btn-logout">Salir</button>
               </div>

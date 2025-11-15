@@ -1,18 +1,19 @@
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { authService } from '../api/api';
+import { authService, absolutizeMediaUrl } from '../api/api';
+import defaultAvatar from '../assets/icono-perfil-vacio-inicio.jpg';
 import api from '../api/api';
 import './Perfil.css';
 
 function Perfil() {
-  const { user, isAuthenticated, loading } = useContext(AuthContext);
+  const { user, isAuthenticated, loading, updateUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loadingStats, setLoadingStats] = useState(true);
   const [combosPersonalizados, setCombosPersonalizados] = useState([]);
   const [loadingCombos, setLoadingCombos] = useState(true);
-  const [imagenPerfil, setImagenPerfil] = useState("ruta/de/tu/foto.png");
+  const [imagenPerfil, setImagenPerfil] = useState(null);
   const [nuevaImagen, setNuevaImagen] = useState(null);
 
   const loadStats = async () => {
@@ -39,9 +40,11 @@ function Perfil() {
 
   const cargarImagenPerfil = async () => {
     try {
-      const response = await api.get("perfil/1/"); // O el perfil del usuario actual
-      if (response.data.imagen) {
-        setImagenPerfil(response.data.imagen);
+      const profile = await authService.getProfile();
+      if (profile?.profile_image) {
+        setImagenPerfil(absolutizeMediaUrl(profile.profile_image));
+      } else {
+        setImagenPerfil(null);
       }
     } catch (error) {
       console.error("Error cargando la imagen del perfil:", error);
@@ -90,14 +93,20 @@ function Perfil() {
   const guardarImagenPerfil = async () => {
     if (!nuevaImagen) return;
     const formData = new FormData();
-    formData.append("imagen", nuevaImagen);
+    formData.append("profile_image", nuevaImagen);
 
     try {
-      await api.put(`perfil/${user.id}/`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const res = await authService.updateProfile(formData);
+      // Respuesta del backend incluye { message, user }
+      if (res?.user) {
+        updateUser(res.user);
+        setImagenPerfil(absolutizeMediaUrl(res.user.profile_image) || null);
+      } else {
+        // Fallback: recargar perfil
+        const profile = await authService.getProfile();
+        updateUser(profile);
+        setImagenPerfil(absolutizeMediaUrl(profile?.profile_image) || null);
+      }
       alert("✅ Imagen de perfil actualizada correctamente");
       setNuevaImagen(null);
     } catch (error) {
@@ -124,7 +133,7 @@ function Perfil() {
         <div className="perfil-header">
           <div className="perfil-foto">
             <img
-              src={imagenPerfil || "/static/img/default-avatar.png"}
+              src={imagenPerfil || defaultAvatar}
               className="foto-perfil"
               alt="Foto de perfil"
             />

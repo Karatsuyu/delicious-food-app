@@ -1,7 +1,23 @@
 import axios from "axios";
 
+// Base URLs centralizados para reuso
+export const API_BASE_URL = "http://127.0.0.1:8000/api/";
+export const API_ORIGIN = API_BASE_URL.replace(/\/?api\/?$/i, "");
+
+// Convierte una ruta /media/... o relativa en URL absoluta al backend
+export const absolutizeMediaUrl = (url) => {
+  if (!url) return null;
+  try {
+    if (/^https?:\/\//i.test(url)) return url; // ya es absoluta
+    if (url.startsWith('/')) return `${API_ORIGIN}${url}`;
+    return `${API_ORIGIN}/${url}`;
+  } catch {
+    return url;
+  }
+};
+
 const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api/",
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -132,7 +148,8 @@ export const authService = {
   
   register: async (userData) => {
     try {
-      const response = await api.post('register/', userData);
+      // Backend expone el registro en /api/users/register/
+      const response = await api.post('users/register/', userData);
       return response.data;
     } catch (error) {
       console.error('Error en registro:', error);
@@ -142,7 +159,8 @@ export const authService = {
   
   getProfile: async () => {
     try {
-      const response = await api.get('profile/');
+      // Perfil del usuario autenticado: /api/users/profile/
+      const response = await api.get('users/profile/');
       return response.data;
     } catch (error) {
       console.error('Error obteniendo perfil:', error);
@@ -152,7 +170,8 @@ export const authService = {
   
   getMe: async () => {
     try {
-      const response = await api.get('users/me/');
+      // Acción del ViewSet UserViewSet -> ruta: /api/users/users/me/
+      const response = await api.get('users/users/me/');
       return response.data;
     } catch (error) {
       console.error('Error obteniendo perfil (me):', error);
@@ -162,7 +181,8 @@ export const authService = {
   
   getStats: async () => {
     try {
-      const response = await api.get('users/estadisticas/');
+      // Acción del ViewSet UserViewSet -> ruta: /api/users/users/estadisticas/
+      const response = await api.get('users/users/estadisticas/');
       return response.data;
     } catch (error) {
       console.error('Error obteniendo estadísticas:', error);
@@ -172,7 +192,11 @@ export const authService = {
   
   updateProfile: async (userData) => {
     try {
-      const response = await api.patch('profile/', userData);
+      // Soporta JSON o FormData (para subir imágenes)
+      const isFormData = typeof FormData !== 'undefined' && userData instanceof FormData;
+      const response = await api.patch('users/profile/', userData, {
+        headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : undefined,
+      });
       return response.data;
     } catch (error) {
       console.error('Error actualizando perfil:', error);
@@ -182,9 +206,11 @@ export const authService = {
   
   changePassword: async (oldPassword, newPassword) => {
     try {
-      const response = await api.post('change-password/', {
+      // UpdateAPIView espera un update; además el serializer requiere confirm_password
+      const response = await api.patch('users/change-password/', {
         old_password: oldPassword,
-        new_password: newPassword
+        new_password: newPassword,
+        confirm_password: newPassword
       });
       return response.data;
     } catch (error) {
