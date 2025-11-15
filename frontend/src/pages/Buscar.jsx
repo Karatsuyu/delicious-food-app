@@ -169,8 +169,8 @@ function Buscar() {
       imagen: item.imagen,
       es_personalizable: Boolean(item.es_personalizable),
     };
-    const message = addToCart(productoData);
-    alert(message);
+  const message = addToCart(productoData);
+  // Se elimina el alert porque el carrito se abre automáticamente; message reservado para posible toast.
   };
 
   return (

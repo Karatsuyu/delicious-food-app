@@ -7,21 +7,21 @@ import './Carrito.css';
 function Carrito() {
   const { isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
-  const { 
-    cartItems, 
-    isOpen, 
-    removeFromCart, 
-    updateQuantity, 
-    clearCart, 
-    getTotalItems, 
-    getTotalPrice, 
-    toggleCart 
+  const {
+    cartItems,
+    isOpen,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    getTotalItems,
+    getTotalPrice,
+    toggleCart
   } = useCart();
 
-  // Si no está autenticado y el carrito está abierto, redirigir al login
+  // Redirigir al login si abre el carrito sin autenticación
   useEffect(() => {
     if (isOpen && !isAuthenticated) {
-      toggleCart(); // Cerrar el carrito
+      toggleCart();
       navigate('/login');
     }
   }, [isOpen, isAuthenticated, navigate, toggleCart]);
@@ -34,9 +34,7 @@ function Carrito() {
       <div className="cart-sidebar">
         <div className="cart-header">
           <h2>🛒 Carrito de Compras</h2>
-          <button className="cart-close-btn" onClick={toggleCart}>
-            ✕
-          </button>
+          <button className="cart-close-btn" onClick={toggleCart}>×</button>
         </div>
 
         <div className="cart-content">
@@ -49,89 +47,63 @@ function Carrito() {
           ) : (
             <>
               <div className="cart-items">
-                {cartItems.map((item) => (
+                {cartItems.map(item => (
                   <div key={item.id} className="cart-item">
                     <div className="item-image">
                       <img src={item.imagen} alt={item.nombre} />
                     </div>
-                    
                     <div className="item-details">
                       <h4 className="item-name">{item.nombre}</h4>
-                      <p className="item-price">
-                        ${item.precio.toLocaleString('es-CO')}
-                      </p>
-                      
+                      <p className="item-price">${item.precio.toLocaleString('es-CO')}</p>
                       {item.personalizacion && Object.keys(item.personalizacion).length > 0 && (
                         <div className="item-customizations">
                           {item.personalizacion.ingredientes && (
-                            <p>
-                              <strong>Ingredientes:</strong> {item.personalizacion.ingredientes.join(', ')}
-                            </p>
+                            <p><strong>Ingredientes:</strong> {item.personalizacion.ingredientes.join(', ')}</p>
                           )}
                           {item.personalizacion.precioExtras > 0 && (
-                            <p>
-                              <strong>Extras:</strong> +${item.personalizacion.precioExtras.toLocaleString('es-CO')}
-                            </p>
+                            <p><strong>Extras:</strong> +${item.personalizacion.precioExtras.toLocaleString('es-CO')}</p>
                           )}
                         </div>
                       )}
                     </div>
-
                     <div className="item-controls">
                       <div className="quantity-controls">
-                        <button 
+                        <button
                           onClick={() => updateQuantity(item.id, item.cantidad - 1)}
                           className="quantity-btn"
-                        >
-                          −
-                        </button>
+                          disabled={item.cantidad <= 1}
+                        >−</button>
                         <span className="quantity">{item.cantidad}</span>
-                        <button 
+                        <button
                           onClick={() => updateQuantity(item.id, item.cantidad + 1)}
                           className="quantity-btn"
-                        >
-                          +
-                        </button>
+                        >+</button>
                       </div>
-                      
-                      <button 
+                      <button
                         onClick={() => removeFromCart(item.id)}
                         className="remove-btn"
-                      >
-                        🗑️
-                      </button>
+                        aria-label={`Eliminar ${item.nombre}`}
+                      >🗑️</button>
                     </div>
-
-                    <div className="item-total">
-                      ${item.precioTotal.toLocaleString('es-CO')}
-                    </div>
+                    <div className="item-total">${item.precioTotal.toLocaleString('es-CO')}</div>
                   </div>
                 ))}
               </div>
-
               <div className="cart-summary">
                 <div className="summary-row">
                   <span>Total ({getTotalItems()} items):</span>
-                  <span className="total-price">
-                    ${getTotalPrice().toLocaleString('es-CO')}
-                  </span>
+                  <span className="total-price">${getTotalPrice().toLocaleString('es-CO')}</span>
                 </div>
               </div>
-
               <div className="cart-actions">
-                <button 
+                <button
                   onClick={clearCart}
                   className="btn-clear-cart"
-                >
-                  🗑️ Limpiar Carrito
-                </button>
-                
-                <button 
+                >🗑️ Limpiar Carrito</button>
+                <button
                   onClick={() => navigate('/checkout')}
                   className="btn-checkout"
-                >
-                  💳 Proceder al Pago
-                </button>
+                >💳 Finalizar Compra</button>
               </div>
             </>
           )}

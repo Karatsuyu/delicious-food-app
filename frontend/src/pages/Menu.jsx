@@ -303,8 +303,9 @@ function Menu() {
       imagen: hamburguesa.imagen,
       es_personalizable: true
     };
-    const message = addToCart(productoData);
-    alert(message);
+              const message = addToCart(productoData);
+              // Reemplazar el alert por apertura automática del carrito (ya gestionada en el contexto)
+              // Podemos añadir un toast en el futuro; por ahora se omite el alert intrusivo.
   };
 
 

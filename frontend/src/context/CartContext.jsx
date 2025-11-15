@@ -28,27 +28,35 @@ export const CartProvider = ({ children }) => {
   }, [cartItems]);
 
   const addToCart = (producto) => {
+    let message;
     setCartItems(prev => {
       const existe = prev.find(item => item.id === producto.id);
-      
       if (existe) {
+        message = `Cantidad de ${existe.nombre} actualizada`;
         return prev.map(item =>
-          item.id === producto.id 
-            ? { 
-                ...item, 
-                cantidad: item.cantidad + 1, 
-                precioTotal: (item.precio * (item.cantidad + 1))
+          item.id === producto.id
+            ? {
+                ...item,
+                cantidad: item.cantidad + 1,
+                precioTotal: item.precio * (item.cantidad + 1)
               }
             : item
         );
       } else {
-        return [...prev, { 
-          ...producto, 
-          cantidad: 1, 
-          precioTotal: producto.precio 
-        }];
+        message = `${producto.nombre} agregado al carrito`;
+        return [
+          ...prev,
+          {
+            ...producto,
+            cantidad: 1,
+            precioTotal: producto.precio
+          }
+        ];
       }
     });
+    // Abrir el carrito automáticamente al agregar
+    setIsOpen(true);
+    return message || 'Producto agregado al carrito';
   };
 
   const removeFromCart = (id) => {
