@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Carrito from './components/Carrito';
 import ProductoDetalle from './pages/ProductoDetalle';
+import ComboDetalle from './pages/ComboDetalle';
 import Personalizador from './pages/Personalizador';
 import Perfil from './pages/Perfil';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -30,6 +31,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/producto/:id" element={<ProductoDetalle />} />
+                <Route path="/combo/:id" element={<ComboDetalle />} />
                 <Route path="/personalizador/:categoria" element={<Personalizador />} />
                 <Route 
                   path="/perfil" 

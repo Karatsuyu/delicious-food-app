@@ -16,12 +16,18 @@ function Home() {
   const [productos, setProductos] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const banners = [banner1, banner2, banner3, banner4];
+  // Mapear cada banner a un combo específico
+  const banners = [
+    { id: 'combo1', img: banner1 },
+    { id: 'combo2', img: banner2 },
+    { id: 'combo3', img: banner3 },
+    { id: 'combo4', img: banner4 },
+  ];
 
   // 🔹 Cambio automático del carrusel
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % banners.length);
+  setCurrentSlide((prev) => (prev + 1) % banners.length);
     }, 4000); // cada 4 segundos
     return () => clearInterval(interval);
   }, [banners.length]);
@@ -42,11 +48,13 @@ function Home() {
               key={index}
               className={`banner-slide ${index === currentSlide ? 'active' : ''}`}
             >
-              <img
-                src={banner}
-                alt={`Banner ${index + 1}`}
-                className="banner-image"
-              />
+              <Link to={`/combo/${banner.id}`} aria-label={`Ver ${banner.id}`}>
+                <img
+                  src={banner.img}
+                  alt={`Banner ${index + 1}`}
+                  className="banner-image"
+                />
+              </Link>
             </div>
           ))}
 
