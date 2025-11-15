@@ -13,19 +13,32 @@ export const useCart = () => {
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
   // Cargar carrito desde localStorage al iniciar
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      setCartItems(JSON.parse(savedCart));
+    try {
+      const savedCart = localStorage.getItem('cart');
+      if (savedCart) {
+        const parsed = JSON.parse(savedCart);
+        if (Array.isArray(parsed)) setCartItems(parsed);
+      }
+    } catch (e) {
+      console.warn('No se pudo leer el carrito de localStorage:', e);
+    } finally {
+      setHydrated(true);
     }
   }, []);
 
   // Guardar carrito en localStorage cuando cambie
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-  }, [cartItems]);
+    if (!hydrated) return;
+    try {
+      localStorage.setItem('cart', JSON.stringify(cartItems));
+    } catch (e) {
+      console.warn('No se pudo guardar el carrito en localStorage:', e);
+    }
+  }, [cartItems, hydrated]);
 
   const addToCart = (producto) => {
     let message;

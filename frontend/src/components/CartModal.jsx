@@ -23,21 +23,29 @@ const CartModal = ({ isOpen, onClose }) => {
 		toggleCart();
 	};
 
-	// Posicionar el modal debajo y centrado respecto al ícono del carrito
-	useEffect(() => {
-		if (isOpen) {
-			const cartButton = document.querySelector('.cart-icon');
-			if (cartButton) {
+		// Posicionar el modal debajo y centrado respecto al ícono del carrito
+		useEffect(() => {
+			const updatePosition = () => {
+				if (!isOpen) return;
+				const cartButton = document.querySelector('.cart-icon');
+				if (!cartButton) return;
 				const rect = cartButton.getBoundingClientRect();
-				const top = rect.bottom + window.scrollY + 12;
-				const centerX = rect.left + rect.width / 2 + window.scrollX;
-				const minX = window.scrollX + 16;
-				const maxX = window.scrollX + window.innerWidth - 16;
+				const top = rect.bottom + 2; // debajo del icono, relativo al viewport
+				const centerX = rect.left + rect.width / 2;
+				const minX = 16;
+				const maxX = window.innerWidth - 16;
 				const adjustedLeft = Math.min(maxX, Math.max(minX, centerX));
 				setPosition({ top, left: adjustedLeft });
-			}
-		}
-	}, [isOpen]);
+			};
+
+			updatePosition();
+			window.addEventListener('scroll', updatePosition, { passive: true });
+			window.addEventListener('resize', updatePosition);
+			return () => {
+				window.removeEventListener('scroll', updatePosition);
+				window.removeEventListener('resize', updatePosition);
+			};
+		}, [isOpen]);
 
 	// Redirigir al login si intenta abrir modal sin autenticación
 	useEffect(() => {
@@ -53,9 +61,9 @@ const CartModal = ({ isOpen, onClose }) => {
 		<div className="cart-modal-overlay" onClick={onClose}>
 			<div
 				ref={modalRef}
-				className="cart-modal-content"
-				style={{
-					position: 'absolute',
+						className="cart-modal-content"
+						style={{
+							position: 'fixed',
 					top: `${position.top}px`,
 					left: `${position.left}px`,
 					transform: 'translateX(-50%)',
