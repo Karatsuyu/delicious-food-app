@@ -411,11 +411,13 @@ const Personalizador = () => {
   };
   
   const handleVolver = () => {
-    if (window.history.state && window.history.state.idx > 0) {
-      navigate(-1); // Hay historial: retroceder
+    // Intento estándar de retroceder: si existe historial suficiente usa -1, si no redirige a inicio.
+    // window.history.length es más confiable que window.history.state.idx en algunos navegadores/Vite.
+    if (window.history.length > 1) {
+      navigate(-1);
     } else {
-      navigate('/'); // No hay historial: ir al inicio
-    } 
+      navigate('/');
+    }
   };
 
   // ✅ Actualizado: usa calcularPrecio()
@@ -442,7 +444,7 @@ const Personalizador = () => {
   return (
     <div className="personalizador-container">
       <div className="personalizador-header">
-        <button className="back-button" onClick={() => navigate(-1)}>
+        <button className="back-button" onClick={handleVolver}>
           ← Volver
         </button>
         <h1 className="personalizador-title">Personaliza tu Pedido</h1>
