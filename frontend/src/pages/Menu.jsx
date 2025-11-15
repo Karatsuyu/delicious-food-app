@@ -347,7 +347,7 @@ function Menu() {
     alert(message);
   };
 
-  const handPostresAddToCart = (e, postres) => {
+  const handlePostresAddToCart = (e, postres) => {
     e.stopPropagation();
     const productoData = {
       id: postres.id,
@@ -360,13 +360,13 @@ function Menu() {
     alert(message);
   };
 
-   const handlePapasAddToCart = (e, postres) => {
+  const handlePapasAddToCart = (e, papas) => {
     e.stopPropagation();
     const productoData = {
-      id: postres.id,
-      nombre: postres.nombre,
-      precio: postres.precio,
-      imagen: postres.imagen,
+      id: papas.id,
+      nombre: papas.nombre,
+      precio: papas.precio,
+      imagen: papas.imagen,
     };
     const message = addToCart(productoData);
     alert(message);
@@ -385,9 +385,11 @@ function Menu() {
   };
 
   const handleCategoriaChange = (categoriaId) => {
-    console.log('Cambiando a categoría:', categoriaId);
+    // Cambia el estado y también actualiza la URL para que sea navegable (back/forward)
     setCategoriaActual(categoriaId);
+    navigate(`/menu?categoria=${categoriaId}`);
   };
+  
 
   const handleHamburguesaClick = (hamburguesa) => {
     sessionStorage.setItem('ultimaCategoria', 'hamburguesas');
@@ -581,7 +583,7 @@ function Menu() {
                 <div className="hamburguesa-actions">
                   <button 
                     className="btn-hamburguesa-cart"
-                    onClick={(e) => handPostresAddToCart(e, postre)}
+              onClick={(e) => handlePostresAddToCart(e, postre)}
                   >
                     Agregar al carrito
                   </button>
@@ -609,7 +611,7 @@ function Menu() {
                 <div className="hamburguesa-actions">
                   <button 
                     className="btn-hamburguesa-cart"
-                    onClick={(e) => handPapasAddToCart(e, papas)}
+              onClick={(e) => handlePapasAddToCart(e, papas)}
                   >
                     Agregar al carrito
                   </button>

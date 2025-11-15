@@ -4,16 +4,17 @@
 .cart-modal-overlay {
   position: fixed;
   top: 0;
-  left: 130px;
-  width: 100%;
-  height: 100%;
+  left: 0; /* cubrir desde el borde izquierdo */
+  width: 100vw;
+  height: 100vh;
   background-color: transparent; /* Sin fondo oscuro */
-  z-index: 1000;
+  z-index: 5000; /* por encima del header y otros elementos */
 }
 
 .cart-modal-content {
   background: white;
   border-radius: 12px;
+  border: 2px solid #f28c1e; /* borde naranja como los botones */
   padding: 76px;
   width: 450px;
   text-align: center;
@@ -21,6 +22,7 @@
   margin: -15px auto;
 
   position: relative;
+  z-index: 6000; /* sobre el overlay */
 }
 
 .cart-modal-icon-img {

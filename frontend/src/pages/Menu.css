@@ -2,6 +2,7 @@
 
 .menu-page {
   min-height: 100vh;
+  padding-top: 88px; /* deja espacio para el header fijo (88px) */
   padding-bottom: 40px;
   background: white;
   width: 100%;
@@ -15,7 +16,7 @@
   margin-bottom: 0;
   width: 100%;
   position: sticky;
-  top: 0;
+  top: 88px; /* se fija justo debajo del header */
   z-index: 1000;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }

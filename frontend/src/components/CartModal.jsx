@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import './CartModal.css';
 import carrito1 from '../assets/carrito1.png';
-
 const CartModal = ({ isOpen, onClose }) => {
   const { isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -20,11 +19,14 @@ const CartModal = ({ isOpen, onClose }) => {
       const cartButton = document.querySelector('.cart-icon');
       if (cartButton) {
         const rect = cartButton.getBoundingClientRect();
-        const top = rect.bottom + window.scrollY;
-        const left = rect.right - 360; // Ajusta según el ancho del modal
+        // Posicionar el modal DEBAJO y CENTRADO respecto al icono del carrito
+        const top = rect.bottom + window.scrollY + 12; // un pequeño offset hacia abajo
+        const centerX = rect.left + rect.width / 2 + window.scrollX;
 
-        // Asegurar que no se salga de la pantalla
-        const adjustedLeft = Math.max(0, left);
+        // Limitar ligeramente para que no se salga por los bordes de la ventana
+        const minX = window.scrollX + 16;
+        const maxX = window.scrollX + window.innerWidth - 16;
+        const adjustedLeft = Math.min(maxX, Math.max(minX, centerX));
 
         setPosition({ top, left: adjustedLeft });
       }
@@ -56,7 +58,8 @@ const CartModal = ({ isOpen, onClose }) => {
           top: `${position.top}px`,
           left: `${position.left}px`,
           transform: 'translateX(-50%)', // Centra horizontalmente respecto al botón
-          zIndex: 1001,
+          margin: 0,
+          zIndex: 6001,
         }}
         onClick={(e) => e.stopPropagation()}
       >

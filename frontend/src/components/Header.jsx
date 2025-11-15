@@ -120,7 +120,7 @@ import defaultAvatar from '../assets/icono-perfil-vacio-inicio.jpg';
         <aside className={`side-menu ${isMenuOpen ? 'open' : ''}`}>
           <button className="close-btn" onClick={toggleMenu}>✕</button>
           <ul className="side-menu-list">
-            <Link to="/menu" className="side-menu-link">
+            <Link to="/menu?categoria=hamburguesas" className="side-menu-link">
               <img src={producto} alt="Productos" className="producto-image" />
               Productos
             </Link>
