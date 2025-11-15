@@ -75,6 +75,12 @@
   margin-top: 8px;
 }
 
+.cart-modal-button.secondary {
+  background: #fff;
+  color: #f28c1e;
+  border: 1px solid #f28c1e;
+}
+
 
 .cart-modal-close {
   position: absolute;
@@ -116,4 +122,58 @@
     font-size: 12px;
     padding: 6px 16px;
   }
+}
+
+/* Lista de productos en el modal (sin cambiar tamaño del cuadro) */
+.cart-modal-items {
+  margin: 8px 0 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.cart-modal-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 4px;
+  border-bottom: 1px solid #f4f4f4;
+}
+
+.cart-modal-item:last-child {
+  border-bottom: none;
+}
+
+.cart-modal-item-img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.cart-modal-item-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+
+.cart-modal-item-name {
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-modal-item-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.cart-modal-message.resumen {
+  margin-top: 8px;
 }

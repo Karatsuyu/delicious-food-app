@@ -54,8 +54,10 @@ export const CartProvider = ({ children }) => {
         ];
       }
     });
-    // Abrir el carrito automáticamente al agregar
-    setIsOpen(true);
+    // Abrir el popup del carrito (no el lateral) al agregar
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('open-cart-modal'));
+    }
     return message || 'Producto agregado al carrito';
   };
 

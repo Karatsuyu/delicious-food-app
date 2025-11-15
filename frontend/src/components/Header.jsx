@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import './Header.css';
 import CartModal from '../components/CartModal';
@@ -51,6 +51,12 @@ import defaultAvatar from '../assets/icono-perfil-vacio-inicio.jpg';
       }
       setIsCartOpen(true);
     };
+
+    useEffect(() => {
+      const openHandler = () => setIsCartOpen(true);
+      window.addEventListener('open-cart-modal', openHandler);
+      return () => window.removeEventListener('open-cart-modal', openHandler);
+    }, []);
 
     const handleLogout = () => {
       logout();

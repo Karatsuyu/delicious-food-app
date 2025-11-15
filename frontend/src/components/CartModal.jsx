@@ -68,23 +68,34 @@ const CartModal = ({ isOpen, onClose }) => {
 				<div className="cart-modal-icon">
 					<img src={carrito1} alt="Carrito" className="cart-modal-icon-img" />
 				</div>
-				{cartItems.length === 0 ? (
-					<>
-						<h2 className="cart-modal-title">Tu carrito está vacío</h2>
-						<p className="cart-modal-message">¿Quieres empezar a ordenar?</p>
-						<button className="cart-modal-button" onClick={handleExplorarMenu}>Explorar Menú</button>
-						<button className="cart-modal-button secondary" onClick={handleExpand}>Ampliar (ver lateral)</button>
-					</>
-				) : (
-					<>
-						<h2 className="cart-modal-title">Carrito</h2>
-						<p className="cart-modal-message">
-							{getTotalItems()} producto(s) · Total ${getTotalPrice().toLocaleString('es-CO')}
-						</p>
-						<button className="cart-modal-button" onClick={handleExpand}>Ver carrito completo</button>
-						<button className="cart-modal-button secondary" onClick={handleExplorarMenu}>Seguir comprando</button>
-					</>
-				)}
+						{cartItems.length === 0 ? (
+							<>
+								<h2 className="cart-modal-title">Tu carrito está vacío</h2>
+								<p className="cart-modal-message">¿Quieres empezar a ordenar?</p>
+								<button className="cart-modal-button" onClick={handleExplorarMenu}>Explorar Menú</button>
+								<button className="cart-modal-button secondary" onClick={handleExpand}>Ampliar (ver lateral)</button>
+							</>
+						) : (
+							<>
+								<h2 className="cart-modal-title">Carrito</h2>
+								<div className="cart-modal-items">
+									{cartItems.map((item) => (
+										<div key={item.id} className="cart-modal-item">
+											<img src={item.imagen} alt={item.nombre} className="cart-modal-item-img" />
+											<div className="cart-modal-item-info">
+												<div className="cart-modal-item-name" title={item.nombre}>{item.nombre}</div>
+												<div className="cart-modal-item-price">${item.precio.toLocaleString('es-CO')}</div>
+											</div>
+										</div>
+									))}
+								</div>
+								<p className="cart-modal-message resumen">
+									{getTotalItems()} producto(s) · Total ${getTotalPrice().toLocaleString('es-CO')}
+								</p>
+								<button className="cart-modal-button" onClick={handleExpand}>Ver carrito completo</button>
+								<button className="cart-modal-button secondary" onClick={handleExplorarMenu}>Seguir comprando</button>
+							</>
+						)}
 			</div>
 		</div>
 	);
