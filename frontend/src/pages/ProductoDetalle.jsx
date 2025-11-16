@@ -1,7 +1,7 @@
 // src/components/ProductoDetalle.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-//import { useCart } from '../context/CartContext';
+import { useCart } from '../context/CartContext';
 
 // Importar imágenes
 import hamburguesa1 from '../assets/hamburguesa1.png';
@@ -66,6 +66,7 @@ const ProductoDetalle = () => {
   const [loading, setLoading] = useState(true);
   const [tamañoSeleccionado, setTamañoSeleccionado] = useState('pequeña');
   const [tipoPolloSeleccionado, setTipoPolloSeleccionado] = useState('alitas'); 
+  const { addToCart } = useCart();
 
   // Definir tamaños de pizzas
   const tamaños = {
@@ -129,11 +130,7 @@ const tiposPollo = {
     { id: 'alitas12', nombre: '8 Partes', precio: 16500},
   ],
 };
-
-  const addToCart = () => {
-    console.log('Agregar al carrito (simulado)');
-    return 'Producto agregado al carrito';
-  };
+  
 
   useEffect(() => {
     const cargarProducto = () => {
@@ -592,7 +589,6 @@ const tiposPollo = {
     };
 
     addToCart(productoParaCarrito);
-    alert('Producto agregado al carrito');
   };
   if (loading) {
     return <div className="loading">Cargando producto...</div>;

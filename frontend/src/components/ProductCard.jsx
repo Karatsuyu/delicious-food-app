@@ -17,8 +17,7 @@ function ProductCard({ producto }) {
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
-    const message = addToCart(producto);
-    alert(message);
+    addToCart(producto);
   };
 
   return (

@@ -145,16 +145,34 @@
             }, 1000);
         });
         
-        // Service Worker registration (for PWA capabilities)
+        // Service Worker handling
+        // En desarrollo (localhost), forzamos desregistrar cualquier SW previo para evitar páginas en blanco por caches obsoletos.
+        // En producción, puedes registrar tu SW real si existe.
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then((registration) => {
-                        console.log('SW registered: ', registration);
-                    })
-                    .catch((registrationError) => {
-                        console.log('SW registration failed: ', registrationError);
-                    });
+            window.addEventListener('load', async () => {
+                const isLocalhost = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+                if (isLocalhost) {
+                    try {
+                        const regs = await navigator.serviceWorker.getRegistrations();
+                        regs.forEach(r => r.unregister());
+                        console.log('[SW] Unregistered all service workers in dev');
+                    } catch (e) {
+                        console.warn('[SW] Unregister failed:', e);
+                    }
+                } else {
+                    // Registra tu SW en producción solo si el archivo existe en el servidor
+                    fetch('/sw.js', { method: 'HEAD' })
+                      .then(res => {
+                        if (res.ok) {
+                          navigator.serviceWorker.register('/sw.js')
+                            .then(reg => console.log('SW registered:', reg))
+                            .catch(err => console.log('SW registration failed:', err));
+                        } else {
+                          console.log('SW not found on server; skipping registration');
+                        }
+                      })
+                      .catch(() => console.log('Skipping SW registration (fetch /sw.js failed)'));
+                }
             });
         }
     </script>

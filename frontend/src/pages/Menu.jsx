@@ -303,9 +303,8 @@ function Menu() {
       imagen: hamburguesa.imagen,
       es_personalizable: true
     };
-              const message = addToCart(productoData);
-              // Reemplazar el alert por apertura automática del carrito (ya gestionada en el contexto)
-              // Podemos añadir un toast en el futuro; por ahora se omite el alert intrusivo.
+              addToCart(productoData);
+              // El carrito modal se abre automáticamente vía evento en el contexto
   };
 
 
@@ -318,8 +317,7 @@ function Menu() {
       imagen: pizza.imagen,
       es_personalizable: true
     };
-    const message = addToCart(productoData);
-    alert(message);
+    addToCart(productoData);
   };
 
   const handlePolloAddToCart = (e, pollo) => {
@@ -331,8 +329,7 @@ function Menu() {
       imagen: pollo.imagen,
       es_personalizable: true
     };
-    const message = addToCart(productoData);
-    alert(message);
+    addToCart(productoData);
   };
 
   const handlePerroAddToCart = (e, perro) => {
@@ -344,8 +341,7 @@ function Menu() {
       imagen: perro.imagen,
       es_personalizable: true
     };
-    const message = addToCart(productoData);
-    alert(message);
+    addToCart(productoData);
   };
 
   const handlePostresAddToCart = (e, postres) => {
@@ -357,8 +353,7 @@ function Menu() {
       imagen: postres.imagen,
       es_personalizable: true
     };
-    const message = addToCart(productoData);
-    alert(message);
+    addToCart(productoData);
   };
 
   const handlePapasAddToCart = (e, papas) => {
@@ -369,8 +364,7 @@ function Menu() {
       precio: papas.precio,
       imagen: papas.imagen,
     };
-    const message = addToCart(productoData);
-    alert(message);
+    addToCart(productoData);
   };
 
   const handleBebidasAddToCart = (e, bebidas) => {
@@ -381,8 +375,7 @@ function Menu() {
       precio: bebidas.precio,
       imagen: bebidas.imagen,
     };
-    const message = addToCart(productoData);
-    alert(message);
+    addToCart(productoData);
   };
 
   const handleCategoriaChange = (categoriaId) => {

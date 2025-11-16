@@ -429,8 +429,7 @@ const Personalizador = () => {
       precioExtras: calcularPrecio() - (parseFloat(producto.precio) || 0) * personalizacion.cantidad
     };
     
-    const message = addToCart(producto, customizations);
-    alert(message);
+    addToCart(producto, customizations);
   };
 
   if (loading) {

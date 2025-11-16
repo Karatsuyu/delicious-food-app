@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import banner1 from '../assets/banner1.png';
 import banner2 from '../assets/banner2.png';
@@ -15,13 +15,14 @@ import './Home.css';
 function Home() {
   const [productos, setProductos] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate();
 
   // Mapear cada banner a un combo específico
   const banners = [
-    { id: 'combo1', img: banner1 },
-    { id: 'combo2', img: banner2 },
-    { id: 'combo3', img: banner3 },
-    { id: 'combo4', img: banner4 },
+    { path: '/combo-bbq-crispy', img: banner1, titulo: 'COMBO BBQ CRISPY' },
+    { path: '/combo-clasico-bacon', img: banner2, titulo: 'COMBO CLASICO BACON' },
+    { path: '/combo-pepperoni-lovers', img: banner3, titulo: 'COMBO PEPPERONI LOVERS' },
+    { path: '/combo-crocante-deluxe', img: banner4, titulo: 'COMBO CROCANTE DELUXE' },
   ];
 
   // 🔹 Cambio automático del carrusel
@@ -42,31 +43,32 @@ function Home() {
 
       {/* Banner principal */}
       <section className="banner-section">
-        <div className="banner-container">
+        <div className="banner-container" onClick={() => navigate(banners[currentSlide].path)} style={{cursor:'pointer'}}>
           {banners.map((banner, index) => (
             <div
               key={index}
               className={`banner-slide ${index === currentSlide ? 'active' : ''}`}
+              role="button"
+              aria-label={`Ver ${banner.titulo}`}
+              style={{ pointerEvents: index === currentSlide ? 'auto' : 'none' }}
             >
-              <Link to={`/combo/${banner.id}`} aria-label={`Ver ${banner.id}`}>
-                <img
-                  src={banner.img}
-                  alt={`Banner ${index + 1}`}
-                  className="banner-image"
-                />
-              </Link>
+              <img
+                src={banner.img}
+                alt={`Banner ${index + 1}`}
+                className="banner-image"
+              />
             </div>
           ))}
 
-          <button className="banner-arrow left" onClick={prevSlide}>‹</button>
-          <button className="banner-arrow right" onClick={nextSlide}>›</button>
+          <button className="banner-arrow left" onClick={(e)=>{e.stopPropagation(); prevSlide();}}>‹</button>
+          <button className="banner-arrow right" onClick={(e)=>{e.stopPropagation(); nextSlide();}}>›</button>
 
           <div className="banner-dots">
             {banners.map((_, index) => (
               <span
                 key={index}
                 className={`dot ${index === currentSlide ? 'active' : ''}`}
-                onClick={() => goToSlide(index)}
+                onClick={(e)=>{e.stopPropagation(); goToSlide(index);}}
               ></span>
             ))}
           </div>
