@@ -355,3 +355,81 @@ body, html {
 footer, .footer {
   background-color: #ffffff !important;
 }
+
+/* ===================== Reseñas ===================== */
+.reviews-section { padding:42px 28px 60px; background:#fff; }
+.reviews-title-inline { margin:0 0 18px 4px; color:#F28c1e; }
+.reviews-carousel { position:relative; overflow:hidden; width:100%; }
+.reviews-track { display:flex; gap:26px; scroll-behavior:smooth; padding:4px 4px 10px; }
+.review-card { flex:0 0 340px; position:relative; display:grid; grid-template-columns:72px 1fr; align-items:center; gap:14px; background:#fff; border-radius:14px; padding:18px 22px 20px; box-shadow:0 12px 20px -8px rgba(0,0,0,0.30); border:1px solid rgba(0,0,0,0.05); }
+
+.review-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #f2b84d;
+}
+
+.review-body { display:flex; flex-direction:column }
+.review-header { display:flex; align-items:center; justify-content:space-between }
+.review-stars { color:#f1a20b; font-size:18px }
+.review-text { margin:8px 0 8px 0; font-family: 'Pacifico', cursive; color:#000; font-size:18px }
+.review-underline { height:4px; width:70%; background:#e8413d; border-radius:2px }
+
+.review-logo { position:absolute; right:12px; top:10px; width:52px; height:auto; opacity:0.95 }
+
+/* carousel arrows */
+.reviews-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 5;
+}
+.reviews-arrow.left { left: 8px }
+.reviews-arrow.right { right: 8px }
+
+@media (max-width: 900px) {
+  .review-card { flex:0 0 300px }
+}
+
+@media (max-width: 520px) {
+  .review-card { flex:0 0 85%; }
+}
+
+/* ========== Marquee infinito para Reseñas ========== */
+.reviews-marquee {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  gap: var(--reviews-gap, 26px);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.reviews-marquee-group {
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  gap: var(--reviews-gap, 26px);
+  min-width: 100%;
+  animation: reviews-scroll var(--reviews-duration, 35s) linear infinite;
+}
+
+@keyframes reviews-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(-100% - var(--reviews-gap, 26px))); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reviews-marquee-group { animation: none; }
+}

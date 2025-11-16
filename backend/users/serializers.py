@@ -53,27 +53,24 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 'non_field_errors': ['Se requiere contraseña']
             })
         
-        # Intentar autenticación primero con email
-        user = None
-        try:
-            user = User.objects.get(email=username_or_email)
-            if not user.check_password(password):
-                user = None
-        except User.DoesNotExist:
-            pass
-        except User.MultipleObjectsReturned:
-            # Si hay múltiples usuarios con el mismo email (no debería pasar pero por si acaso)
-            user = User.objects.filter(email=username_or_email, is_active=True).first()
+        # Normalizar para búsquedas case-insensitive (email puede variar en mayúsculas)
+        lookup_value = username_or_email.lower()
+
+        # 1) Intentar autenticación con el backend estándar (maneja bloqueo, is_active, etc.)
+        # Dado que USERNAME_FIELD = 'email', pasamos como username.
+        user = authenticate(username=username_or_email, password=password)
+
+        # 2) Si falla authenticate (por case sensitivity o porque se utilizó username), intentar manual.
+        if not user:
+            # Buscar por email (case-insensitive)
+            user = User.objects.filter(email__iexact=lookup_value).first()
             if user and not user.check_password(password):
                 user = None
-        
-        # Si no funciona con email, intentar con username
+
+        # 3) Si todavía no, intentar por username (case-insensitive)
         if not user:
-            try:
-                user = User.objects.get(username=username_or_email)
-                if not user.check_password(password):
-                    user = None
-            except User.DoesNotExist:
+            user = User.objects.filter(username__iexact=lookup_value).first()
+            if user and not user.check_password(password):
                 user = None
         
         if not user:

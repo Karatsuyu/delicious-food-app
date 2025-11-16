@@ -11,11 +11,16 @@ import pollo from '../assets/pollo.png';
 import perro from '../assets/perro.png';
 import postre from '../assets/postre.png';
 import './Home.css';
+import logo from '../assets/logo.png';
+import api from '../api/api';
+import { useRef } from 'react';
 
 function Home() {
   const [productos, setProductos] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
+  const carouselRef = useRef(null);
+  const [reviews, setReviews] = useState([]);
 
   // Mapear cada banner a un combo específico
   const banners = [
@@ -37,6 +42,36 @@ function Home() {
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % banners.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length);
   const goToSlide = (index) => setCurrentSlide(index);
+
+  // Obtener reseñas desde el backend (no quemadas)
+  useEffect(() => {
+    let mounted = true;
+    const fetchReviews = async () => {
+      try {
+        const resp = await api.get('reviews/');
+        if (!mounted) return;
+        // Resp puede ser lista de objetos {id, usuario, texto, calificacion, creado}
+        setReviews(Array.isArray(resp.data) ? resp.data : []);
+      } catch (err) {
+        console.error('Error cargando reseñas:', err);
+        setReviews([]);
+      }
+    };
+    fetchReviews();
+    return () => { mounted = false; };
+  }, []);
+
+  const scrollReviews = (direction = 'next') => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const card = el.querySelector('.review-card');
+    if (!card) return;
+    const style = window.getComputedStyle(card);
+    const gap = parseInt(style.marginRight || 20, 10) || 20;
+    const width = card.offsetWidth + gap;
+    const delta = direction === 'next' ? width : -width;
+    el.scrollBy({ left: delta, behavior: 'smooth' });
+  };
 
   return (
     <div className="home">
@@ -75,7 +110,7 @@ function Home() {
         </div>
       </section>
 
-      {/* Categorías */}
+  {/* Categorías */}
       <section className="categories-section">
         <div className="categories-container">
           <Link to="/menu?categoria=hamburguesas" className="category-item">
@@ -135,6 +170,69 @@ function Home() {
           </Link> 
         </div>
      </section>
+
+      {/* Reseñas (Marquee infinito estilo solicitado) */}
+      <section className="reviews-section">
+        <h2 className="section-title-custom reviews-title-inline">Reseñas</h2>
+        {reviews && reviews.length > 0 ? (
+          <div
+            className="reviews-marquee"
+            style={{ '--reviews-duration': `${Math.max(24, reviews.length * 4)}s` }}
+          >
+            <div className="reviews-marquee-group">
+              {reviews.map((r) => {
+                const rating = r.calificacion || r.rating || 5;
+                const text = r.texto || r.comment || '';
+                const uid = r.usuario || (r.user && r.user.id) || Math.floor(Math.random() * 1000);
+                const avatar = r.usuario_profile_image || r.profile_image || `https://i.pravatar.cc/80?img=${(uid % 70) + 1}`;
+                return (
+                  <article key={`g1-${r.id}`} className="review-card">
+                    <img className="review-avatar" src={avatar} alt="Foto de perfil" />
+                    <div className="review-body">
+                      <div className="review-header">
+                        <div className="review-stars" aria-label={`${rating} estrellas`}>
+                          {Array.from({ length: rating }).map(() => '★').join('')}
+                          {Array.from({ length: 5 - rating }).map(() => '☆').join('')}
+                        </div>
+                      </div>
+                      <p className="review-text">{text}</p>
+                      <div className="review-underline" />
+                    </div>
+                    <img className="review-logo" src={logo} alt="Logo Delicious Food" />
+                  </article>
+                );
+              })}
+            </div>
+            {/* Segunda copia para efecto infinito */}
+            <div className="reviews-marquee-group" aria-hidden="true">
+              {reviews.map((r) => {
+                const rating = r.calificacion || r.rating || 5;
+                const text = r.texto || r.comment || '';
+                const uid = r.usuario || (r.user && r.user.id) || Math.floor(Math.random() * 1000);
+                const avatar = r.usuario_profile_image || r.profile_image || `https://i.pravatar.cc/80?img=${(uid % 70) + 1}`;
+                return (
+                  <article key={`g2-${r.id}`} className="review-card">
+                    <img className="review-avatar" src={avatar} alt="Foto de perfil" />
+                    <div className="review-body">
+                      <div className="review-header">
+                        <div className="review-stars" aria-label={`${rating} estrellas`}>
+                          {Array.from({ length: rating }).map(() => '★').join('')}
+                          {Array.from({ length: 5 - rating }).map(() => '☆').join('')}
+                        </div>
+                      </div>
+                      <p className="review-text">{text}</p>
+                      <div className="review-underline" />
+                    </div>
+                    <img className="review-logo" src={logo} alt="Logo Delicious Food" />
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <p style={{ padding: '12px', color: '#666' }}>No hay reseñas disponibles todavía.</p>
+        )}
+      </section>
 
     </div>
   );

@@ -138,7 +138,15 @@ export const productService = {
 export const authService = {
   login: async (username, password) => {
     try {
-      const response = await api.post('token/', { username, password });
+      // Acepta email o username; normaliza y arma el payload correcto
+      const identifier = (username || '').trim();
+      const pwd = (password || '').trim();
+      // Enviar ambos campos para máxima compatibilidad con el serializer backend
+      const response = await api.post('token/', {
+        username: identifier,
+        email: identifier,
+        password: pwd
+      });
       return response.data;
     } catch (error) {
       console.error('Error en login:', error);
