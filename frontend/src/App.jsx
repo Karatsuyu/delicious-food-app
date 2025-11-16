@@ -9,6 +9,10 @@ import Register from './pages/Register';
 import Carrito from './components/Carrito';
 import ProductoDetalle from './pages/ProductoDetalle';
 import ComboDetalle from './pages/ComboDetalle';
+import ComboBBQCrispy from './pages/ComboBBQCrispy';
+import ComboClasicoBacon from './pages/ComboClasicoBacon';
+import ComboPepperoniLovers from './pages/ComboPepperoniLovers';
+import ComboCrocanteDeluxe from './pages/ComboCrocanteDeluxe';
 import Personalizador from './pages/Personalizador';
 import Perfil from './pages/Perfil';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -31,6 +35,12 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/producto/:id" element={<ProductoDetalle />} />
+                {/* Rutas nuevas: 4 pantallas independientes para cada combo */}
+                <Route path="/combo-bbq-crispy" element={<ComboBBQCrispy />} />
+                <Route path="/combo-clasico-bacon" element={<ComboClasicoBacon />} />
+                <Route path="/combo-pepperoni-lovers" element={<ComboPepperoniLovers />} />
+                <Route path="/combo-crocante-deluxe" element={<ComboCrocanteDeluxe />} />
+                {/* Ruta dinámica previa se mantiene (opcional) */}
                 <Route path="/combo/:id" element={<ComboDetalle />} />
                 <Route path="/personalizador/:categoria" element={<Personalizador />} />
                 <Route 
