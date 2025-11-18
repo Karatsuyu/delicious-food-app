@@ -33,9 +33,19 @@ function Checkout() {
     try {
       setLoading(true);
       setError('');
+      // Importante: en sandbox de MP Colombia, enviar phone/address mal formateados rompe el checkout (FE-xxxx).
+      // Enviar solo nombre, apellido y email para máxima compatibilidad.
       const payload = {
-        items: itemsForSummary.map(i => ({ title: i.title, quantity: i.quantity, unit_price: i.unit_price })),
-        payer: { name: buyer.nombre, surname: buyer.apellidos, email: buyer.email, phone: buyer.telefono, address: buyer.direccion },
+        items: itemsForSummary.map(i => ({
+          title: i.title,
+          quantity: i.quantity,
+          unit_price: i.unit_price
+        })),
+        payer: {
+          name: buyer.nombre || 'Test',
+          surname: buyer.apellidos || 'User',
+          email: buyer.email || 'test@test.com'
+        },
         success_url: window.location.origin + '/success',
         failure_url: window.location.origin + '/failure',
         pending_url: window.location.origin + '/pending',
