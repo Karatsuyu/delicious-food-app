@@ -423,13 +423,34 @@ const Personalizador = () => {
   // ✅ Actualizado: usa calcularPrecio()
   const agregarAlCarrito = () => {
     if (!producto) return;
-    
-    const customizations = {
-      ...personalizacion,
-      precioExtras: calcularPrecio() - (parseFloat(producto.precio) || 0) * personalizacion.cantidad
+
+    // Construir detalle legible de la "combinación" personalizada para mostrar en el carrito pequeño
+    const detalles = {
+      ...(personalizacion.tamaño && { tamaño: tamaños.find(t => t.id === personalizacion.tamaño)?.nombre || personalizacion.tamaño }),
+      ...(personalizacion.pan && { pan: personalizacion.pan }),
+      ...(personalizacion.masa && { masa: personalizacion.masa }),
+      ...(Array.isArray(personalizacion.carnes) && personalizacion.carnes.length > 0
+        ? { carnes: personalizacion.carnes }
+        : (personalizacion.carnes && typeof personalizacion.carnes === 'string'
+            ? { carnes: [personalizacion.carnes] }
+            : {})),
+      ...(Array.isArray(personalizacion.ingredientes) && personalizacion.ingredientes.length > 0 && { ingredientes: personalizacion.ingredientes }),
+      ...(Array.isArray(personalizacion.extras) && personalizacion.extras.length > 0 && { extras: personalizacion.extras }),
+      ...(personalizacion.observaciones && { observaciones: personalizacion.observaciones })
     };
-    
-    addToCart(producto, customizations);
+
+    const productoParaCarrito = {
+      id: producto.id,
+      nombre: producto.nombre,
+      precio: calcularPrecio(),
+      imagen: producto.imagen,
+      cantidad: 1,
+      precioTotal: calcularPrecio(),
+      categoria: producto.categoria,
+      detalles
+    };
+
+    addToCart(productoParaCarrito);
   };
 
   if (loading) {

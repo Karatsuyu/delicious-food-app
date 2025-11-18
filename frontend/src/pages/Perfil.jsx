@@ -281,9 +281,9 @@ function Perfil() {
                   <p>No has creado ningún combo personalizado aún.</p>
                   <button 
                     className="btn-crear-combo"
-                    onClick={() => navigate('/menu')}
+                    onClick={() => navigate('/crear-combo')}
                   >
-                    Crear mi primer combo
+                    Crear mi propio combo
                   </button>
                 </div>
               ) : (

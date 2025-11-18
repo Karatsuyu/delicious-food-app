@@ -576,6 +576,11 @@ const tiposPollo = {
       }
     }
 
+    const detalles = {
+      ...(tamañoNombre && { tamaño: tamañoNombre }),
+      ...(tipoPolloNombre && { presentacion: tipoPolloNombre })
+    };
+
     const productoParaCarrito = {
       id: producto.id,
       nombre: nombreProducto,
@@ -584,8 +589,7 @@ const tiposPollo = {
       cantidad: 1,
       precioTotal: precioFinal,
       categoria: categoriaActual,
-      ...(tamañoNombre && { tamaño: tamañoNombre }),
-      ...(tipoPolloNombre && { tipoPollo: tipoPolloNombre })
+      ...(Object.keys(detalles).length ? { detalles } : {})
     };
 
     addToCart(productoParaCarrito);

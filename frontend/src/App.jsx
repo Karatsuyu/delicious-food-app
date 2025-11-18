@@ -9,12 +9,16 @@ import Register from './pages/Register';
 import Carrito from './components/Carrito';
 import ProductoDetalle from './pages/ProductoDetalle';
 import ComboDetalle from './pages/ComboDetalle';
+import CarritoItemDetalle from './pages/CarritoItemDetalle';
 import ComboBBQCrispy from './pages/ComboBBQCrispy';
 import ComboClasicoBacon from './pages/ComboClasicoBacon';
 import ComboPepperoniLovers from './pages/ComboPepperoniLovers';
 import ComboCrocanteDeluxe from './pages/ComboCrocanteDeluxe';
 import Personalizador from './pages/Personalizador';
 import Perfil from './pages/Perfil';
+import CrearCombo from './pages/CrearCombo';
+import Checkout from './pages/Checkout';
+import PaymentResult from './pages/PaymentResult';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -35,6 +39,11 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/producto/:id" element={<ProductoDetalle />} />
+                <Route path="/carrito/item/:id" element={<CarritoItemDetalle />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/success" element={<PaymentResult type="success" />} />
+                <Route path="/failure" element={<PaymentResult type="failure" />} />
+                <Route path="/pending" element={<PaymentResult type="pending" />} />
                 {/* Rutas nuevas: 4 pantallas independientes para cada combo */}
                 <Route path="/combo-bbq-crispy" element={<ComboBBQCrispy />} />
                 <Route path="/combo-clasico-bacon" element={<ComboClasicoBacon />} />
@@ -48,6 +57,22 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <Perfil />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/crear-combo" 
+                  element={
+                    <ProtectedRoute>
+                      <CrearCombo />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/editar-combo/:id" 
+                  element={
+                    <ProtectedRoute>
+                      <CrearCombo />
                     </ProtectedRoute>
                   } 
                 />

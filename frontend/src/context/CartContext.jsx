@@ -101,6 +101,21 @@ export const CartProvider = ({ children }) => {
     setCartItems([]);
   };
 
+  const updateCartItem = (id, changesOrUpdater) => {
+    setCartItems(prev => prev.map(item => {
+      if (item.id !== id) return item;
+      if (typeof changesOrUpdater === 'function') {
+        const next = changesOrUpdater(item) || item;
+        const cantidad = typeof next.cantidad === 'number' ? next.cantidad : item.cantidad || 1;
+        const precio = typeof next.precio === 'number' ? next.precio : item.precio || 0;
+        return { ...item, ...next, precioTotal: precio * cantidad };
+      }
+      const cantidad = typeof changesOrUpdater.cantidad === 'number' ? changesOrUpdater.cantidad : item.cantidad || 1;
+      const precio = typeof changesOrUpdater.precio === 'number' ? changesOrUpdater.precio : item.precio || 0;
+      return { ...item, ...changesOrUpdater, precioTotal: precio * cantidad };
+    }));
+  };
+
   const getTotalItems = () => {
     return cartItems.reduce((total, item) => total + item.cantidad, 0);
   };
@@ -134,6 +149,7 @@ export const CartProvider = ({ children }) => {
         addToCart,
         removeFromCart,
         updateQuantity,
+        updateCartItem,
         clearCart,
         getTotalItems,
         getTotalPrice,

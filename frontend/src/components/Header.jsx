@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState, useContext, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import './Header.css';
@@ -15,7 +15,8 @@ import defaultAvatar from '../assets/icono-perfil-vacio-inicio.jpg';
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
-    const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const location = useLocation();
     const { isAuthenticated, user, logout } = useContext(AuthContext);
 
     const toggleMenu = () => {
@@ -54,9 +55,20 @@ import defaultAvatar from '../assets/icono-perfil-vacio-inicio.jpg';
 
     useEffect(() => {
       const openHandler = () => setIsCartOpen(true);
+      const closeHandler = () => setIsCartOpen(false);
       window.addEventListener('open-cart-modal', openHandler);
-      return () => window.removeEventListener('open-cart-modal', openHandler);
+      window.addEventListener('close-cart-modal', closeHandler);
+      return () => {
+        window.removeEventListener('open-cart-modal', openHandler);
+        window.removeEventListener('close-cart-modal', closeHandler);
+      };
     }, []);
+
+    // Cerrar modal del carrito automáticamente al cambiar de ruta
+    useEffect(() => {
+      if (isCartOpen) setIsCartOpen(false);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location.pathname]);
 
     const handleLogout = () => {
       logout();

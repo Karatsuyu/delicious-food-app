@@ -12,9 +12,13 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+# Cargar variables de entorno desde .env si existe
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -45,6 +49,7 @@ INSTALLED_APPS = [
     'orders',
     'reviews',
     'notifications',
+    'payments',
 ]
 
 MIDDLEWARE = [

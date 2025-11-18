@@ -11,7 +11,7 @@ from .serializers import (
     CarritoSerializer, 
     EstadoSerializer
 )
-from products.models import Producto, Ingrediente
+from products.models import Producto, Ingrediente, ComboPersonalizado, ComboPersonalizadoProducto
 from decimal import Decimal
 
 class AgregarCarritoAPIView(APIView):
@@ -35,6 +35,62 @@ class AgregarCarritoAPIView(APIView):
         item.precio_total = precio * cantidad
         item.save()
         return Response({'ok': True, 'item_id': item.id})
+
+
+class AddCustomComboToCartAPIView(APIView):
+    """Agregar un combo personalizado (on-the-fly) como un solo ítem al carrito.
+    Body esperado:
+      {
+        "nombre": "Mi combo",
+        "productos": [{"producto": <id>, "cantidad": 1}, ...]
+      }
+    Calcula precio con precios actuales de Producto y crea un ComboPersonalizado temporal ligado al usuario.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        nombre = (request.data.get('nombre') or '').strip() or None
+        productos_data = request.data.get('productos', [])
+        if not productos_data or not isinstance(productos_data, list):
+            return Response({'error': 'Debes seleccionar al menos un producto'}, status=400)
+
+        # Crear combo personalizado efímero (no publicado)
+        combo = ComboPersonalizado.objects.create(usuario=user, nombre=nombre or 'Mi combo', precio_total=0, publicado=False)
+
+        total = 0
+        for pd in productos_data:
+            try:
+                prod_id = int(pd.get('producto'))
+                cantidad = int(pd.get('cantidad', 1))
+            except Exception:
+                continue
+            if cantidad <= 0:
+                continue
+            try:
+                prod = Producto.objects.get(id=prod_id)
+            except Producto.DoesNotExist:
+                continue
+            ComboPersonalizadoProducto.objects.create(combo=combo, producto=prod, cantidad=cantidad)
+            total += prod.precio * cantidad
+
+        combo.precio_total = total
+        combo.save()
+
+        # Agregar al carrito como un único item apuntando al combo_personalizado
+        carrito, _ = Carrito.objects.get_or_create(usuario=user)
+        item = CarritoItem.objects.create(
+            carrito=carrito,
+            combo_personalizado=combo,
+            cantidad=1,
+            precio_total=total
+        )
+        return Response({
+            'ok': True,
+            'carrito_item_id': item.id,
+            'combo_id': combo.id,
+            'total': float(total)
+        })
     
 
 from .models import Carrito, Pedido

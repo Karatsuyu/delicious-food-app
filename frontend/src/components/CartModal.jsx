@@ -12,6 +12,7 @@ const CartModal = ({ isOpen, onClose }) => {
 	const navigate = useNavigate();
 	const modalRef = useRef(null);
 	const [position, setPosition] = useState({ top: 0, left: 0 });
+	// Ya no usamos expansión en el modal: redirigimos a una página de detalle
 
 	const handleExplorarMenu = () => {
 		onClose();
@@ -87,43 +88,57 @@ const CartModal = ({ isOpen, onClose }) => {
 							<>
 								<h2 className="cart-modal-title">Carrito</h2>
 								<div className="cart-modal-items">
-									{cartItems.map((item) => (
-										<div
-											key={item.id}
-											className="cart-modal-item"
-											onClick={() => {
-												// Inferir categoría para restaurar contexto de navegación
-												const prefixMap = {
-													hamburguesa: 'hamburguesas',
-													pizza: 'pizzas',
-													pollo: 'pollo',
-													perro: 'perros',
-													postres: 'postres',
-													papas: 'papas',
-													bebida: 'bebidas'
-												};
-												const foundKey = Object.keys(prefixMap).find(k => item.id.startsWith(k));
-												if (foundKey) {
-													sessionStorage.setItem('ultimaCategoria', prefixMap[foundKey]);
-												}
-												onClose();
-												navigate(`/producto/${item.id}`);
-											}}
-											role="button"
-											aria-label={`Ver detalle de ${item.nombre}`}
-										>
-											<img src={item.imagen} alt={item.nombre} className="cart-modal-item-img" />
-											<div className="cart-modal-item-info">
-												<div className="cart-modal-item-name" title={item.nombre}>{item.nombre}</div>
-												<div className="cart-modal-item-price">${item.precio.toLocaleString('es-CO')}</div>
-											</div>
-										</div>
-									))}
+														{cartItems.map((item) => {
+															const hasDetailsArray = Array.isArray(item.items) && item.items.length > 0;
+															const hasDetallesObject = item.detalles && typeof item.detalles === 'object' && Object.keys(item.detalles).length > 0;
+															const isCustomCombo = Boolean(item.isCustomCombo) || hasDetailsArray;
+
+															const handleClick = () => {
+																						if (isCustomCombo) {
+																							onClose();
+																							navigate(`/editar-combo/${item.id}`);
+																	return;
+																}
+																// Inferir categoría para restaurar contexto de navegación
+																const prefixMap = {
+																	hamburguesa: 'hamburguesas',
+																	pizza: 'pizzas',
+																	pollo: 'pollo',
+																	perro: 'perros',
+																	postres: 'postres',
+																	papas: 'papas',
+																	bebida: 'bebidas'
+																};
+																const foundKey = Object.keys(prefixMap).find(k => String(item.id).startsWith(k));
+																if (foundKey) {
+																	sessionStorage.setItem('ultimaCategoria', prefixMap[foundKey]);
+																}
+																onClose();
+																navigate(`/producto/${item.id}`);
+															};
+
+															return (
+																<div key={item.id} className="cart-modal-item-wrap">
+																	<div
+																		className={`cart-modal-item ${isCustomCombo ? 'clickable' : ''}`}
+																		onClick={handleClick}
+																		role={'button'}
+																	>
+																		<img src={item.imagen} alt={item.nombre} className="cart-modal-item-img" />
+																		<div className="cart-modal-item-info">
+																			<div className="cart-modal-item-name" title={item.nombre}>{item.nombre}</div>
+																			<div className="cart-modal-item-price">${item.precio.toLocaleString('es-CO')}</div>
+																		</div>
+																	</div>
+																</div>
+															);
+														})}
 								</div>
 								<p className="cart-modal-message resumen">
 									{getTotalItems()} producto(s) · Total ${getTotalPrice().toLocaleString('es-CO')}
 								</p>
 								<button className="cart-modal-button" onClick={handleExpand}>Ver carrito completo</button>
+								<button className="cart-modal-button" onClick={() => { onClose(); navigate('/checkout'); }}>Finalizar compra</button>
 								<button className="cart-modal-button secondary" onClick={handleExplorarMenu}>Seguir comprando</button>
 							</>
 						)}

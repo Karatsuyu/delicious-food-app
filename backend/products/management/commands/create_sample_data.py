@@ -85,20 +85,39 @@ class Command(BaseCommand):
             {'nombre': 'Perro Supremo', 'descripcion': 'Perro caliente con ingredientes premium', 'precio': Decimal('12.00'), 'categoria': 'perros', 'es_personalizable': True},
             {'nombre': 'Perro Crocante', 'descripcion': 'Perro caliente crujiente', 'precio': Decimal('16.00'), 'categoria': 'perros', 'es_personalizable': True},
             {'nombre': 'Perro Especial', 'descripcion': 'Perro caliente con ingredientes especiales', 'precio': Decimal('16.50'), 'categoria': 'perros', 'es_personalizable': True},
+            # Nuevos perros para alinear con menú fijo
+            {'nombre': 'Perro Crunch Teriyaki', 'descripcion': 'Perro con salsa teriyaki y crocante', 'precio': Decimal('16.00'), 'categoria': 'perros', 'es_personalizable': True},
+            {'nombre': 'Perro Fresh', 'descripcion': 'Perro con topping fresco', 'precio': Decimal('18.00'), 'categoria': 'perros', 'es_personalizable': True},
             
             # Postres
             {'nombre': 'Brownie de Chocolate', 'descripcion': 'Brownie casero con chocolate', 'precio': Decimal('8.00'), 'categoria': 'postres', 'es_personalizable': False},
             {'nombre': 'Cheesecake', 'descripcion': 'Torta de queso cremosa', 'precio': Decimal('12.00'), 'categoria': 'postres', 'es_personalizable': False},
             {'nombre': 'Helado de Vainilla', 'descripcion': 'Helado artesanal de vainilla', 'precio': Decimal('6.00'), 'categoria': 'postres', 'es_personalizable': False},
+            # Conos y Sundaes para alinear con menú fijo
+            {'nombre': 'Cono de Vainilla', 'descripcion': 'Cono de helado de vainilla', 'precio': Decimal('4.50'), 'categoria': 'postres', 'es_personalizable': False},
+            {'nombre': 'Cono de Vainilla y Chocolate', 'descripcion': 'Cono mixto vainilla-chocolate', 'precio': Decimal('4.50'), 'categoria': 'postres', 'es_personalizable': False},
+            {'nombre': 'Cono de Fresa', 'descripcion': 'Cono de helado de fresa', 'precio': Decimal('4.50'), 'categoria': 'postres', 'es_personalizable': False},
+            {'nombre': 'Cono de Chocolate', 'descripcion': 'Cono de helado de chocolate', 'precio': Decimal('4.50'), 'categoria': 'postres', 'es_personalizable': False},
+            {'nombre': 'Sundae de Arequipe', 'descripcion': 'Sundae con salsa de arequipe', 'precio': Decimal('6.00'), 'categoria': 'postres', 'es_personalizable': False},
+            {'nombre': 'Sundae de Fresa', 'descripcion': 'Sundae con salsa de fresa', 'precio': Decimal('6.00'), 'categoria': 'postres', 'es_personalizable': False},
+            {'nombre': 'Sundae de Chocolate', 'descripcion': 'Sundae con salsa de chocolate', 'precio': Decimal('6.00'), 'categoria': 'postres', 'es_personalizable': False},
+            {'nombre': 'Sundae de Caramelo', 'descripcion': 'Sundae con salsa de caramelo', 'precio': Decimal('6.00'), 'categoria': 'postres', 'es_personalizable': False},
             
             # Papas
-            {'nombre': 'Papas Fritas Clásicas', 'descripcion': 'Papas fritas crujientes', 'precio': Decimal('7.00'), 'categoria': 'papas', 'es_personalizable': False},
-            {'nombre': 'Papas con Queso', 'descripcion': 'Papas fritas con queso derretido', 'precio': Decimal('9.00'), 'categoria': 'papas', 'es_personalizable': False},
+            {'nombre': 'Papas Fritas', 'descripcion': 'Papas fritas crujientes', 'precio': Decimal('3.50'), 'categoria': 'papas', 'es_personalizable': False},
+            {'nombre': 'Aros de Cebolla', 'descripcion': 'Crujientes aros de cebolla', 'precio': Decimal('3.50'), 'categoria': 'papas', 'es_personalizable': False},
+            {'nombre': 'Nuggets de Pollo', 'descripcion': 'Nuggets de pollo', 'precio': Decimal('3.50'), 'categoria': 'papas', 'es_personalizable': False},
             
             # Bebidas
-            {'nombre': 'Coca Cola', 'descripcion': 'Bebida gaseosa', 'precio': Decimal('5.00'), 'categoria': 'bebidas', 'es_personalizable': False},
-            {'nombre': 'Jugo de Naranja', 'descripcion': 'Jugo natural de naranja', 'precio': Decimal('4.00'), 'categoria': 'bebidas', 'es_personalizable': False},
-            {'nombre': 'Agua', 'descripcion': 'Agua natural', 'precio': Decimal('2.00'), 'categoria': 'bebidas', 'es_personalizable': False},
+            {'nombre': 'Coca-Cola Personal', 'descripcion': 'Bebida gaseosa CocaCola Personal', 'precio': Decimal('4.00'), 'categoria': 'bebidas', 'es_personalizable': False},
+            {'nombre': 'Coca-Cola En Lata', 'descripcion': 'Bebida gaseosa CocaCola en lata', 'precio': Decimal('4.50'), 'categoria': 'bebidas', 'es_personalizable': False},
+            {'nombre': 'Coca-Cola 3L', 'descripcion': 'Bebida gaseosa CocaCola 3L', 'precio': Decimal('7.50'), 'categoria': 'bebidas', 'es_personalizable': False},
+            {'nombre': 'Sprite Personal', 'descripcion': 'Bebida gaseosa Sprite Personal', 'precio': Decimal('4.00'), 'categoria': 'bebidas', 'es_personalizable': False},
+            {'nombre': 'Sprite En Lata', 'descripcion': 'Bebida gaseosa Sprite en lata', 'precio': Decimal('4.50'), 'categoria': 'bebidas', 'es_personalizable': False},
+            {'nombre': 'Sprite 3L', 'descripcion': 'Bebida gaseosa Sprite 3L', 'precio': Decimal('7.50'), 'categoria': 'bebidas', 'es_personalizable': False},
+            {'nombre': 'Pepsi Personal', 'descripcion': 'Bebida gaseosa Pepsi Personal', 'precio': Decimal('4.00'), 'categoria': 'bebidas', 'es_personalizable': False},
+            {'nombre': 'Pepsi En Lata', 'descripcion': 'Bebida gaseosa Pepsi en lata', 'precio': Decimal('4.50'), 'categoria': 'bebidas', 'es_personalizable': False},
+            {'nombre': 'Pepsi 3L', 'descripcion': 'Bebida gaseosa Pepsi 3L', 'precio': Decimal('7.50'), 'categoria': 'bebidas', 'es_personalizable': False},
         ]
 
         # Crear productos

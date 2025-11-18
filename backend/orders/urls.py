@@ -5,7 +5,8 @@ from .views import (
     CrearPedidoAPIView, 
     CarritoView,
     PedidoViewSet,
-    EstadoViewSet
+    EstadoViewSet,
+    AddCustomComboToCartAPIView
 )
 
 router = DefaultRouter()
@@ -16,6 +17,7 @@ urlpatterns = [
     # Carrito endpoints
     path('cart/', CarritoView.as_view(), name='view_cart'),
     path('add-to-cart/', AgregarCarritoAPIView.as_view(), name='add_to_cart'),
+    path('add-custom-combo/', AddCustomComboToCartAPIView.as_view(), name='add_custom_combo'),
     
     # Pedidos endpoints via ViewSet
     path('', include(router.urls)),
