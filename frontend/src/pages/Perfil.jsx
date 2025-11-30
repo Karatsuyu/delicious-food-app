@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { authService, absolutizeMediaUrl } from '../api/api';
 import defaultAvatar from '../assets/icono-perfil-vacio-inicio.jpg';
@@ -196,37 +196,39 @@ function Perfil() {
             </div>
           </div>
 
-          {/* Puntos */}
-          <div className="perfil-card puntos-card">
-            <div className="perfil-card-header">
-              <h2>⭐ Puntos Acumulados</h2>
-            </div>
-            <div className="perfil-card-body">
-              <div className="puntos-display">
-                <div className="puntos-total">
-                  <span className="puntos-number">{user?.points || 0}</span>
-                  <span className="puntos-label">Puntos Totales</span>
-                </div>
+          {/* Puntos - Solo mostrar si NO es administrador */}
+          {!user?.is_staff && (
+            <div className="perfil-card puntos-card">
+              <div className="perfil-card-header">
+                <h2>⭐ Puntos Acumulados</h2>
               </div>
-              {stats && stats.puntos_ganados_ventas > 0 && (
-                <div className="puntos-desglose">
-                  <div className="puntos-item">
-                    <span className="puntos-icon">💰</span>
-                    <div className="puntos-info">
-                      <span className="puntos-titulo">Puntos por Ventas</span>
-                      <span className="puntos-valor">{stats.puntos_ganados_ventas} pts</span>
-                    </div>
+              <div className="perfil-card-body">
+                <div className="puntos-display">
+                  <div className="puntos-total">
+                    <span className="puntos-number">{user?.points || 0}</span>
+                    <span className="puntos-label">Puntos Totales</span>
                   </div>
-                  <p className="puntos-explicacion">
-                    Has ganado puntos cuando otros usuarios compraron tus combos personalizados publicados
-                  </p>
                 </div>
-              )}
+                {stats && stats.puntos_ganados_ventas > 0 && (
+                  <div className="puntos-desglose">
+                    <div className="puntos-item">
+                      <span className="puntos-icon">💰</span>
+                      <div className="puntos-info">
+                        <span className="puntos-titulo">Puntos por Ventas</span>
+                        <span className="puntos-valor">{stats.puntos_ganados_ventas} pts</span>
+                      </div>
+                    </div>
+                    <p className="puntos-explicacion">
+                      Has ganado puntos cuando otros usuarios compraron tus combos personalizados publicados
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Estadísticas */}
-          {stats && (
+          {/* Estadísticas - Solo mostrar si NO es administrador */}
+          {!user?.is_staff && stats && (
             <div className="perfil-card">
               <div className="perfil-card-header">
                 <h2>📊 Estadísticas</h2>
@@ -268,11 +270,42 @@ function Perfil() {
             </div>
           )}
 
-          {/* Combos Personalizados */}
-          <div className="perfil-card combos-card">
-            <div className="perfil-card-header">
-              <h2>🍔 Mis Combos Personalizados</h2>
+          {/* Enlaces de administración - Solo para admins */}
+          {user?.is_staff && (
+            <div className="perfil-card admin-links-card">
+              <div className="perfil-card-header">
+                <h2>⚙️ Panel de Administración</h2>
+              </div>
+              <div className="perfil-card-body">
+                <div className="admin-links-grid">
+                  <Link to="/admin/productos" className="admin-link-btn">
+                    <span className="admin-link-icon">📦</span>
+                    <div className="admin-link-content">
+                      <h3>Gestionar Productos</h3>
+                      <p>Agregar, editar o eliminar productos</p>
+                    </div>
+                  </Link>
+                  <Link to="/admin/dashboard" className="admin-link-btn">
+                    <span className="admin-link-icon">📊</span>
+                    <div className="admin-link-content">
+                      <h3>Dashboard</h3>
+                      <p>Ver estadísticas y productos más vendidos</p>
+                    </div>
+                  </Link>
+                </div>
+              </div>
             </div>
+          )}
+
+          {/* Combos Personalizados - Solo mostrar si NO es administrador */}
+          {!user?.is_staff && (
+            <div className="perfil-card combos-card">
+              <div className="perfil-card-header">
+                <h2>🍔 Mis Combos Personalizados</h2>
+                <Link to="/combos-publicos" className="btn-ver-combos-publicos">
+                  Ver Combos de la Comunidad →
+                </Link>
+              </div>
             <div className="perfil-card-body">
               {loadingCombos ? (
                 <div className="combos-loading">Cargando...</div>
@@ -332,6 +365,7 @@ function Perfil() {
               )}
             </div>
           </div>
+          )}
         </div>
       </div>
     </div>

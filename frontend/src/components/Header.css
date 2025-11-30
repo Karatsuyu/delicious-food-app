@@ -427,3 +427,28 @@
   object-fit: cover;
   background: #fff;
 }
+
+/* === Botones de administración === */
+.admin-links {
+  display: flex;
+  gap: 10px;
+  margin: 0 10px;
+}
+
+.btn-admin {
+  background: #9C27B0;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+.btn-admin:hover {
+  background: #7B1FA2;
+  color: white;
+}

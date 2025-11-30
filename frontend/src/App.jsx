@@ -20,6 +20,11 @@ import CrearCombo from './pages/CrearCombo';
 import Checkout from './pages/Checkout';
 import PaymentResult from './pages/PaymentResult';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
+import AdminPanel from './pages/AdminPanel';
+import AdminDashboard from './pages/AdminDashboard';
+import CombosPublicos from './pages/CombosPublicos';
+import PerfilPublico from './pages/PerfilPublico';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import './App.css';
@@ -76,6 +81,26 @@ function App() {
                     </ProtectedRoute>
                   } 
                 />
+                {/* Rutas de administración */}
+                <Route 
+                  path="/admin/productos" 
+                  element={
+                    <AdminRoute>
+                      <AdminPanel />
+                    </AdminRoute>
+                  } 
+                />
+                <Route 
+                  path="/admin/dashboard" 
+                  element={
+                    <AdminRoute>
+                      <AdminDashboard />
+                    </AdminRoute>
+                  } 
+                />
+                {/* Rutas públicas de combos y perfiles */}
+                <Route path="/combos-publicos" element={<CombosPublicos />} />
+                <Route path="/perfil/:userId" element={<PerfilPublico />} />
               </Routes>
             </main>
             <Footer />

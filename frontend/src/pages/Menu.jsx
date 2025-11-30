@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { productService } from '../api/api';
 import ProductCard from '../components/ProductCard';
 import { useCart } from '../context/CartContext';
+import { AuthContext } from '../context/AuthContext';
 import './Menu.css';
 
 // Importar imágenes de hamburguesas
@@ -66,6 +67,8 @@ function Menu() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { user } = useContext(AuthContext);
+  const isAdmin = user?.is_staff;
   const categoriaUrl = searchParams.get('categoria');
   
   const [productos, setProductos] = useState([]);
@@ -464,14 +467,16 @@ function Menu() {
                   <h3 className="hamburguesa-title">{hamburguesa.nombre}</h3>
                   <p className="hamburguesa-price">${hamburguesa.precio.toLocaleString('es-CO')}</p>
                 </div>
-                <div className="hamburguesa-actions">
-                  <button 
-                    className="btn-hamburguesa-cart"
-                    onClick={(e) => handleHamburguesaAddToCart(e, hamburguesa)}
-                  >
-                    Agregar al carrito
-                  </button>
-                </div>
+                {!isAdmin && (
+                  <div className="hamburguesa-actions">
+                    <button 
+                      className="btn-hamburguesa-cart"
+                      onClick={(e) => handleHamburguesaAddToCart(e, hamburguesa)}
+                    >
+                      Agregar al carrito
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -491,14 +496,16 @@ function Menu() {
                   <h3 className="hamburguesa-title">{pizza.nombre}</h3>
                   <p className="hamburguesa-price">${pizza.precio.toLocaleString('es-CO')}</p>
                 </div>
-                <div className="hamburguesa-actions">
-                  <button 
-                    className="btn-hamburguesa-cart"
-                    onClick={(e) => handlePizzaAddToCart(e, pizza)}
-                  >
-                    Agregar al carrito
-                  </button>
-                </div>
+                {!isAdmin && (
+                  <div className="hamburguesa-actions">
+                    <button 
+                      className="btn-hamburguesa-cart"
+                      onClick={(e) => handlePizzaAddToCart(e, pizza)}
+                    >
+                      Agregar al carrito
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -518,14 +525,16 @@ function Menu() {
                   <h3 className="hamburguesa-title">{pollo.nombre}</h3>
                   <p className="hamburguesa-price">${pollo.precio.toLocaleString('es-CO')}</p>
                 </div>
-                <div className="hamburguesa-actions">
-                  <button 
-                    className="btn-hamburguesa-cart"
-                    onClick={(e) => handlePolloAddToCart(e, pollo)}
-                  >
-                    Agregar al carrito
-                  </button>
-                </div>
+                {!isAdmin && (
+                  <div className="hamburguesa-actions">
+                    <button 
+                      className="btn-hamburguesa-cart"
+                      onClick={(e) => handlePolloAddToCart(e, pollo)}
+                    >
+                      Agregar al carrito
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -546,14 +555,16 @@ function Menu() {
                     ${perro.precio.toLocaleString('es-CO')}
                   </p>
                 </div>
-                <div className="hamburguesa-actions">
-                  <button 
-                    className="btn-hamburguesa-cart"
-                    onClick={(e) => handlePerroAddToCart(e, perro)}
-                  >
-                    Agregar al carrito
-                  </button>
-                </div>
+                {!isAdmin && (
+                  <div className="hamburguesa-actions">
+                    <button 
+                      className="btn-hamburguesa-cart"
+                      onClick={(e) => handlePerroAddToCart(e, perro)}
+                    >
+                      Agregar al carrito
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -574,14 +585,16 @@ function Menu() {
                     ${postre.precio.toLocaleString('es-CO')}
                   </p>
                 </div>
-                <div className="hamburguesa-actions">
-                  <button 
-                    className="btn-hamburguesa-cart"
+                {!isAdmin && (
+                  <div className="hamburguesa-actions">
+                    <button 
+                      className="btn-hamburguesa-cart"
               onClick={(e) => handlePostresAddToCart(e, postre)}
-                  >
-                    Agregar al carrito
-                  </button>
-                </div>
+                    >
+                      Agregar al carrito
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -602,14 +615,16 @@ function Menu() {
                     ${papas.precio.toLocaleString('es-CO')}
                   </p>
                 </div>
-                <div className="hamburguesa-actions">
-                  <button 
-                    className="btn-hamburguesa-cart"
+                {!isAdmin && (
+                  <div className="hamburguesa-actions">
+                    <button 
+                      className="btn-hamburguesa-cart"
               onClick={(e) => handlePapasAddToCart(e, papas)}
-                  >
-                    Agregar al carrito
-                  </button>
-                </div>
+                    >
+                      Agregar al carrito
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -630,14 +645,16 @@ function Menu() {
                     ${bebidas.precio.toLocaleString('es-CO')}
                   </p>
                 </div>
-                <div className="hamburguesa-actions">
-                  <button 
-                    className="btn-hamburguesa-cart"
-                    onClick={(e) => handleBebidasAddToCart(e, bebidas)}
-                  >
-                    Agregar al carrito
-                  </button>
-                </div>
+                {!isAdmin && (
+                  <div className="hamburguesa-actions">
+                    <button 
+                      className="btn-hamburguesa-cart"
+                      onClick={(e) => handleBebidasAddToCart(e, bebidas)}
+                    >
+                      Agregar al carrito
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>

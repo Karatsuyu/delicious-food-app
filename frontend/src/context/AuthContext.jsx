@@ -1,7 +1,17 @@
-import { createContext, useState, useEffect, useCallback } from 'react';
+
+import { createContext, useState, useEffect, useCallback, useContext } from 'react';
 import { authService, absolutizeMediaUrl } from '../api/api';
 
 export const AuthContext = createContext();
+
+// Hook personalizado para usar el contexto de autenticación
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth debe ser usado dentro de un AuthProvider');
+  }
+  return context;
+}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -10,7 +20,16 @@ export function AuthProvider({ children }) {
   const normalizeUser = (u) => {
     if (!u) return u;
     const profile_image = absolutizeMediaUrl(u.profile_image);
-    return { ...u, profile_image };
+    // Preservar is_staff y otros campos importantes
+    // Asegurar que is_staff sea un booleano explícito
+    const isStaff = u.is_staff === true || u.is_staff === 'true' || u.is_staff === 1;
+    const normalized = { 
+      ...u, 
+      profile_image,
+      is_staff: isStaff
+    };
+    console.log('normalizeUser - Input:', u, 'Output:', normalized, 'is_staff value:', normalized.is_staff);
+    return normalized;
   };
 
   const loadUser = useCallback(async () => {
@@ -18,13 +37,17 @@ export function AuthProvider({ children }) {
     if (token) {
       try {
         const profile = await authService.getProfile();
-        setUser(normalizeUser(profile));
+        const userData = normalizeUser(profile);
+        console.log('loadUser - User data:', userData); // Debug
+        setUser(userData);
       } catch (error) {
         console.error('Error cargando perfil:', error);
         // Intentar con el endpoint alternativo
         try {
           const profile = await authService.getMe();
-          setUser(normalizeUser(profile));
+          const userData = normalizeUser(profile);
+          console.log('loadUser (getMe) - User data:', userData); // Debug
+          setUser(userData);
         } catch (error2) {
           console.error('Error cargando perfil alternativo:', error2);
           localStorage.removeItem('access_token');
@@ -45,20 +68,36 @@ export function AuthProvider({ children }) {
       localStorage.setItem('access_token', response.access);
       localStorage.setItem('refresh_token', response.refresh);
       
+      // Priorizar is_staff del response del login (más confiable)
+      const isStaffFromLogin = response.user?.is_staff || false;
+      
       // Obtener perfil del usuario
       try {
         const profile = await authService.getProfile();
-        setUser(normalizeUser(profile));
+        // Asegurar que is_staff esté incluido, priorizando el del login
+        const userData = normalizeUser(profile);
+        // Usar is_staff del login si está disponible, sino del perfil
+        userData.is_staff = isStaffFromLogin || userData.is_staff || false;
+        console.log('Login - User data:', userData); // Debug
+        setUser(userData);
       } catch (profileError) {
         // Si falla getProfile, intentar con getMe
         try {
           const profile = await authService.getMe();
-          setUser(normalizeUser(profile));
+          // Asegurar que is_staff esté incluido
+          const userData = normalizeUser(profile);
+          // Usar is_staff del login si está disponible, sino del perfil
+          userData.is_staff = isStaffFromLogin || userData.is_staff || false;
+          console.log('Login (getMe) - User data:', userData); // Debug
+          setUser(userData);
         } catch (meError) {
           console.error('Error obteniendo perfil:', meError);
           // Si también falla, usar la información del token
           if (response.user) {
-            setUser(normalizeUser(response.user));
+            const userData = normalizeUser(response.user);
+            userData.is_staff = isStaffFromLogin || userData.is_staff || false;
+            console.log('Login (fallback) - User data:', userData); // Debug
+            setUser(userData);
           }
         }
       }

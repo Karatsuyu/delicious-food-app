@@ -56,22 +56,30 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Normalizar para búsquedas case-insensitive (email puede variar en mayúsculas)
         lookup_value = username_or_email.lower()
 
-        # 1) Intentar autenticación con el backend estándar (maneja bloqueo, is_active, etc.)
-        # Dado que USERNAME_FIELD = 'email', pasamos como username.
-        user = authenticate(username=username_or_email, password=password)
-
-        # 2) Si falla authenticate (por case sensitivity o porque se utilizó username), intentar manual.
+        # Como USERNAME_FIELD = 'email', primero intentamos buscar por email
+        user = None
+        
+        # 1) Intentar buscar por email (case-insensitive) ya que USERNAME_FIELD = 'email'
+        user_by_email = User.objects.filter(email__iexact=lookup_value).first()
+        if user_by_email and user_by_email.check_password(password):
+            user = user_by_email
+        
+        # 2) Si no se encontró por email, intentar por username (case-insensitive)
         if not user:
-            # Buscar por email (case-insensitive)
-            user = User.objects.filter(email__iexact=lookup_value).first()
-            if user and not user.check_password(password):
-                user = None
+            user_by_username = User.objects.filter(username__iexact=lookup_value).first()
+            if user_by_username and user_by_username.check_password(password):
+                user = user_by_username
 
-        # 3) Si todavía no, intentar por username (case-insensitive)
+        # 3) Si aún no se encontró, intentar con authenticate usando email directamente
         if not user:
-            user = User.objects.filter(username__iexact=lookup_value).first()
-            if user and not user.check_password(password):
-                user = None
+            # Intentar con email primero (ya que USERNAME_FIELD = 'email')
+            user = authenticate(username=username_or_email, password=password)
+            
+            # Si falla, intentar buscar el email del usuario por username y autenticar
+            if not user:
+                potential_user = User.objects.filter(username__iexact=lookup_value).first()
+                if potential_user:
+                    user = authenticate(username=potential_user.email, password=password)
         
         if not user:
             raise serializers.ValidationError({
@@ -96,6 +104,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'profile_image': user.profile_image.url if user.profile_image else None,
+                'is_staff': user.is_staff,
             }
         }
         
@@ -104,8 +113,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone_number', 'points', 'profile_image', 'date_joined']
-        read_only_fields = ['id', 'date_joined', 'points']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone_number', 'points', 'profile_image', 'date_joined', 'is_staff']
+        read_only_fields = ['id', 'date_joined', 'points', 'is_staff']
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])

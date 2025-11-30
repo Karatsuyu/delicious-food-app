@@ -1,7 +1,8 @@
 // src/components/ProductoDetalle.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { AuthContext } from '../context/AuthContext';
 
 // Importar imágenes
 import hamburguesa1 from '../assets/hamburguesa1.png';
@@ -67,6 +68,8 @@ const ProductoDetalle = () => {
   const [tamañoSeleccionado, setTamañoSeleccionado] = useState('pequeña');
   const [tipoPolloSeleccionado, setTipoPolloSeleccionado] = useState('alitas'); 
   const { addToCart } = useCart();
+  const { user } = useContext(AuthContext);
+  const isAdmin = user?.is_staff;
 
   // Definir tamaños de pizzas
   const tamaños = {
@@ -659,9 +662,33 @@ const tiposPollo = {
             </div>
           )}
 
-          <button className="agregar-carrito-btn" onClick={agregarAlCarrito}>
-            Agregar al carrito
-          </button>
+          {!isAdmin && (
+            <button className="agregar-carrito-btn" onClick={agregarAlCarrito}>
+              Agregar al carrito
+            </button>
+          )}
+          
+          {isAdmin && producto.id && !isNaN(parseInt(producto.id)) && (
+            <button 
+              className="editar-producto-btn" 
+              onClick={() => navigate(`/admin/productos?edit=${producto.id}`)}
+              style={{
+                backgroundColor: '#007bff',
+                color: 'white',
+                padding: '12px 24px',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                marginTop: '20px',
+                width: '100%',
+                maxWidth: '300px'
+              }}
+            >
+              ✏️ Editar Producto
+            </button>
+          )}
         </div>
       </div>
     </div>

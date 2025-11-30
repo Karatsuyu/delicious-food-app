@@ -1,8 +1,99 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { productService } from '../api/api';
 import { useCart } from '../context/CartContext';
-import './Personalizador.css'
+import './Personalizador.css';
+// Importar imágenes para el mapeo de hamburguesas
+import aceitunasImg from '../assets/aceitunas.png';
+import baconImg from '../assets/bacon.png';
+import briocheImg from '../assets/brioche.png';
+import cebollaImg from '../assets/cebolla.png';
+import quesoImg from '../assets/queso.png';
+import carneBisonteImg from '../assets/carne de bisonte.png';
+import tomateImg from '../assets/tomate.png';
+import cerdoImg from '../assets/cerdo.png';
+import champiñonImg from '../assets/champiñon.png';
+import corderoImg from '../assets/cordero.png';
+import garbanzosImg from '../assets/garbanzos.png';
+import lechugaImg from '../assets/lechuga.png';
+import lentejasImg from '../assets/lentejas.png';
+import pepinoImg from '../assets/pepino.png';
+import madreImg from '../assets/madre.png';
+import moradaImg from '../assets/morada.png';
+import muffinImg from '../assets/muffin.png';
+import multigranoImg from '../assets/multigrano.png';
+import papaImg from '../assets/papa.png';
+import pavoImg from '../assets/pavo.png';
+import peperoniImg from '../assets/peperoni.png';
+import pretzelImg from '../assets/pretzel.png';
+import resImg from '../assets/res.png';
+import seitanImg from '../assets/seitan.png';
+import sesamoImg from '../assets/sesamo.png';
+import singlutenImg from '../assets/sin gluten.png';
+import venadoImg from '../assets/venado.png';
+import veganoImg from '../assets/vegano.png';
+import hamburguesaImg from '../assets/hamburguesa.png';
+
+
+
+
+
+
+
+
+// Mapeo de ingredientes a imágenes (solo para hamburguesas)
+const ingredientImagesMap = {
+  // Panes
+  'pan brioche': briocheImg,
+  'pan clasico': sesamoImg,
+  'pan de papa': papaImg,
+  'pan pretzel': pretzelImg,
+  'pan masa madre': madreImg,
+  'pan multigrano': multigranoImg,
+  'pan muffin': muffinImg,
+  'pan sin gluten': singlutenImg,
+  'pan vegano': veganoImg,
+
+  // Carnes
+  'carne de res': resImg,
+  'carne de bisonte': carneBisonteImg,
+  'carne de pavo': pavoImg,
+  'carne de cordero': corderoImg,
+  'carne de venado': venadoImg,
+  'carne de cerdo': cerdoImg,
+  'carne de garbanzos vegana': garbanzosImg,
+  'carne de lentejas vegana': lentejasImg,
+  'carne de seitan': seitanImg,
+
+  // Ingredientes
+  'queso': quesoImg,
+  'tomate': tomateImg,
+  'lechuga': lechugaImg,
+  'cebolla': cebollaImg,
+  'pepperoni': peperoniImg,
+  'champiñones': champiñonImg,
+  'pepino': pepinoImg,
+  'bacon': baconImg,
+  'cebolla morada': moradaImg,
+  'aceitunas': aceitunasImg,
+};
+
+// Función helper para obtener la imagen de un ingrediente
+// Solo aplica el mapeo si la categoría es "hamburguesas"
+const getIngredientImage = (ingredienteId, categoria) => {
+  // Solo aplicar el mapeo si es para hamburguesas
+  if (categoria === 'hamburguesas' || categoria === 'hamburguesa') {
+    // Buscar en el mapeo específico
+    if (ingredientImagesMap[ingredienteId]) {
+      return ingredientImagesMap[ingredienteId];
+    }
+    // Fallback a imagen base de hamburguesa
+    return hamburguesaImg;
+  }
+  
+  // Para otras categorías, retornar imagen base de hamburguesa como fallback
+  return hamburguesaImg;
+};
 
 const Personalizador = () => {
   const { categoria: categoriaParam } = useParams();
@@ -28,31 +119,132 @@ const Personalizador = () => {
     observaciones: ''
   });
 
+  // Estado para animaciones de ingredientes (imágenes cayendo)
+  const [animatingIngredients, setAnimatingIngredients] = useState([]);
+
+  // Referencia al visualizador del producto
+  const productViewerRef = useRef(null);
+
+  // Estado para los ingredientes ya colocados en la hamburguesa
+  const [stackedIngredients, setStackedIngredients] = useState([]);
+  // Contador para el orden z-index de los ingredientes
+  const [zIndexCounter, setZIndexCounter] = useState(0);
+
+  // Función para obtener la posición del visualizador
+  const getViewerPosition = () => {
+    if (productViewerRef.current) {
+      const rect = productViewerRef.current.getBoundingClientRect();
+      return {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      };
+    }
+    return { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+  };
+
+  // Función para animar un ingrediente al caer
+  const animateIngredient = (ingredient) => {
+    const viewerPos = getViewerPosition();
+    const newZIndex = zIndexCounter + 1;
+
+    // Asignar zIndex y posición para la animación
+    const animatedIngredient = {
+      ...ingredient,
+      id: `${ingredient.id}-${Date.now()}`,
+      zIndex: newZIndex,
+      style: {
+        '--target-x': `${viewerPos.x}px`,
+        '--target-y': `${viewerPos.y}px`,
+      },
+    };
+
+    // Agregar a los ingredientes animados
+    setAnimatingIngredients((prev) => [...prev, animatedIngredient]);
+    setZIndexCounter(newZIndex);
+
+    // Después de duración de la animación, remover de animating y agregar a stacked
+    setTimeout(() => {
+      setAnimatingIngredients((prev) =>
+        prev.filter((ing) => ing.id !== animatedIngredient.id)
+      );
+      setStackedIngredients((prev) => [...prev, animatedIngredient]);
+    }, 4000);
+  };
+
   
   // Cargar producto desde la API
   useEffect(() => {
     const fetchProducto = async () => {
       try {
         setLoading(true);
-        
+
         // Intentar cargar desde la API
         try {
           const productos = await productService.getAllProducts();
-          const productoEncontrado = productos.find(p => p.id === categoria || p.categoria === categoria || p.id === categoriaParam || p.categoria === categoriaParam);
+          const productoEncontrado = productos.find(
+            (p) =>
+              p.id === categoria ||
+              p.categoria === categoria ||
+              p.id === categoriaParam ||
+              p.categoria === categoriaParam
+          );
           if (productoEncontrado) {
             setProducto(productoEncontrado);
           } else {
             // Si no se encuentra, usar datos locales como fallback
             const productosLocales = {
-              'hamburguesas': { id: 'hamburguesa1', nombre: 'Hamburguesa Clásica', precio: 0, descripcion: 'Hamburguesa tradicional', categoria: 'hamburguesas' },
-              'pizzas': { id: 'pizza1', nombre: 'Pizza Hawaiana', precio: 32000, descripcion: 'Pizza con jamón y piña', categoria: 'pizzas' },
-              'pollo': { id: 'pollo1', nombre: 'Alitas Simples', precio: 12000, descripcion: 'Alitas de pollo tradicionales', categoria: 'pollo' },
-              'perros': { id: 'perro1', nombre: 'Perro Clásico', precio: 9000, descripcion: 'Perro caliente tradicional', categoria: 'perros' },
-              'perro': { id: 'perro1', nombre: 'Perro Clásico', precio: 9000, descripcion: 'Perro caliente tradicional', categoria: 'perros' },
-              'postres': { id: 'postre1', nombre: 'Brownie Clásico', precio: 8000, descripcion: 'Delicioso brownie casero', categoria: 'postres' },
-              'postre': { id: 'postre1', nombre: 'Brownie Clásico', precio: 8000, descripcion: 'Delicioso brownie casero', categoria: 'postres' },
+              hamburguesas: {
+                id: 'hamburguesa1',
+                nombre: 'Hamburguesa Clásica',
+                precio: 0,
+                descripcion: 'Hamburguesa tradicional',
+                categoria: 'hamburguesas',
+              },
+              pizzas: {
+                id: 'pizza1',
+                nombre: 'Pizza Hawaiana',
+                precio: 32000,
+                descripcion: 'Pizza con jamón y piña',
+                categoria: 'pizzas',
+              },
+              pollo: {
+                id: 'pollo1',
+                nombre: 'Alitas Simples',
+                precio: 12000,
+                descripcion: 'Alitas de pollo tradicionales',
+                categoria: 'pollo',
+              },
+              perros: {
+                id: 'perro1',
+                nombre: 'Perro Clásico',
+                precio: 9000,
+                descripcion: 'Perro caliente tradicional',
+                categoria: 'perros',
+              },
+              perro: {
+                id: 'perro1',
+                nombre: 'Perro Clásico',
+                precio: 9000,
+                descripcion: 'Perro caliente tradicional',
+                categoria: 'perros',
+              },
+              postres: {
+                id: 'postre1',
+                nombre: 'Brownie Clásico',
+                precio: 8000,
+                descripcion: 'Delicioso brownie casero',
+                categoria: 'postres',
+              },
+              postre: {
+                id: 'postre1',
+                nombre: 'Brownie Clásico',
+                precio: 8000,
+                descripcion: 'Delicioso brownie casero',
+                categoria: 'postres',
+              },
             };
-            const productoSeleccionado = productosLocales[categoria] || productosLocales[categoriaParam];
+            const productoSeleccionado =
+              productosLocales[categoria] || productosLocales[categoriaParam];
             if (productoSeleccionado) {
               setProducto(productoSeleccionado);
             } else {
@@ -63,14 +255,51 @@ const Personalizador = () => {
           console.error('Error cargando desde API:', apiError);
           // Fallback a datos locales
           const productosLocales = {
-            'hamburguesas': { id: 'hamburguesa1', nombre: 'Hamburguesa Clásica', precio: 0, descripcion: 'Hamburguesa tradicional', categoria: 'hamburguesas' },
-            'pizzas': { id: 'pizza1', nombre: 'Pizza Hawaiana', precio: 0, descripcion: 'Pizza con jamón y piña', categoria: 'pizzas' },
-            'pollo': { id: 'pollo1', nombre: 'Alitas Simples', precio: 0, descripcion: 'Alitas de pollo tradicionales', categoria: 'pollo' },
-            'perros': { id: 'perro1', nombre: 'Perro Clásico', precio: 0, descripcion: 'Perro caliente tradicional', categoria: 'perros' },
-            'perro': { id: 'perro1', nombre: 'Perro Clásico', precio: 0, descripcion: 'Perro caliente tradicional', categoria: 'perros' },
-            'postres': { id: 'postre1', nombre: 'Brownie Clásico', precio: 0, descripcion: 'Delicioso brownie casero', categoria: 'postres' },
+            hamburguesas: {
+              id: 'hamburguesa1',
+              nombre: 'Hamburguesa Clásica',
+              precio: 0,
+              descripcion: 'Hamburguesa tradicional',
+              categoria: 'hamburguesas',
+            },
+            pizzas: {
+              id: 'pizza1',
+              nombre: 'Pizza Hawaiana',
+              precio: 0,
+              descripcion: 'Pizza con jamón y piña',
+              categoria: 'pizzas',
+            },
+            pollo: {
+              id: 'pollo1',
+              nombre: 'Alitas Simples',
+              precio: 0,
+              descripcion: 'Alitas de pollo tradicionales',
+              categoria: 'pollo',
+            },
+            perros: {
+              id: 'perro1',
+              nombre: 'Perro Clásico',
+              precio: 0,
+              descripcion: 'Perro caliente tradicional',
+              categoria: 'perros',
+            },
+            perro: {
+              id: 'perro1',
+              nombre: 'Perro Clásico',
+              precio: 0,
+              descripcion: 'Perro caliente tradicional',
+              categoria: 'perros',
+            },
+            postres: {
+              id: 'postre1',
+              nombre: 'Brownie Clásico',
+              precio: 0,
+              descripcion: 'Delicioso brownie casero',
+              categoria: 'postres',
+            },
           };
-          const productoSeleccionado = productosLocales[categoria] || productosLocales[categoriaParam];
+          const productoSeleccionado =
+            productosLocales[categoria] || productosLocales[categoriaParam];
           if (productoSeleccionado) {
             setProducto(productoSeleccionado);
           } else {
@@ -91,15 +320,15 @@ const Personalizador = () => {
   }, [categoria, categoriaParam]);
 
   const pan = [
-    { id: 'pan brioche', nombre: 'Pan brioche francés', precio: 1200},
-    { id: 'pan clasico', nombre: 'Pan clasico con semillas sésamo', precio: 1000},
+    { id: 'pan brioche', nombre: 'Pan brioche francés', precio: 1200 },
+    { id: 'pan clasico', nombre: 'Pan clasico con semillas sésamo', precio: 1000 },
     { id: 'pan de papa', nombre: 'Pan de papa suave', precio: 1000 },
-    { id: 'pan pretzel', nombre: 'Pan pretzel', precio: 1300},
-    { id: 'pan masa madre', nombre: 'Pan de masa madre', precio: 1400},
-    { id: 'pan multigrano', nombre: 'Pan multigrano', precio: 1300},
-    { id: 'pan muffin', nombre: 'Pan ingles Muffin', precio: 1200},
-    { id: 'pan sin gluten', nombre: 'Pan sin gluten', precio: 1500},
-    { id: 'pan vegano', nombre: 'Pan Vegano', precio: 1400}
+    { id: 'pan pretzel', nombre: 'Pan pretzel', precio: 1300 },
+    { id: 'pan masa madre', nombre: 'Pan de masa madre', precio: 1400 },
+    { id: 'pan multigrano', nombre: 'Pan multigrano', precio: 1300 },
+    { id: 'pan muffin', nombre: 'Pan ingles Muffin', precio: 1200 },
+    { id: 'pan sin gluten', nombre: 'Pan sin gluten', precio: 1500 },
+    { id: 'pan vegano', nombre: 'Pan Vegano', precio: 1400 },
   ];
 
   const carnes = [
@@ -236,67 +465,251 @@ const Personalizador = () => {
   ];
 
   
+  // Función para construir las capas del producto visualmente
+  const construirCapasProducto = () => {
+    const capas = [];
+    
+    if (categoria === 'hamburguesas' || categoria === 'hamburguesa') {
+      // Orden: pan inferior, carne, ingredientes, extras, pan superior
+      if (personalizacion.pan) {
+        const panNombre = pan.find(p => p.id === personalizacion.pan);
+        capas.push({ 
+          tipo: 'pan-inferior', 
+          nombre: panNombre?.nombre || 'Pan',
+          imagen: getIngredientImage(personalizacion.pan, categoria),
+          zIndex: 1
+        });
+      }
+      
+      if (personalizacion.carnes) {
+        const carne = carnes.find(c => c.id === personalizacion.carnes);
+        if (carne) {
+          capas.push({ 
+            tipo: 'carne', 
+            nombre: carne.nombre,
+            imagen: getIngredientImage(personalizacion.carnes, categoria),
+            zIndex: 2
+          });
+        }
+      }
+      
+      personalizacion.ingredientes.forEach((ingId, index) => {
+        const ing = ingredientesDisponibles.find(i => i.id === ingId);
+        if (ing) {
+          capas.push({ 
+            tipo: 'ingrediente', 
+            nombre: ing.nombre,
+            imagen: getIngredientImage(ingId, categoria),
+            zIndex: 3 + index
+          });
+        }
+      });
+      
+
+      
+      if (personalizacion.pan) {
+        const panNombre = pan.find(p => p.id === personalizacion.pan);
+        capas.push({ 
+          tipo: 'pan-superior', 
+          nombre: panNombre?.nombre || 'Pan',
+          imagen: getIngredientImage(personalizacion.pan, categoria),
+          zIndex: 5 + personalizacion.ingredientes.length + personalizacion.extras.length
+        });
+      }
+    } else if (categoria === 'pizzas') {
+      if (personalizacion.masa) {
+        capas.push({ 
+          tipo: 'masa', 
+          nombre: masasPizza.find(m => m.id === personalizacion.masa)?.nombre || 'Masa',
+          imagen: getIngredientImage(personalizacion.masa, categoria),
+          zIndex: 1
+        });
+      }
+      
+      if (personalizacion.ingredientes[0]) {
+        const queso = quesosPizza.find(q => q.id === personalizacion.ingredientes[0]);
+        if (queso) {
+          capas.push({ 
+            tipo: 'queso', 
+            nombre: queso.nombre,
+            imagen: getIngredientImage(personalizacion.ingredientes[0], categoria),
+            zIndex: 2
+          });
+        }
+      }
+      
+      personalizacion.carnes.forEach((carneId, index) => {
+        const carne = carnesPizza.find(c => c.id === carneId);
+        if (carne) {
+          capas.push({ 
+            tipo: 'carne', 
+            nombre: carne.nombre,
+            imagen: getIngredientImage(carneId, categoria),
+            zIndex: 3 + index
+          });
+        }
+      });
+    } else if (categoria === 'pollo') {
+      if (personalizacion.carnes) {
+        const tipo = tiposPollo.find(t => t.id === personalizacion.carnes);
+        if (tipo) {
+          capas.push({ 
+            tipo: 'pollo', 
+            nombre: tipo.nombre,
+            imagen: getIngredientImage(personalizacion.carnes, categoria),
+            zIndex: 1
+          });
+        }
+      }
+      
+      personalizacion.extras.forEach((salsaId, index) => {
+        const salsa = salsasPollo.find(s => s.id === salsaId);
+        if (salsa) {
+          capas.push({ 
+            tipo: 'salsa', 
+            nombre: salsa.nombre,
+            imagen: getIngredientImage(salsaId, categoria),
+            zIndex: 2 + index
+          });
+        }
+      });
+    } else if (categoria === 'perros') {
+      if (personalizacion.carnes) {
+        const tipo = tiposPerro.find(t => t.id === personalizacion.carnes);
+        if (tipo) {
+          capas.push({ 
+            tipo: 'perro-base', 
+            nombre: tipo.nombre,
+            imagen: getIngredientImage(personalizacion.carnes, categoria),
+            zIndex: 1
+          });
+        }
+      }
+      
+      personalizacion.extras.forEach((extraId, index) => {
+        const comp = complementosPerro.find(c => c.id === extraId) || salsasPerros.find(s => s.id === extraId);
+        if (comp) {
+          capas.push({ 
+            tipo: 'complemento', 
+            nombre: comp.nombre,
+            imagen: getIngredientImage(extraId, categoria),
+            zIndex: 2 + index
+          });
+        }
+      });
+    } else if (categoria === 'postres') {
+      if (personalizacion.carnes) {
+        const tipo = tiposPostre.find(t => t.id === personalizacion.carnes);
+        if (tipo) {
+          capas.push({ 
+            tipo: 'postre-base', 
+            nombre: tipo.nombre,
+            imagen: getIngredientImage(personalizacion.carnes, categoria),
+            zIndex: 1
+          });
+        }
+      }
+      
+      personalizacion.extras.forEach((agregadoId, index) => {
+        const agregado = agregadosPostre.find(a => a.id === agregadoId);
+        if (agregado) {
+          capas.push({ 
+            tipo: 'agregado', 
+            nombre: agregado.nombre,
+            imagen: getIngredientImage(agregadoId, categoria),
+            zIndex: 2 + index
+          });
+        }
+      });
+    }
+    
+    return capas;
+  };
+
   const calcularPrecio = () => {
-    if (!producto) {console.log('producto no encontrado'); return 0;}
-  
+    if (!producto) {
+      console.log('producto no encontrado');
+      return 0;
+    }
+
     const precioBase = parseFloat(producto.precio) || 0;
-    const precioTamaño = tamaños.find(t => t.id === personalizacion.tamaño)?.precio || 0;
-  
+    const precioTamaño = tamaños.find((t) => t.id === personalizacion.tamaño)
+      ?.precio || 0;
+
     let precioExtrasTotal = 0;
-  
+
     if (categoria === 'pizzas') {
-      const precioMasa = masasPizza.find(m => m.id === personalizacion.masa)?.precio || 0;
-      const precioQueso = quesosPizza.find(q => q.id === personalizacion.ingredientes[0])?.precio || 0;
-      const precioCarne = personalizacion.carnes.reduce((sum, cId) => {
-        const c = carnes.find(carne => carne.id === cId);
-        return sum + (c?.precio || 0);
-      }, 0);
+      const precioMasa =
+        masasPizza.find((m) => m.id === personalizacion.masa)?.precio || 0;
+      const precioQueso =
+        quesosPizza.find((q) => q.id === personalizacion.ingredientes[0])
+          ?.precio || 0;
+      const precioCarne = Array.isArray(personalizacion.carnes)
+        ? personalizacion.carnes.reduce((sum, cId) => {
+            const c = carnes.find((carne) => carne.id === cId);
+            return sum + (c?.precio || 0);
+          }, 0)
+        : 0;
       precioExtrasTotal = precioMasa + precioQueso + precioCarne;
-    } 
-    else if (categoria === 'pollo') {
+    } else if (categoria === 'pollo') {
       const precioSalsas = personalizacion.extras.reduce((sum, eId) => {
-        const s = salsasPollo.find(s => s.id === eId);
+        const s = salsasPollo.find((s) => s.id === eId);
         return sum + (s?.precio || 0);
       }, 0);
       precioExtrasTotal = precioSalsas;
-    }
-    else if (categoria === 'perros') {
+    } else if (categoria === 'perros') {
       const precioSalsas = personalizacion.extras.reduce((sum, eId) => {
-        const c = salsasPerros.find(c => c.id === eId);
+        const c = salsasPerros.find((c) => c.id === eId);
         return sum + (c?.precio || 0);
       }, 0);
       precioExtrasTotal = precioSalsas;
-    }
-    else if (categoria === 'postres') {
+    } else if (categoria === 'postres') {
       const precioAgregados = personalizacion.extras.reduce((sum, eId) => {
-        const a = agregadosPostre.find(a => a.id === eId);
+        const a = agregadosPostre.find((a) => a.id === eId);
         return sum + (a?.precio || 0);
       }, 0);
       precioExtrasTotal = precioAgregados;
-    }
-    else {
+    } else {
       // hamburguesas
-      const precioPan = pan.find(p => p.id === personalizacion.pan)?.precio || 0;
-      const precioCarne = personalizacion.carnes.reduce((sum, cId) => {
-        const c = carnes.find(carne => carne.id === cId);
-        return sum + (c?.precio || 0);
-      }, 0);
-      const precioIngredientes = personalizacion.ingredientes.reduce((sum, iId) => {
-        const i = ingredientesDisponibles.find(ing => ing.id === iId);
-        return sum + (i?.precio || 0);
-      }, 0);
+      const precioPan = pan.find((p) => p.id === personalizacion.pan)?.precio || 0;
+      const precioCarne = Array.isArray(personalizacion.carnes)
+        ? personalizacion.carnes.reduce((sum, cId) => {
+            const c = carnes.find((carne) => carne.id === cId);
+            return sum + (c?.precio || 0);
+          }, 0)
+        : personalizacion.carnes
+        ? carnes.find((carne) => carne.id === personalizacion.carnes)?.precio || 0
+        : 0;
+      const precioIngredientes = personalizacion.ingredientes.reduce(
+        (sum, iId) => {
+          const i = ingredientesDisponibles.find((ing) => ing.id === iId);
+          return sum + (i?.precio || 0);
+        },
+        0
+      );
       const precioExtras = personalizacion.extras.reduce((sum, eId) => {
-        const e = extrasDisponibles.find(extra => extra.id === eId);
+        const e = extrasDisponibles.find((extra) => extra.id === eId);
         return sum + (e?.precio || 0);
       }, 0);
       precioExtrasTotal = precioPan + precioCarne + precioIngredientes + precioExtras;
     }
-  
+
     return (precioBase + precioTamaño + precioExtrasTotal) * personalizacion.cantidad;
   };
 
-  const handlepanChange = (pan) => {
-    setPersonalizacion(prev => ({ ...prev, pan}));
+  const handlepanChange = (panId) => {
+    setPersonalizacion((prev) => ({ ...prev, pan: panId }));
+
+    // Animar pan cayendo
+    const panSeleccionado = pan.find((p) => p.id === panId);
+    if (panSeleccionado) {
+      animateIngredient({
+        id: panId,
+        tipo: 'pan-inferior',
+        nombre: panSeleccionado.nombre,
+        imagen: getIngredientImage(panId, categoria),
+      });
+    }
   };
 
   const handleTamañoChange = (tamaño) => {
@@ -304,42 +717,75 @@ const Personalizador = () => {
   };
 
   const handleCarnesChange = (carneId) => {
-    setPersonalizacion(prev => {
-      const carnesActuales = prev.carnes || [];
-      const yaSeleccionada = carnesActuales.includes(carneId);
-      
-      let nuevasCarnes;
-      if (yaSeleccionada) {
-        // Quitar la carne
-        nuevasCarnes = carnesActuales.filter(id => id !== carneId);
+    const isAdding =
+      categoria === 'hamburguesas' || categoria === 'hamburguesa'
+        ? !personalizacion.carnes || personalizacion.carnes !== carneId
+        : !personalizacion.carnes || (Array.isArray(personalizacion.carnes) ? !personalizacion.carnes.includes(carneId) : true);
+
+    setPersonalizacion((prev) => {
+      if (categoria === 'hamburguesas' || categoria === 'hamburguesa') {
+        // Para hamburguesas, solo una carne (radio button)
+        return { ...prev, carnes: carneId };
       } else {
-        // Agregar la carne
-        nuevasCarnes = [...carnesActuales, carneId];
+        // Para pizzas, múltiples carnes (checkbox)
+        const carnesActuales = Array.isArray(prev.carnes) ? prev.carnes : [];
+        const yaSeleccionada = carnesActuales.includes(carneId);
+
+        let nuevasCarnes;
+        if (yaSeleccionada) {
+          nuevasCarnes = carnesActuales.filter((id) => id !== carneId);
+        } else {
+          nuevasCarnes = [...carnesActuales, carneId];
+        }
+
+        return { ...prev, carnes: nuevasCarnes };
       }
-      
-      return {
-        ...prev,
-        carnes: nuevasCarnes
-      };
     });
+
+    // Animación removida para carnes de pizza
   };
 
   const handleIngredienteToggle = (ingredienteId) => {
+    const isAdding = !personalizacion.ingredientes.includes(ingredienteId);
+    
     setPersonalizacion(prev => ({
       ...prev,
       ingredientes: prev.ingredientes.includes(ingredienteId)
         ? prev.ingredientes.filter(id => id !== ingredienteId)
         : [...prev.ingredientes, ingredienteId]
     }));
+
+    // Activar animación solo cuando se agrega un ingrediente
+    if (isAdding) {
+      const ingrediente = ingredientesDisponibles.find(i => i.id === ingredienteId);
+      if (ingrediente) {
+        const animationId = `ing-${ingredienteId}-${Date.now()}`;
+        setAnimatingIngredients(prev => [...prev, { 
+          id: animationId, 
+          nombre: ingrediente.nombre, 
+          tipo: 'ingrediente',
+          imagen: getIngredientImage(ingredienteId, categoria)
+        }]);
+        
+        // Remover la animación después de que termine
+        setTimeout(() => {
+          setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
+        }, 4000);
+      }
+    }
   };
 
   const handleExtraToggle = (extraId) => {
+    const isAdding = !personalizacion.extras.includes(extraId);
+    
     setPersonalizacion(prev => ({
       ...prev,
       extras: prev.extras.includes(extraId)
         ? prev.extras.filter(id => id !== extraId)
         : [...prev.extras, extraId]
     }));
+
+    // Animación removida para extras de hamburguesas
   };
 
   const handleCantidadChange = (cantidad) => {
@@ -351,17 +797,20 @@ const Personalizador = () => {
   };
 
   // PIZZA
-  const handleMasaChange = (masa) => {
-    setPersonalizacion(prev => ({ ...prev, masa }));
+  const handleMasaChange = (masaId) => {
+    setPersonalizacion(prev => ({ ...prev, masa: masaId }));
+    // Animación removida
   };
 
-  const handleQuesoChange = (queso) => {
-    setPersonalizacion(prev => ({ ...prev, ingredientes: [queso] }));
+  const handleQuesoChange = (quesoId) => {
+    setPersonalizacion(prev => ({ ...prev, ingredientes: [quesoId] }));
+    // Animación removida
   };
 
   // POLLO
-  const handleTipoPolloChange = (tipo) => {
-    setPersonalizacion(prev => ({ ...prev, carnes: tipo }));
+  const handleTipoPolloChange = (tipoId) => {
+    setPersonalizacion(prev => ({ ...prev, carnes: tipoId }));
+    // Animación removida
   };
 
   const handleSalsaPolloToggle = (salsaId) => {
@@ -371,11 +820,13 @@ const Personalizador = () => {
         ? prev.extras.filter(id => id !== salsaId)
         : [...prev.extras, salsaId]
     }));
+    // Animación removida
   };
 
   // PERROS
-  const handleTipoPerroChange = (tipo) => {
-    setPersonalizacion(prev => ({ ...prev, carnes: tipo }));
+  const handleTipoPerroChange = (tipoId) => {
+    setPersonalizacion(prev => ({ ...prev, carnes: tipoId }));
+    // Animación removida
   };
 
   const handleComplementoPerroToggle = (compId) => {
@@ -385,6 +836,7 @@ const Personalizador = () => {
         ? prev.extras.filter(id => id !== compId)
         : [...prev.extras, compId]
     }));
+    // Animación removida
   };
 
   const handleSalsaPerroToggle = (salsaId) => {
@@ -394,11 +846,13 @@ const Personalizador = () => {
         ? prev.extras.filter(id => id !== salsaId)
         : [...prev.extras, salsaId]
     }));
+    // Animación removida
   };
 
   // POSTRES
-  const handleTipoPostreChange = (tipo) => {
-    setPersonalizacion(prev => ({ ...prev, carnes: tipo }));
+  const handleTipoPostreChange = (tipoId) => {
+    setPersonalizacion(prev => ({ ...prev, carnes: tipoId }));
+    // Animación removida
   };
 
   const handleAgregadoPostreToggle = (agregadoId) => {
@@ -408,6 +862,7 @@ const Personalizador = () => {
         ? prev.extras.filter(id => id !== agregadoId)
         : [...prev.extras, agregadoId]
     }));
+    // Animación removida
   };
   
   const handleVolver = () => {
@@ -461,8 +916,35 @@ const Personalizador = () => {
     return <div className="error">Producto no encontrado</div>;
   }
 
+  // Actualizar capas cuando cambie la personalización
+  const capasProducto = construirCapasProducto();
+
   return (
     <div className="personalizador-container">
+      {/* Contenedor para animaciones de ingredientes */}
+      <div className="ingredient-animation-container">
+        {animatingIngredients.map(anim => {
+          const viewerPos = getViewerPosition();
+          return (
+            <div 
+              key={anim.id} 
+              className="ingredient-falling"
+              style={{
+                '--target-x': `${viewerPos.x}px`,
+                '--target-y': `${viewerPos.y}px`
+              }}
+            >
+              <img 
+                src={anim.imagen} 
+                alt={anim.nombre}
+                className="ingredient-falling-image"
+              />
+              <div className="ingredient-falling-label">{anim.nombre}</div>
+            </div>
+          );
+        })}
+      </div>
+
       <div className="personalizador-header">
         <button className="back-button" onClick={handleVolver}>
           ← Volver
@@ -891,6 +1373,36 @@ const Personalizador = () => {
               Agregar al Carrito
             </button>
           </div>
+
+          {/* Visualizador del Producto */}
+          {/* Eliminado el visualizador del producto para solo mostrar animación de caída */}
+          {/* <div className="product-viewer-container" ref={productViewerRef}>
+            <h3 className="viewer-title">Tu Producto</h3>
+            <div className="product-viewer">
+              {capasProducto.length === 0 ? (
+                <div className="product-placeholder">
+                  <p>Selecciona ingredientes para ver tu producto</p>
+                </div>
+              ) : (
+                <div className="product-layers">
+                  {capasProducto.map((capa, index) => (
+                    <div 
+                      key={`${capa.tipo}-${index}`}
+                      className="product-layer"
+                      style={{ zIndex: capa.zIndex }}
+                    >
+                      <img 
+                        src={capa.imagen} 
+                        alt={capa.nombre}
+                        className="layer-image"
+                      />
+                      <div className="layer-label">{capa.nombre}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div> */}
         </div>
       </div>
     </div>

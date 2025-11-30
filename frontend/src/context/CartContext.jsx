@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { AuthContext } from './AuthContext';
 
 const CartContext = createContext();
 
@@ -11,34 +12,62 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
+  const { user } = useContext(AuthContext);
   const [cartItems, setCartItems] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
-  // Cargar carrito desde localStorage al iniciar
+  // Obtener la clave del carrito basada en el usuario
+  const getCartKey = () => {
+    if (user && user.id) {
+      return `cart_${user.id}`;
+    }
+    return 'cart_guest'; // Para usuarios no autenticados
+  };
+
+  // Cargar carrito desde localStorage al iniciar o cuando cambie el usuario
   useEffect(() => {
     try {
-      const savedCart = localStorage.getItem('cart');
+      const cartKey = getCartKey();
+      const savedCart = localStorage.getItem(cartKey);
       if (savedCart) {
         const parsed = JSON.parse(savedCart);
-        if (Array.isArray(parsed)) setCartItems(parsed);
+        if (Array.isArray(parsed)) {
+          setCartItems(parsed);
+        } else {
+          setCartItems([]);
+        }
+      } else {
+        // Si no hay carrito para este usuario, limpiar el estado
+        setCartItems([]);
       }
     } catch (e) {
       console.warn('No se pudo leer el carrito de localStorage:', e);
+      setCartItems([]);
     } finally {
       setHydrated(true);
     }
-  }, []);
+  }, [user?.id]); // Recargar cuando cambie el usuario
+
+  // Limpiar carrito cuando el usuario cierre sesión
+  useEffect(() => {
+    if (!user) {
+      // Usuario cerró sesión, limpiar el carrito
+      setCartItems([]);
+      setHydrated(true);
+    }
+  }, [user]);
 
   // Guardar carrito en localStorage cuando cambie
   useEffect(() => {
     if (!hydrated) return;
     try {
-      localStorage.setItem('cart', JSON.stringify(cartItems));
+      const cartKey = user && user.id ? `cart_${user.id}` : 'cart_guest';
+      localStorage.setItem(cartKey, JSON.stringify(cartItems));
     } catch (e) {
       console.warn('No se pudo guardar el carrito en localStorage:', e);
     }
-  }, [cartItems, hydrated]);
+  }, [cartItems, hydrated, user?.id]);
 
   const addToCart = (producto) => {
     let message;

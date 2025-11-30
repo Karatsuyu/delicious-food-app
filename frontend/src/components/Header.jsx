@@ -107,10 +107,12 @@ import defaultAvatar from '../assets/icono-perfil-vacio-inicio.jpg';
               )}
             </div>
 
-            {/* 🛒 BOTÓN CARRITO */}
+            {/* 🛒 BOTÓN CARRITO - Solo mostrar si NO es administrador */}
+            {!user?.is_staff && (
             <button className="icon-btn cart-icon" title="Carrito" onClick={handleCartClick}>
               <img src={carrito} alt="Carrito de Compras" className="carrito-image" />
             </button>
+            )}
 
             {/* 👤 LOGIN / REGISTER / USER MENU */}
             {isAuthenticated ? (
@@ -122,6 +124,12 @@ import defaultAvatar from '../assets/icono-perfil-vacio-inicio.jpg';
                     className="avatar-image"
                   />
                 </Link>
+                {user?.is_staff && (
+                  <div className="admin-links">
+                    <Link to="/admin/dashboard" className="btn btn-admin">Dashboard</Link>
+                    <Link to="/admin/productos" className="btn btn-admin">Productos</Link>
+                  </div>
+                )}
                 <button onClick={handleLogout} className="btn btn-logout">Salir</button>
               </div>
             ) : (
@@ -143,9 +151,9 @@ import defaultAvatar from '../assets/icono-perfil-vacio-inicio.jpg';
               Productos
             </Link>
             <li>
-              <Link to="/combos destacados" className="side-menu-link">
+              <Link to="/combos-publicos" className="side-menu-link">
                 <img src={combos} alt="Combos" className="combos-image" />
-                Combos Destacados
+                Combos de la Comunidad
               </Link>
             </li>
           </ul>

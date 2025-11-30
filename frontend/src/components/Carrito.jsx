@@ -5,8 +5,9 @@ import { AuthContext } from '../context/AuthContext';
 import './Carrito.css';
 
 function Carrito() {
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, user } = useContext(AuthContext);
   const navigate = useNavigate();
+  const isAdmin = user?.is_staff;
   const {
     cartItems,
     isOpen,
@@ -19,14 +20,19 @@ function Carrito() {
   } = useCart();
 
   // Redirigir al login si abre el carrito sin autenticación
+  // Ocultar carrito si es administrador
   useEffect(() => {
     if (isOpen && !isAuthenticated) {
       toggleCart();
       navigate('/login');
     }
-  }, [isOpen, isAuthenticated, navigate, toggleCart]);
+    // Cerrar carrito automáticamente si es admin
+    if (isOpen && isAdmin) {
+      toggleCart();
+    }
+  }, [isOpen, isAuthenticated, isAdmin, navigate, toggleCart]);
 
-  if (!isOpen || !isAuthenticated) return null;
+  if (!isOpen || !isAuthenticated || isAdmin) return null;
 
   return (
     <div className="cart-overlay">

@@ -131,6 +131,17 @@ export const productService = {
       console.error('Error obteniendo combos:', error);
       throw error;
     }
+  },
+
+  // Obtener combos personalizados públicos
+  getCombosPublicos: async () => {
+    try {
+      const response = await api.get('productos/combos-personalizados/publicos/');
+      return response.data;
+    } catch (error) {
+      console.error('Error obteniendo combos públicos:', error);
+      throw error;
+    }
   }
 };
 
@@ -225,6 +236,17 @@ export const authService = {
       console.error('Error cambiando contraseña:', error);
       throw error;
     }
+  },
+
+  // Obtener perfil público de un usuario
+  getPerfilPublico: async (userId) => {
+    try {
+      const response = await api.get(`users/users/${userId}/perfil_publico/`);
+      return response.data;
+    } catch (error) {
+      console.error('Error obteniendo perfil público:', error);
+      throw error;
+    }
   }
 };
 
@@ -316,6 +338,77 @@ export const notificationService = {
       return response.data;
     } catch (error) {
       console.error('Error obteniendo notificaciones:', error);
+      throw error;
+    }
+  }
+};
+
+// Servicios de administración
+export const adminService = {
+  // CRUD de productos
+  getAllProducts: async () => {
+    try {
+      const response = await api.get('admin/productos/');
+      return response.data;
+    } catch (error) {
+      console.error('Error obteniendo productos (admin):', error);
+      throw error;
+    }
+  },
+
+  getProduct: async (id) => {
+    try {
+      const response = await api.get(`admin/productos/${id}/`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error obteniendo producto ${id} (admin):`, error);
+      throw error;
+    }
+  },
+
+  createProduct: async (productData) => {
+    try {
+      const isFormData = typeof FormData !== 'undefined' && productData instanceof FormData;
+      const response = await api.post('admin/productos/', productData, {
+        headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : undefined,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error creando producto (admin):', error);
+      throw error;
+    }
+  },
+
+  updateProduct: async (id, productData) => {
+    try {
+      const isFormData = typeof FormData !== 'undefined' && productData instanceof FormData;
+      const response = await api.patch(`admin/productos/${id}/`, productData, {
+        headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : undefined,
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error actualizando producto ${id} (admin):`, error);
+      throw error;
+    }
+  },
+
+  deleteProduct: async (id) => {
+    try {
+      const response = await api.delete(`admin/productos/${id}/`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error eliminando producto ${id} (admin):`, error);
+      throw error;
+    }
+  },
+
+  // Estadísticas
+  getEstadisticas: async () => {
+    try {
+      const response = await api.get('admin/estadisticas/');
+      return response.data;
+    } catch (error) {
+      console.error('Error obteniendo estadísticas (admin):', error);
       throw error;
     }
   }
