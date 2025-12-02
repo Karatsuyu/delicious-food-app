@@ -380,9 +380,11 @@ function CrearCombo() {
           };
         });
 
+      let cartItemId;
       if (editId) {
         // Modo edición: actualizar el ítem existente en el carrito
-        updateCartItem(String(editId), (prev) => ({
+        cartItemId = String(editId);
+        updateCartItem(cartItemId, (prev) => ({
           nombre: comboNombre,
           precio: total,
           imagen,
@@ -393,9 +395,9 @@ function CrearCombo() {
         try { window.dispatchEvent(new CustomEvent('open-cart-modal')); } catch {}
       } else {
         // Modo creación: crear un nuevo ítem en el carrito
-        const syntheticId = `combo-${Date.now()}`;
+        cartItemId = `combo-${Date.now()}`;
         addToCart({
-          id: syntheticId,
+          id: cartItemId,
           nombre: comboNombre,
           precio: total, // precio unitario será el total, cantidad inicia en 1
           imagen,
@@ -405,12 +407,16 @@ function CrearCombo() {
         });
       }
 
-      // 2) Persistir en backend (si falla, mostramos un error no bloqueante)
+      // 2) Persistir en backend y actualizar el item del carrito con comboPersonalizadoId
       try {
-        await api.post('orders/add-custom-combo/', {
+        const resp = await api.post('orders/add-custom-combo/', {
           nombre: comboNombre,
           productos: productosPayload
         });
+        if (resp?.data?.combo_id) {
+          updateCartItem(cartItemId, { comboPersonalizadoId: resp.data.combo_id });
+          console.log('[CrearCombo] comboPersonalizadoId asignado:', resp.data.combo_id);
+        }
       } catch (persistErr) {
         console.warn('No se pudo persistir el combo en backend, se mantiene en carrito local:', persistErr);
         setError('El combo se agregó al carrito, pero no pudo guardarse en tu perfil. Inténtalo nuevamente.');

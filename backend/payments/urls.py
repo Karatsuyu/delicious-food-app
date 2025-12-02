@@ -1,7 +1,9 @@
 from django.urls import path
-from .views import create_preference, account_status
+from . import views
 
 urlpatterns = [
-    path('create_preference/', create_preference, name='mp_create_preference'),
-    path('account_status/', account_status, name='mp_account_status'),
+    path('create-checkout-session/', views.CreateCheckoutSessionView.as_view(), name='stripe_create_checkout_session'),
+    path('webhook/', views.stripe_webhook, name='stripe_webhook'),
+    path('retrieve-session/', views.retrieve_session, name='stripe_retrieve_session'),
+    path('confirm-session/', views.ConfirmSessionView.as_view(), name='stripe_confirm_session'),
 ]

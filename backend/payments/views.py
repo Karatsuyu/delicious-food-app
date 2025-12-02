@@ -1,131 +1,170 @@
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
 import json
 import os
-import mercadopago
-import requests
+import stripe
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
-# Access token: prefer environment variable if present
-ACCESS_TOKEN = os.getenv('MERCADOPAGO_ACCESS_TOKEN', 'TEST-REPLACE_WITH_YOUR_ACCESS_TOKEN')
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
-sdk = mercadopago.SDK(ACCESS_TOKEN)
+class CreateCheckoutSessionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            data = request.data or {}
+            items = data.get("items", [])
+
+            line_items = []
+            for item in items:
+                line_items.append({
+                    "price_data": {
+                        "currency": "cop",
+                        "product_data": {"name": item.get("name") or item.get("title") or "Producto"},
+                        "unit_amount": int(item.get("unit_amount") or int(float(item.get("unit_price", 0)) * 100)),
+                    },
+                    "quantity": int(item.get("quantity", 1)),
+                })
+
+            # Log temporal de totales recibidos
+            try:
+                total_cents = sum(li["price_data"]["unit_amount"] * li["quantity"] for li in line_items)
+                print(f"[Stripe] Items recibidos: {items}")
+                print(f"[Stripe] Total en centavos: {total_cents}")
+            except Exception as _:
+                pass
+
+            if not line_items:
+                # Item de prueba si no llegaron items
+                line_items = [{
+                    "price_data": {
+                        "currency": "cop",
+                        "product_data": {"name": "Producto de prueba"},
+                        "unit_amount": 1000,  # $10.00 COP (centavos)
+                    },
+                    "quantity": 1,
+                }]
+
+            metadata = {}
+            combo_id = data.get('combo_personalizado_id')
+            combo_obj = None
+            if combo_id:
+                # Validar que el combo pertenezca al usuario y actualizar stripe_session_id posteriormente
+                from products.models import ComboPersonalizado
+                try:
+                    combo_obj = ComboPersonalizado.objects.get(id=combo_id, usuario=request.user)
+                    metadata['combo_personalizado_id'] = str(combo_obj.id)
+                except ComboPersonalizado.DoesNotExist:
+                    return Response({"error": "combo_personalizado_id inválido"}, status=400)
+
+            checkout_session = stripe.checkout.Session.create(
+                payment_method_types=["card"],
+                line_items=line_items,
+                mode="payment",
+                success_url=f"{settings.FRONTEND_URL}/success?session_id={{CHECKOUT_SESSION_ID}}",
+                cancel_url=f"{settings.FRONTEND_URL}/failure",
+                metadata=metadata or None,
+            )
+
+            if combo_obj is not None:
+                # Guardar stripe_session_id en el combo (pendiente de pago)
+                combo_obj.stripe_session_id = checkout_session.id
+                combo_obj.save(update_fields=["stripe_session_id"])
+
+            return Response({"id": checkout_session.id, "url": checkout_session.url})
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
+
 
 @csrf_exempt
-@require_POST
-def create_preference(request):
-    try:
-        data = json.loads(request.body.decode('utf-8') or '{}')
-    except Exception:
-        data = {}
+def stripe_webhook(request):
+    payload = request.body
+    sig_header = request.META.get("HTTP_STRIPE_SIGNATURE")
+    endpoint_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
 
-    items = data.get('items') or []
-    # Fallback simple item if empty
-    if not items:
-        title = data.get('title', 'Producto de prueba')
-        price = float(data.get('price', 10000))
-        items = [{
-            "title": title,
-            "quantity": 1,
-            "unit_price": price,
-            "currency_id": "COP",
-        }]
-    else:
-        # Normalize received items
-        norm = []
-        for it in items:
+    event = None
+    try:
+        if endpoint_secret:
+            event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)
+        else:
+            event = json.loads(payload)
+    except ValueError:
+        return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError:
+        return HttpResponse(status=400)
+
+    if event.get("type") == "checkout.session.completed":
+        session = event["data"]["object"]
+        print("Pago completado para session:", session.get("id"))
+        combo_id = session.get("metadata", {}).get("combo_personalizado_id")
+        if combo_id:
+            from products.models import ComboPersonalizado
+            from django.utils import timezone
             try:
-                norm.append({
-                    "title": str(it.get('title') or it.get('nombre') or 'Producto'),
-                    "quantity": int(it.get('quantity') or it.get('cantidad') or 1),
-                    "unit_price": float(it.get('unit_price') or it.get('precio') or it.get('precioUnitario') or 0.0),
-                    "currency_id": "COP",
-                })
-            except Exception:
-                continue
-        if norm:
-            items = norm
+                combo_obj = ComboPersonalizado.objects.get(id=combo_id)
+                if not combo_obj.is_paid:
+                    combo_obj.is_paid = True
+                    combo_obj.paid_at = timezone.now()
+                    # Aumentar contador propio (veces_comprado se usa para compras de otros; aquí sólo confirmamos creación pagada)
+                    combo_obj.save(update_fields=["is_paid", "paid_at"])
+                    print(f"ComboPersonalizado {combo_id} marcado como pagado.")
+            except ComboPersonalizado.DoesNotExist:
+                print(f"ComboPersonalizado {combo_id} no encontrado para marcar pago.")
 
-    payer = data.get('payer') or {}
-    payer_payload = {}
-    if payer:
-        payer_payload = {
-            "name": payer.get('name') or payer.get('nombre') or '',
-            "surname": payer.get('surname') or payer.get('apellidos') or '',
-            "email": payer.get('email') or '',
-            "phone": {
-                "area_code": "57",
-                "number": str(payer.get('phone') or payer.get('telefono') or ''),
-            },
-            "address": {
-                "street_name": payer.get('address') or payer.get('direccion') or '',
-                "zip_code": str(payer.get('zip') or payer.get('codigoPostal') or ''),
-            },
-        }
+    return HttpResponse(status=200)
 
-    preference_data = {
-        "items": items,
-        "payer": payer_payload,
-        "back_urls": {
-            "success": data.get('success_url') or "http://localhost:5173/success",
-            "failure": data.get('failure_url') or "http://localhost:5173/failure",
-            "pending": data.get('pending_url') or "http://localhost:5173/pending",
-        },
-        # "auto_return": "approved",  # opcional; puede causar error si back_urls no es aceptada por la cuenta
-        # You can set notification_url to receive Webhooks later
-    }
 
+def retrieve_session(request):
+    session_id = request.GET.get("session_id")
+    if not session_id:
+        return JsonResponse({"error": "session_id requerido"}, status=400)
     try:
-        preference = sdk.preference().create(preference_data)
-        status_code = preference.get("status")
-        resp = preference.get("response", {}) or {}
-        if status_code != 201:
-            return JsonResponse({
-                "error": "mercadopago_error",
-                "status": status_code,
-                "error_type": resp.get("error"),
-                "message": resp.get("message"),
-                "cause": resp.get("cause"),
-            }, status=400)
-
-        pref_id = resp.get("id")
-        init_point = resp.get("init_point") or resp.get("sandbox_init_point")
-        if not pref_id:
-            return JsonResponse({"error": "No se pudo crear la preferencia", "mp": resp}, status=500)
-        return JsonResponse({"id": pref_id, "init_point": init_point})
+        session = stripe.checkout.Session.retrieve(session_id)
+        return JsonResponse(session)
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        return JsonResponse({"error": str(e)}, status=400)
 
 
-def account_status(request):
-    """Devuelve un resumen del estado de la cuenta asociada al Access Token.
+class ConfirmSessionView(APIView):
+    """Confirma el estado de una sesión de Stripe y marca el combo como pagado si aplica.
 
-    Útil para diagnosticar: país/site, status, tipo de usuario y si el token está activo.
+    Seguridad:
+    - Requiere autenticación JWT.
+    - Verifica que el combo de metadata pertenezca al usuario autenticado.
+    - Verifica que el combo tenga el mismo stripe_session_id que la sesión consultada.
     """
-    token = ACCESS_TOKEN
-    if not token or token.startswith('TEST-REPLACE'):
-        return JsonResponse({
-            "ok": False,
-            "error": "token_missing",
-            "message": "MERCADOPAGO_ACCESS_TOKEN no configurado en backend/.env",
-        }, status=400)
-    try:
-        resp = requests.get(
-            'https://api.mercadopago.com/users/me',
-            headers={'Authorization': f'Bearer {token}'},
-            timeout=20
-        )
-        data = resp.json() if resp.headers.get('content-type','').startswith('application/json') else {}
-        subset = {
-            'http_status': resp.status_code,
-            'id': data.get('id'),
-            'nickname': data.get('nickname'),
-            'email': data.get('email'),
-            'site_id': data.get('site_id'),
-            'status': data.get('status'),
-            'user_type': data.get('user_type'),
-        }
-        # Hint: si status != 'active' o site_id != 'MCO' (Colombia), habrá rechazos
-        return JsonResponse({"ok": True, "account": subset})
-    except Exception as e:
-        return JsonResponse({"ok": False, "error": str(e)}, status=500)
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        session_id = request.data.get("session_id")
+        if not session_id:
+            return Response({"error": "session_id requerido"}, status=400)
+
+        try:
+            session = stripe.checkout.Session.retrieve(session_id)
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
+
+        # Intentar marcar combo como pagado si la sesión está pagada y hay metadata
+        payment_status = session.get("payment_status") or session.get("status")
+        metadata = session.get("metadata") or {}
+        combo_id = metadata.get("combo_personalizado_id")
+
+        if payment_status in ("paid", "complete") and combo_id:
+            try:
+                from products.models import ComboPersonalizado
+                from django.utils import timezone
+                combo = ComboPersonalizado.objects.get(id=combo_id, usuario=request.user)
+                # Validar que corresponda a la misma sesión
+                if combo.stripe_session_id == session.get("id") and not combo.is_paid:
+                    combo.is_paid = True
+                    combo.paid_at = timezone.now()
+                    combo.save(update_fields=["is_paid", "paid_at"])
+            except ComboPersonalizado.DoesNotExist:
+                # No romper; sólo retornar la sesión
+                pass
+
+        return Response(session)

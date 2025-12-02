@@ -88,8 +88,8 @@ class ComboPersonalizadoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ComboPersonalizado
-        fields = ["id", "usuario", "usuario_info", "nombre", "precio_total", "creado_en", "productos", "productos_detalle", "publicado", "veces_comprado"]
-        read_only_fields = ["usuario", "precio_total", "creado_en", "veces_comprado"]
+        fields = ["id", "usuario", "usuario_info", "nombre", "precio_total", "creado_en", "productos", "productos_detalle", "publicado", "veces_comprado", "is_paid", "stripe_session_id", "paid_at"]
+        read_only_fields = ["usuario", "precio_total", "creado_en", "veces_comprado", "is_paid", "stripe_session_id", "paid_at"]
 
     def get_usuario_info(self, obj):
         """Retorna información básica del usuario creador"""

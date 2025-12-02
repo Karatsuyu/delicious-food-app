@@ -34,7 +34,8 @@ class ComboPersonalizadoViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return ComboPersonalizado.objects.filter(usuario=self.request.user)
+        # Mostrar solo combos pagados
+        return ComboPersonalizado.objects.filter(usuario=self.request.user, is_paid=True)
 
     def perform_create(self, serializer):
         serializer.save(usuario=self.request.user)
@@ -51,7 +52,7 @@ class ComboPersonalizadoListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return ComboPersonalizado.objects.filter(usuario=self.request.user)
+        return ComboPersonalizado.objects.filter(usuario=self.request.user, is_paid=True)
 
 class ComboPersonalizadoPublicosView(generics.ListAPIView):
     """Vista para listar combos personalizados publicados para que otros usuarios los compren"""

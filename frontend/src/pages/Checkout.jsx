@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useCart } from '../context/CartContext';
-import api from '../api/api';
 import './Checkout.css';
+import { loadStripe } from '@stripe/stripe-js';
+import api from '../api/api';
 
-const MP_PUBLIC_KEY = import.meta?.env?.VITE_MP_PUBLIC_KEY || 'TEST-PUBLIC-KEY-REPLACE';
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 function Checkout() {
   const { cartItems } = useCart();
@@ -33,42 +34,70 @@ function Checkout() {
     try {
       setLoading(true);
       setError('');
-      // Importante: en sandbox de MP Colombia, enviar phone/address mal formateados rompe el checkout (FE-xxxx).
-      // Enviar solo nombre, apellido y email para máxima compatibilidad.
-      const payload = {
-        items: itemsForSummary.map(i => ({
-          title: i.title,
-          quantity: i.quantity,
-          unit_price: i.unit_price
-        })),
-        payer: {
-          name: buyer.nombre || 'Test',
-          surname: buyer.apellidos || 'User',
-          email: buyer.email || 'test@test.com'
-        },
-        success_url: window.location.origin + '/success',
-        failure_url: window.location.origin + '/failure',
-        pending_url: window.location.origin + '/pending',
+      // Stripe espera amounts en centavos (integer). Convertimos COP a centavos
+      // Teniendo en cuenta que en nuestra UI los precios pueden venir como strings con separadores ("39.900").
+      const toPesosInteger = (value) => {
+        if (typeof value === 'string') {
+          // Remover separadores de miles y espacios: "39.900" -> "39900"; "216.900" -> "216900"
+          const digits = value.replace(/[^0-9]/g, '');
+          return digits ? parseInt(digits, 10) : 0;
+        }
+        if (typeof value === 'number') {
+          // Si llegó como número con decimales por parseo de string (ej: 39.9), asumimos que representa miles mal parseados.
+          // Redondeamos a entero de pesos.
+          return Math.round(value);
+        }
+        return 0;
       };
-      const { data } = await api.post('payments/create_preference/', payload);
-      // Si el backend devuelve init_point, redirigimos; si no, mostramos botón alternativo (id)
-      if (data?.init_point) {
-        window.location.href = data.init_point;
+
+      const items = itemsForSummary.map(i => {
+        const pesos = toPesosInteger(i.unit_price); // en pesos (COP)
+        const cents = pesos * 100; // en centavos
+        const line = {
+          name: i.title,
+          quantity: Number(i.quantity) || 1,
+          unit_amount: cents,
+        };
+        return line;
+      });
+      // Detectar combo personalizado propio para pasar su ID al backend (solo uno por sesión)
+      const customCombo = (cartItems || []).find(ci => ci.isCustomCombo && ci.comboPersonalizadoId);
+
+      console.log('[Checkout] Payload enviado a backend:', { items });
+      const bodyPayload = customCombo ? { items, combo_personalizado_id: customCombo.comboPersonalizadoId } : { items };
+      if (customCombo) {
+        console.log('[Checkout] Enviando combo_personalizado_id:', customCombo.comboPersonalizadoId);
+      }
+      // Usar el cliente API con JWT para que el backend pueda validar al usuario y asociar el combo
+      const { data } = await api.post('payments/create-checkout-session/', bodyPayload);
+      console.log('[Checkout] Respuesta backend:', data);
+      if (data.error) {
+        setError(`Stripe: ${data.error}`);
         return;
       }
-      alert('Preferencia creada. ID: ' + data?.id + '\nInstala el SDK de Mercado Pago o habilita init_point para continuar.');
+
+      // Stripe.js reciente ha desaprobado redirectToCheckout; usa la URL devuelta
+      if (data.url) {
+        window.location.href = data.url;
+      } else if (data.id) {
+        // Fallback legacy: si existe session id pero no URL, intenta con redirectToCheckout si está disponible
+        const stripe = await stripePromise;
+        if (stripe && typeof stripe.redirectToCheckout === 'function') {
+          const { error } = await stripe.redirectToCheckout({ sessionId: data.id });
+          if (error) throw error;
+        } else {
+          setError('Stripe: no se pudo redirigir. Usa la URL de sesión devuelta por el backend.');
+        }
+      } else {
+        setError('Stripe: respuesta sin id ni url.');
+      }
     } catch (e) {
       console.error(e);
-      setError('No se pudo iniciar el pago. Inténtalo nuevamente.');
+      setError('No se pudo iniciar el pago con Stripe. Inténtalo nuevamente.');
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    // Solo referencia para futuras mejoras con el SDK de React o CDN
-    void MP_PUBLIC_KEY;
-  }, []);
 
   return (
     <div className="checkout-page">
@@ -140,9 +169,9 @@ function Checkout() {
           {error && <div className="checkout-error">{error}</div>}
 
           <button className="btn-mp" onClick={onPay} disabled={loading || total<=0}>
-            {loading ? 'Creando orden…' : 'Pagar con Mercado Pago'}
+            {loading ? 'Creando sesión…' : 'Pagar con tarjeta (Stripe)'}
           </button>
-          <p className="note">Se abrirá el checkout seguro de Mercado Pago.</p>
+          <p className="note">Se abrirá el checkout seguro de Stripe.</p>
         </section>
       </div>
     </div>

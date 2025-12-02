@@ -128,6 +128,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
 ]
 
+# Stripe keys and frontend URL
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+ 
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 AUTH_USER_MODEL = 'users.User'

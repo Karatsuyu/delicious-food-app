@@ -239,6 +239,15 @@ class PedidoViewSet(viewsets.ModelViewSet):
         response_serializer = PedidoSerializer(pedido)
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
 
+class ClearCartAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        carrito = Carrito.objects.filter(usuario=request.user).first()
+        if carrito:
+            carrito.items.all().delete()
+        return Response({'ok': True, 'cleared': True})
+
     @action(detail=True, methods=['patch'])
     def actualizar_estado(self, request, pk=None):
         """Actualizar estado del pedido (solo para staff/admin)"""

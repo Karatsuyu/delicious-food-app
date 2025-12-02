@@ -64,6 +64,10 @@ class ComboPersonalizado(models.Model):
     creado_en = models.DateTimeField(auto_now_add=True)
     publicado = models.BooleanField(default=False, help_text="Si está publicado, otros usuarios pueden comprarlo")
     veces_comprado = models.PositiveIntegerField(default=0, help_text="Cantidad de veces que otros han comprado este combo")
+    # Nuevo: estado de pago y sesión de Stripe
+    is_paid = models.BooleanField(default=False, help_text="Indica si el combo ha sido pagado por su creador")
+    stripe_session_id = models.CharField(max_length=255, blank=True, null=True, help_text="ID de la sesión de Stripe usada para pagar este combo")
+    paid_at = models.DateTimeField(blank=True, null=True, help_text="Fecha y hora en que se registró el pago exitoso")
     
     class Meta:
         ordering = ['-creado_en']
