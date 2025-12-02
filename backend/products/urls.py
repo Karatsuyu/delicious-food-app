@@ -21,7 +21,9 @@ urlpatterns = [
     path('', include(admin_router.urls)),
     path('combos-personalizados/create/',ComboPersonalizadoCreateView.as_view(), name='combo-personalizado-create'),
     path('combos-personalizados/list/',ComboPersonalizadoListView.as_view(), name='combo-personalizo-list'),
-    path('combos-personalizados/publicos/',ComboPersonalizadoPublicosView.as_view(), name='combo-personalizado-publicos'),
+    # Cambiar la ruta para evitar conflicto con el ViewSet
+    path('combos-publicos/',ComboPersonalizadoPublicosView.as_view(), name='combo-personalizado-publicos'),
+
     # Ruta de estadísticas para administradores
     path('admin/estadisticas/', AdminEstadisticasView.as_view(), name='admin-estadisticas'),
 ]

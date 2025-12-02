@@ -136,7 +136,7 @@ export const productService = {
   // Obtener combos personalizados públicos
   getCombosPublicos: async () => {
     try {
-      const response = await api.get('productos/combos-personalizados/publicos/');
+      const response = await api.get('combos-publicos/');
       return response.data;
     } catch (error) {
       console.error('Error obteniendo combos públicos:', error);

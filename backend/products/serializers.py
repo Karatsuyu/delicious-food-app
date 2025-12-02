@@ -79,7 +79,7 @@ class ComboSerializer(serializers.ModelSerializer):
 class ComboPersonalizadoProductoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ComboPersonalizadoProducto
-        fields = ["producto", "cantidad"]
+        fields = ["producto", "cantidad", "imagen_seleccionada"]
 
 class ComboPersonalizadoSerializer(serializers.ModelSerializer):
     productos = ComboPersonalizadoProductoSerializer(many=True, write_only=True, required=False)
@@ -97,8 +97,12 @@ class ComboPersonalizadoSerializer(serializers.ModelSerializer):
         profile_image_url = None
         if obj.usuario.profile_image:
             try:
-                profile_image_url = request.build_absolute_uri(obj.usuario.profile_image.url) if request else obj.usuario.profile_image.url
-            except:
+                if request:
+                    profile_image_url = request.build_absolute_uri(obj.usuario.profile_image.url)
+                else:
+                    # Construir URL manualmente cuando no hay request
+                    profile_image_url = f"http://127.0.0.1:8000{obj.usuario.profile_image.url}"
+            except Exception as e:
                 profile_image_url = obj.usuario.profile_image.url if obj.usuario.profile_image else None
         
         return {
@@ -116,10 +120,18 @@ class ComboPersonalizadoSerializer(serializers.ModelSerializer):
         productos_data = []
         for combo_producto in obj.combopersonalizadoproducto_set.all():
             imagen_url = None
-            if combo_producto.producto.imagen:
+            # Priorizar la imagen seleccionada si existe
+            if combo_producto.imagen_seleccionada:
+                # La imagen_seleccionada es la ruta completa del asset
+                imagen_url = combo_producto.imagen_seleccionada
+            elif combo_producto.producto.imagen:
                 try:
-                    imagen_url = request.build_absolute_uri(combo_producto.producto.imagen.url) if request else combo_producto.producto.imagen.url
-                except:
+                    if request:
+                        imagen_url = request.build_absolute_uri(combo_producto.producto.imagen.url)
+                    else:
+                        # Construir URL manualmente cuando no hay request
+                        imagen_url = f"http://127.0.0.1:8000{combo_producto.producto.imagen.url}"
+                except Exception as e:
                     imagen_url = combo_producto.producto.imagen.url if combo_producto.producto.imagen else None
             
             productos_data.append({
@@ -127,6 +139,7 @@ class ComboPersonalizadoSerializer(serializers.ModelSerializer):
                 'nombre': combo_producto.producto.nombre,
                 'precio': float(combo_producto.producto.precio),
                 'imagen': imagen_url,
+                'imagen_seleccionada': combo_producto.imagen_seleccionada,  # Incluir también el campo directamente
                 'cantidad': combo_producto.cantidad
             })
         return productos_data
@@ -138,8 +151,12 @@ class ComboPersonalizadoSerializer(serializers.ModelSerializer):
         for prod_data in productos_data:
             producto = prod_data["producto"]
             cantidad = prod_data.get("cantidad", 1)
+            imagen_seleccionada = prod_data.get("imagen_seleccionada", "")
             ComboPersonalizadoProducto.objects.create(
-                combo=combo, producto=producto, cantidad=cantidad
+                combo=combo, 
+                producto=producto, 
+                cantidad=cantidad,
+                imagen_seleccionada=imagen_seleccionada
             )
             total += producto.precio * cantidad
         combo.precio_total = total

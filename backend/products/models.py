@@ -80,3 +80,4 @@ class ComboPersonalizadoProducto(models.Model):
     combo = models.ForeignKey(ComboPersonalizado, on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     cantidad = models.PositiveIntegerField(default=1)
+    imagen_seleccionada = models.CharField(max_length=200, blank=True, null=True, help_text="Ruta de la imagen específica seleccionada en el personalizador")

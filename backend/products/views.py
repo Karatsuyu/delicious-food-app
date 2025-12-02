@@ -2,7 +2,9 @@ from rest_framework import viewsets, permissions, generics, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.views import APIView
 from django.db.models import Sum, Count, Q, F
+from django.http import JsonResponse
 from .models import Producto, Ingrediente, Combo, ComboPersonalizado
 from .serializers import ProductoSerializer, IngredienteSerializer, ComboSerializer, ComboPersonalizadoSerializer
 from orders.models import PedidoItem, Pedido
@@ -58,12 +60,17 @@ class ComboPersonalizadoPublicosView(generics.ListAPIView):
     """Vista para listar combos personalizados publicados para que otros usuarios los compren"""
     serializer_class = ComboPersonalizadoSerializer
     permission_classes = [permissions.AllowAny]
-    queryset = ComboPersonalizado.objects.filter(publicado=True).order_by('-veces_comprado', '-creado_en')
+    authentication_classes = []  # Permitir acceso sin autenticación
+    
+    def get_queryset(self):
+        return ComboPersonalizado.objects.filter(publicado=True).order_by('-veces_comprado', '-creado_en')
     
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
+    
+
 
 
 # ========== VISTAS DE ADMINISTRACIÓN ==========
@@ -175,4 +182,7 @@ class AdminEstadisticasView(generics.RetrieveAPIView):
             },
             'productos_por_categoria': list(productos_por_categoria)
         })
+
+
+
 

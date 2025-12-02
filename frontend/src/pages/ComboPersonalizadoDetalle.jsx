@@ -9,6 +9,7 @@ import hamburguesa1 from '../assets/hamburguesa1.png';
 import hamburguesa2 from '../assets/hamburguesa2.png';
 import hamburguesa3 from '../assets/hamburguesa3.png';
 import hamburguesa4 from '../assets/hamburguesa4.png';
+import hamburguesa8 from '../assets/hamburguesa8.png';
 import pizza from '../assets/pizza.png';
 import pizza1 from '../assets/pizza1.png';
 import pizza2 from '../assets/pizza2.png';
@@ -32,105 +33,61 @@ import postres1 from '../assets/postres1.png';
 import postres2 from '../assets/postres2.png';
 import postres3 from '../assets/postres3.png';
 
-const getAssetForProduct = (name = '') => {
-  if (!name) return hamburguesa;
-  
-  const key = name.trim().toLowerCase();
-  
-  // Mapeo exacto IDÉNTICO al personalizador
-  const NAME_MAP = {
-    // Mapeo exacto para los productos que aparecen en el combo JEGT
-    'double smash': hamburguesa1,           // EXACTA del personalizador
-    'pizza de pepperoni': peperoni,         // EXACTA: usa peperoni.png no pizza2.png
-    'alitas simples': pollo1,               // EXACTA del personalizador
-    
-    // Hamburguesas - mapeo completo del personalizador
-    'hamburguesa clásica': hamburguesa,
-    'hamburguesa bbq': hamburguesa1,
-    'hamburguesa pollo crispy': hamburguesa2,
-    'hamburguesa vegetariana': hamburguesa3,
-    'big mac': hamburguesa1,
-    'whopper': hamburguesa2,
-    'quarter pounder': hamburguesa3,
-    'cheeseburger': hamburguesa4,
-    
-    // Pizzas - mapeo exacto del personalizador
-    'pizza margherita': pizza,
-    'pizza pepperoni': peperoni,            // Siempre peperoni.png para pepperoni
-    'pizza hawaiana': pizza1,
-    'pizza cuatro quesos': pizza2,
-    'pizza vegetariana': pizza3,
-    'pizza suprema': pizza1,
-    'pizza bbq': pizza2,
-    
-    // Pollo - mapeo exacto del personalizador
-    'alitas simples': pollo1,
-    'alitas bbq': pollo2,
-    'nuggets de pollo': pollo,
-    'pollo crispy': pollo1,
-    'pollo asado': pollo2,
-    'pollo empanizado': pollo,
-    
-    // Perros - mapeo exacto del personalizador
-    'perro especial': perro1,
-    'perro clásico': perro,
-    'hot dog americano': perro2,
-    'perro colombiano': perro1,
-    'perro gourmet': perro2,
-    
-    // Papas - mapeo exacto del personalizador
-    'papas fritas medianas': papas1,
-    'papas fritas grandes': papas2,
-    'papas con queso': papas3,
-    'papas curly': papas2,
-    'papas rústicas': papas3,
-    'papas pequeñas': papas1,
-    
-    // Bebidas - mapeo exacto del personalizador
-    'coca-cola': bebida1,
-    'pepsi': bebida2,
-    'sprite': bebida3l,
-    'fanta': bebida4,
-    'agua mineral': bebida5,
-    'jugo de naranja': bebida1,
-    'té helado': bebida2,
-    'malteada': bebida4,
-    'gaseosa': bebida3l,
-    
-    // Postres - mapeo exacto del personalizador
-    'brownie de chocolate': postres1,
-    'cheesecake': postres2,
-    'helado de vainilla': postres3,
-    'tiramisu': postres1,
-    'flan casero': postres2,
-    'torta de chocolate': postres3
-  };
-  
-  // Buscar coincidencia exacta primero
-  if (NAME_MAP[key]) {
-    return NAME_MAP[key];
+// Mapeo de nombres de archivo a imágenes importadas
+const IMAGE_MAP = {
+  'hamburguesa.png': hamburguesa,
+  'hamburguesa1.png': hamburguesa1,
+  'hamburguesa2.png': hamburguesa2,
+  'hamburguesa3.png': hamburguesa3,
+  'hamburguesa4.png': hamburguesa4,
+  'hamburguesa8.png': hamburguesa8,
+  'pizza.png': pizza,
+  'pizza1.png': pizza1,
+  'pizza2.png': pizza2,
+  'pizza3.png': pizza3,
+  'peperoni.png': peperoni,
+  'perro.png': perro,
+  'perro1.png': perro1,
+  'perro2.png': perro2,
+  'papas1.png': papas1,
+  'papas2.png': papas2,
+  'papas3.png': papas3,
+  'bebida1.png': bebida1,
+  'bebida2.png': bebida2,
+  'bebida3.png': bebida3l,
+  'bebida4.png': bebida4,
+  'bebida5.png': bebida5,
+  'pollo.png': pollo,
+  'pollo1.png': pollo1,
+  'pollo2.png': pollo2,
+  'postres1.png': postres1,
+  'postres2.png': postres2,
+  'postres3.png': postres3,
+};
+
+// Función que usa las imágenes guardadas en la BD y las mapea correctamente
+const getProductImage = (producto) => {
+  // Priorizar la imagen_seleccionada guardada en la BD (desde el personalizador)
+  if (producto.imagen_seleccionada) {
+    const imagenImportada = IMAGE_MAP[producto.imagen_seleccionada];
+    if (imagenImportada) {
+      return imagenImportada;
+    }
   }
   
-  // Búsqueda por palabras clave EXACTAS del personalizador
-  if (key.includes('double') && key.includes('smash')) return hamburguesa1;
-  if (key.includes('alitas') && key.includes('simples')) return pollo1;
-  if (key.includes('pizza') && key.includes('pepperoni')) return peperoni;  // MUY IMPORTANTE: peperoni.png
-  if (key.includes('pepperoni')) return peperoni;  // SIEMPRE peperoni.png para pepperoni
-  if (key.includes('pizza') && !key.includes('pepperoni')) return pizza;
-  if (key.includes('hamburguesa') || key.includes('burger')) return hamburguesa;
-  if (key.includes('perro') || key.includes('hot') || key.includes('dog')) return perro;
-  if (key.includes('papas') || key.includes('fries')) return papas1;
-  if (key.includes('pollo') || key.includes('chicken') || key.includes('alitas')) return pollo1;
-  if (key.includes('coca')) return bebida1;
-  if (key.includes('pepsi')) return bebida2;
-  if (key.includes('sprite')) return bebida3l;
-  if (key.includes('fanta')) return bebida4;
-  if (key.includes('agua')) return bebida5;
-  if (key.includes('bebida') || key.includes('jugo')) return bebida1;
-  if (key.includes('brownie')) return postres1;
-  if (key.includes('cheese') || key.includes('cake')) return postres2;
-  if (key.includes('helado')) return postres3;
-  if (key.includes('postre')) return postres1;
+  // Fallback a la imagen del producto si no hay imagen_seleccionada
+  if (producto.imagen) {
+    return absolutizeMediaUrl(producto.imagen);
+  }
+  
+  // Fallback final - imagen por defecto según categoría
+  const nombre = (producto.nombre || '').toLowerCase();
+  if (nombre.includes('hamburguesa') || nombre.includes('burger')) return hamburguesa;
+  if (nombre.includes('pizza')) return pizza;
+  if (nombre.includes('pollo') || nombre.includes('alita')) return pollo;
+  if (nombre.includes('perro') || nombre.includes('hot')) return perro;
+  if (nombre.includes('papa')) return papas1;
+  if (nombre.includes('postre')) return postres1;
   
   return hamburguesa; // Default final
 };
@@ -200,7 +157,7 @@ export default function ComboPersonalizadoDetalle() {
             <div key={p.id} className="combodetalle-item">
               <div className="img">
                 <img 
-                  src={p.imagen ? absolutizeMediaUrl(p.imagen) : getAssetForProduct(p.nombre)} 
+                  src={getProductImage(p)} 
                   alt={p.nombre} 
                 />
               </div>

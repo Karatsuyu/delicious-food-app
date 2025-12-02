@@ -354,7 +354,15 @@ function CrearCombo() {
     try {
       const productosPayload = Object.entries(seleccion)
         .filter(([, qty]) => qty > 0)
-        .map(([id, qty]) => ({ producto: Number(id), cantidad: qty }));
+        .map(([id, qty]) => {
+          const producto = productos.find(p => p.id === Number(id));
+          const imagenSeleccionada = producto?.imagen ? resolveImage(producto.imagen) : null;
+          return {
+            producto: Number(id),
+            cantidad: qty,
+            imagen_seleccionada: imagenSeleccionada
+          };
+        });
       if (productosPayload.length === 0) {
         setError('Selecciona al menos un producto');
         return;
@@ -362,9 +370,8 @@ function CrearCombo() {
       setError('');
 
       // 1) Agregar/Actualizar en el carrito local como un único ítem
-      const firstSelectedId = Number(Object.keys(seleccion).find(id => seleccion[id] > 0));
-      const firstProd = productos.find(p => p.id === firstSelectedId);
-  const imagen = firstProd?.imagen ? resolveImage(firstProd.imagen) : combosIcon;
+      // Usar la imagen seleccionada del primer producto en lugar de la imagen por defecto
+      const imagen = productosPayload[0]?.imagen_seleccionada || combosIcon;
       const comboNombre = (nombre?.trim() || 'Combo personalizado');
 
       // Construimos el desglose de items seleccionados
