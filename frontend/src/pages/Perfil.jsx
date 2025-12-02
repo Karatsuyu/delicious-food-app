@@ -320,19 +320,23 @@ function Perfil() {
                   </button>
                 </div>
               ) : (
-                <div className="combos-list">
-                  {combosPersonalizados.map((combo) => (
-                    <div key={combo.id} className="combo-item">
-                      <div className="combo-info">
-                        <h3 className="combo-nombre">
-                          {combo.nombre || `Combo #${combo.id}`}
-                        </h3>
+                <>
+                  <div className="combos-list">
+                    {combosPersonalizados.map((combo) => (
+                      <div key={combo.id} className="combo-item">
+                        <div className="combo-info">
+                          <h3 className="combo-nombre">
+                            {combo.nombre || `Combo #${combo.id}`}
+                          </h3>
                         <div className="combo-details">
                           <span className="combo-precio">
                             ${parseFloat(combo.precio_total || 0).toLocaleString('es-CO')}
                           </span>
                           <span className="combo-fecha">
                             Creado: {new Date(combo.creado_en).toLocaleDateString('es-ES')}
+                          </span>
+                          <span className={`combo-estado ${combo.is_paid ? 'pagado' : 'pendiente'}`}>
+                            {combo.is_paid ? '✅ Pagado' : '⏳ Pendiente de pago'}
                           </span>
                         </div>
                         <div className="combo-stats">
@@ -342,26 +346,41 @@ function Perfil() {
                             </span>
                           )}
                         </div>
+                        </div>
+                        <div className="combo-actions">
+                          <button
+                            className={`btn-publicar ${combo.publicado ? 'publicado' : 'no-publicado'}`}
+                            onClick={() => togglePublicar(combo.id, combo.publicado)}
+                          >
+                            {combo.publicado ? (
+                              <>
+                                <span>✓</span> Publicado
+                              </>
+                            ) : (
+                              <>
+                                <span>📢</span> Publicar
+                              </>
+                            )}
+                          </button>
+                          <Link 
+                            to={`/mis-combos/${combo.id}`}
+                            className="btn-ver-detalle"
+                          >
+                            Ver Detalle
+                          </Link>
+                        </div>
                       </div>
-                      <div className="combo-actions">
-                        <button
-                          className={`btn-publicar ${combo.publicado ? 'publicado' : 'no-publicado'}`}
-                          onClick={() => togglePublicar(combo.id, combo.publicado)}
-                        >
-                          {combo.publicado ? (
-                            <>
-                              <span>✓</span> Publicado
-                            </>
-                          ) : (
-                            <>
-                              <span>📢</span> Publicar
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                  <div className="crear-combo-section">
+                    <button 
+                      className="btn-crear-combo-adicional"
+                      onClick={() => navigate('/crear-combo')}
+                    >
+                      + Crear otro combo personalizado
+                    </button>
+                  </div>
+                </>
               )}
             </div>
           </div>

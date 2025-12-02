@@ -1,0 +1,217 @@
+/* Estilo para la página de detalle del combo personalizado */
+.combodetalle-page {
+  min-height: calc(100vh - 200px);
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #F28c1e 0%, #e8413d 100%);
+}
+
+.combodetalle-header {
+  max-width: 1200px;
+  margin: 0 auto 2rem auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.combodetalle-header h2 {
+  color: #333;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  font-family: 'Pacifico', cursive;
+}
+
+.btn-back {
+  background: linear-gradient(135deg, #F28c1e 0%, #e8413d 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.btn-back:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(242, 140, 30, 0.4);
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.precio {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #F28c1e;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.fecha {
+  color: #666;
+  font-size: 1rem;
+}
+
+.combo-estado {
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.combo-estado.pagado {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.combo-estado.pendiente {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.combodetalle-empty {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: white;
+  padding: 3rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  color: #666;
+  font-size: 1.2rem;
+}
+
+.combodetalle-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.combodetalle-item {
+  background: white;
+  border-radius: 12px;
+  border: 3px solid #F28c1e;
+  box-shadow: 0 4px 15px rgba(242, 140, 30, 0.2);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.combodetalle-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(242, 140, 30, 0.4);
+  border-color: #e8413d;
+}
+
+.combodetalle-item .img {
+  height: 200px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #fff5e6 0%, #ffe0b3 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 2px solid #F28c1e;
+}
+
+.combodetalle-item .img img {
+  width: auto;
+  height: 80%;
+  max-width: 90%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.combodetalle-item:hover .img img {
+  transform: scale(1.05);
+}
+
+.combodetalle-item .info {
+  padding: 1.5rem;
+}
+
+.combodetalle-item .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.combodetalle-item .title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.combodetalle-item .unit {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #F28c1e;
+  white-space: nowrap;
+}
+
+.combodetalle-item .sub {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #F28c1e;
+  background: linear-gradient(135deg, #fff5e6 0%, #ffe0b3 100%);
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .combodetalle-page {
+    padding: 1rem 0.5rem;
+  }
+  
+  .combodetalle-header {
+    padding: 1.5rem;
+  }
+  
+  .combodetalle-header h2 {
+    font-size: 2rem;
+  }
+  
+  .meta {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .precio {
+    font-size: 1.5rem;
+  }
+  
+  .combodetalle-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .combodetalle-item .row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .combodetalle-item .title {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+}

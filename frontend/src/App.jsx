@@ -17,6 +17,7 @@ import ComboCrocanteDeluxe from './pages/ComboCrocanteDeluxe';
 import Personalizador from './pages/Personalizador';
 import Perfil from './pages/Perfil';
 import CrearCombo from './pages/CrearCombo';
+import ComboPersonalizadoDetalle from './pages/ComboPersonalizadoDetalle';
 import Checkout from './pages/Checkout';
 import PaymentResult from './pages/PaymentResult';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -78,6 +79,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <CrearCombo />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/mis-combos/:id" 
+                  element={
+                    <ProtectedRoute>
+                      <ComboPersonalizadoDetalle />
                     </ProtectedRoute>
                   } 
                 />
