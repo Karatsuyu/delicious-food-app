@@ -9,7 +9,6 @@ import hamburguesa1 from '../assets/hamburguesa1.png';
 import hamburguesa2 from '../assets/hamburguesa2.png';
 import hamburguesa3 from '../assets/hamburguesa3.png';
 import hamburguesa4 from '../assets/hamburguesa4.png';
-import hamburguesa8 from '../assets/hamburguesa8.png';
 import pizza from '../assets/pizza.png';
 import pizza1 from '../assets/pizza1.png';
 import pizza2 from '../assets/pizza2.png';
@@ -40,7 +39,6 @@ const IMAGE_MAP = {
   'hamburguesa2.png': hamburguesa2,
   'hamburguesa3.png': hamburguesa3,
   'hamburguesa4.png': hamburguesa4,
-  'hamburguesa8.png': hamburguesa8,
   'pizza.png': pizza,
   'pizza1.png': pizza1,
   'pizza2.png': pizza2,
