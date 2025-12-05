@@ -316,6 +316,12 @@
   align-items: center;
 }
 
+.menu-emoji {
+  font-size: 1.2rem;
+  margin-right: 8px;
+  display: inline-block;
+}
+
 .side-menu-list li {
   font-size: 18px;
   margin:25px 0;

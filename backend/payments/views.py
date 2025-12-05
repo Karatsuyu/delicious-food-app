@@ -50,7 +50,10 @@ class CreateCheckoutSessionView(APIView):
 
             metadata = {}
             combo_id = data.get('combo_personalizado_id')
+            producto_personalizado_id = data.get('producto_personalizado_id')
             combo_obj = None
+            producto_personalizado_obj = None
+            
             if combo_id:
                 # Validar que el combo pertenezca al usuario y actualizar stripe_session_id posteriormente
                 from products.models import ComboPersonalizado
@@ -59,6 +62,15 @@ class CreateCheckoutSessionView(APIView):
                     metadata['combo_personalizado_id'] = str(combo_obj.id)
                 except ComboPersonalizado.DoesNotExist:
                     return Response({"error": "combo_personalizado_id inválido"}, status=400)
+            
+            elif producto_personalizado_id:
+                # Validar que el producto personalizado pertenezca al usuario
+                from products.models import ProductoPersonalizado
+                try:
+                    producto_personalizado_obj = ProductoPersonalizado.objects.get(id=producto_personalizado_id, usuario=request.user)
+                    metadata['producto_personalizado_id'] = str(producto_personalizado_obj.id)
+                except ProductoPersonalizado.DoesNotExist:
+                    return Response({"error": "producto_personalizado_id inválido"}, status=400)
 
             checkout_session = stripe.checkout.Session.create(
                 payment_method_types=["card"],
@@ -73,6 +85,10 @@ class CreateCheckoutSessionView(APIView):
                 # Guardar stripe_session_id en el combo (pendiente de pago)
                 combo_obj.stripe_session_id = checkout_session.id
                 combo_obj.save(update_fields=["stripe_session_id"])
+            elif producto_personalizado_obj is not None:
+                # Guardar stripe_session_id en el producto personalizado (pendiente de pago)
+                producto_personalizado_obj.stripe_session_id = checkout_session.id
+                producto_personalizado_obj.save(update_fields=["stripe_session_id"])
 
             return Response({"id": checkout_session.id, "url": checkout_session.url})
         except Exception as e:
@@ -99,6 +115,8 @@ def stripe_webhook(request):
     if event.get("type") == "checkout.session.completed":
         session = event["data"]["object"]
         print("Pago completado para session:", session.get("id"))
+        
+        # Procesar combo personalizado
         combo_id = session.get("metadata", {}).get("combo_personalizado_id")
         if combo_id:
             from products.models import ComboPersonalizado
@@ -113,6 +131,21 @@ def stripe_webhook(request):
                     print(f"ComboPersonalizado {combo_id} marcado como pagado.")
             except ComboPersonalizado.DoesNotExist:
                 print(f"ComboPersonalizado {combo_id} no encontrado para marcar pago.")
+        
+        # Procesar producto personalizado
+        producto_personalizado_id = session.get("metadata", {}).get("producto_personalizado_id")
+        if producto_personalizado_id:
+            from products.models import ProductoPersonalizado
+            from django.utils import timezone
+            try:
+                producto_obj = ProductoPersonalizado.objects.get(id=producto_personalizado_id)
+                if not producto_obj.is_paid:
+                    producto_obj.is_paid = True
+                    producto_obj.paid_at = timezone.now()
+                    producto_obj.save(update_fields=["is_paid", "paid_at"])
+                    print(f"ProductoPersonalizado {producto_personalizado_id} marcado como pagado.")
+            except ProductoPersonalizado.DoesNotExist:
+                print(f"ProductoPersonalizado {producto_personalizado_id} no encontrado para marcar pago.")
 
     return HttpResponse(status=200)
 
@@ -153,19 +186,35 @@ class ConfirmSessionView(APIView):
         payment_status = session.get("payment_status") or session.get("status")
         metadata = session.get("metadata") or {}
         combo_id = metadata.get("combo_personalizado_id")
+        producto_personalizado_id = metadata.get("producto_personalizado_id")
 
-        if payment_status in ("paid", "complete") and combo_id:
-            try:
-                from products.models import ComboPersonalizado
-                from django.utils import timezone
-                combo = ComboPersonalizado.objects.get(id=combo_id, usuario=request.user)
-                # Validar que corresponda a la misma sesión
-                if combo.stripe_session_id == session.get("id") and not combo.is_paid:
-                    combo.is_paid = True
-                    combo.paid_at = timezone.now()
-                    combo.save(update_fields=["is_paid", "paid_at"])
-            except ComboPersonalizado.DoesNotExist:
-                # No romper; sólo retornar la sesión
-                pass
+        if payment_status in ("paid", "complete"):
+            if combo_id:
+                try:
+                    from products.models import ComboPersonalizado
+                    from django.utils import timezone
+                    combo = ComboPersonalizado.objects.get(id=combo_id, usuario=request.user)
+                    # Validar que corresponda a la misma sesión
+                    if combo.stripe_session_id == session.get("id") and not combo.is_paid:
+                        combo.is_paid = True
+                        combo.paid_at = timezone.now()
+                        combo.save(update_fields=["is_paid", "paid_at"])
+                except ComboPersonalizado.DoesNotExist:
+                    # No romper; sólo retornar la sesión
+                    pass
+                    
+            elif producto_personalizado_id:
+                try:
+                    from products.models import ProductoPersonalizado
+                    from django.utils import timezone
+                    producto = ProductoPersonalizado.objects.get(id=producto_personalizado_id, usuario=request.user)
+                    # Validar que corresponda a la misma sesión
+                    if producto.stripe_session_id == session.get("id") and not producto.is_paid:
+                        producto.is_paid = True
+                        producto.paid_at = timezone.now()
+                        producto.save(update_fields=["is_paid", "paid_at"])
+                except ProductoPersonalizado.DoesNotExist:
+                    # No romper; sólo retornar la sesión
+                    pass
 
         return Response(session)

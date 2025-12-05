@@ -142,6 +142,17 @@ export const productService = {
       console.error('Error obteniendo combos públicos:', error);
       throw error;
     }
+  },
+
+  // Obtener productos personalizados públicos
+  getProductosPersonalizadosPublicos: async () => {
+    try {
+      const response = await api.get('productos-publicos/');
+      return response.data;
+    } catch (error) {
+      console.error('Error obteniendo productos personalizados públicos:', error);
+      throw error;
+    }
   }
 };
 

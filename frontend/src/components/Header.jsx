@@ -6,34 +6,32 @@ import CartModal from '../components/CartModal';
 import logo from '../assets/logo.png';
 import lupa from '../assets/lupa.png';
 import carrito from '../assets/carrito.png';
-import producto from '../assets/producto.png';
-import combos from '../assets/combos.png';
 import defaultAvatar from '../assets/icono-perfil-vacio-inicio.jpg';
 
-  function Header() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
-    const navigate = useNavigate();
+function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const location = useLocation();
-    const { isAuthenticated, user, logout } = useContext(AuthContext);
+  const { isAuthenticated, user, logout } = useContext(AuthContext);
 
-    const toggleMenu = () => {
-      setIsMenuOpen(!isMenuOpen);
-    };
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
-    const toggleSearch = () => {
-      setIsSearchOpen(!isSearchOpen);
-    };
+  const toggleSearch = () => {
+    setIsSearchOpen(!isSearchOpen);
+  };
 
-    const handleRegisterClick = () => {
-      navigate('/register');
-    };
+  const handleRegisterClick = () => {
+    navigate('/register');
+  };
 
-    const handleLoginClick = () => {
-      navigate('/login');
-    };
+  const handleLoginClick = () => {
+    navigate('/login');
+  };
 
     const handleSearch = (e) => {
       e.preventDefault();
@@ -147,13 +145,19 @@ import defaultAvatar from '../assets/icono-perfil-vacio-inicio.jpg';
           <button className="close-btn" onClick={toggleMenu}>✕</button>
           <ul className="side-menu-list">
             <Link to="/menu?categoria=hamburguesas" className="side-menu-link">
-              <img src={producto} alt="Productos" className="producto-image" />
+              <span className="menu-emoji">🍽️</span>
               Productos
             </Link>
             <li>
               <Link to="/combos-publicos" className="side-menu-link">
-                <img src={combos} alt="Combos" className="combos-image" />
+                <span className="menu-emoji">🍔🍟</span>
                 Combos de la Comunidad
+              </Link>
+            </li>
+            <li>
+              <Link to="/productos-publicos" className="side-menu-link">
+                <span className="menu-emoji">✨🍴</span>
+                Productos de la Comunidad
               </Link>
             </li>
           </ul>

@@ -62,11 +62,20 @@ function Checkout() {
       });
       // Detectar combo personalizado propio para pasar su ID al backend (solo uno por sesión)
       const customCombo = (cartItems || []).find(ci => ci.isCustomCombo && ci.comboPersonalizadoId);
+      
+      // Detectar producto personalizado propio para pasar su ID al backend (solo uno por sesión)
+      const customProducto = (cartItems || []).find(ci => ci.es_producto_personalizado && ci.producto_personalizado_id);
 
       console.log('[Checkout] Payload enviado a backend:', { items });
-      const bodyPayload = customCombo ? { items, combo_personalizado_id: customCombo.comboPersonalizadoId } : { items };
+      
+      // Determinar qué metadata enviar (combo o producto personalizado)
+      let bodyPayload = { items };
       if (customCombo) {
+        bodyPayload.combo_personalizado_id = customCombo.comboPersonalizadoId;
         console.log('[Checkout] Enviando combo_personalizado_id:', customCombo.comboPersonalizadoId);
+      } else if (customProducto) {
+        bodyPayload.producto_personalizado_id = customProducto.producto_personalizado_id;
+        console.log('[Checkout] Enviando producto_personalizado_id:', customProducto.producto_personalizado_id);
       }
       // Usar el cliente API con JWT para que el backend pueda validar al usuario y asociar el combo
       const { data } = await api.post('payments/create-checkout-session/', bodyPayload);

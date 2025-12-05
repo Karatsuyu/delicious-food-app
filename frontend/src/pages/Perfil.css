@@ -586,3 +586,194 @@
   }
 }
 
+/* Estilos específicos para productos personalizados */
+.productos-card {
+  margin-top: 20px;
+}
+
+.productos-loading,
+.productos-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.btn-crear-producto {
+  background: linear-gradient(135deg, #F28c1e 0%, #e8413d 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 15px;
+}
+
+.btn-crear-producto:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(242, 140, 30, 0.4);
+}
+
+.productos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.producto-item {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.producto-item:hover {
+  border-color: #F28c1e;
+  box-shadow: 0 4px 12px rgba(242, 140, 30, 0.1);
+}
+
+.producto-info {
+  margin-bottom: 15px;
+}
+
+.producto-nombre {
+  color: #e8413d;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.producto-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.producto-base {
+  font-style: italic;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.producto-precio {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #F28c1e;
+}
+
+.producto-fecha {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.producto-ingredientes {
+  margin-top: 10px;
+}
+
+.ingredientes-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.ingredientes-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ingrediente-tag {
+  background: #fff3e0;
+  color: #F28c1e;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid #ffe0b2;
+}
+
+.ingredientes-mas {
+  color: #999;
+  font-size: 0.8rem;
+  font-style: italic;
+  padding: 4px 8px;
+}
+
+.producto-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.producto-veces-comprado {
+  color: #F28c1e;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.producto-estado .estado-pagado {
+  color: #28a745;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.producto-estado .estado-pendiente {
+  color: #ffc107;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.producto-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.crear-producto-section {
+  margin-top: 20px;
+  text-align: center;
+  padding: 20px;
+  border-top: 1px solid #eee;
+}
+
+.btn-crear-producto-adicional {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-crear-producto-adicional:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+@media (max-width: 768px) {
+  .producto-details {
+    gap: 6px;
+  }
+  
+  .producto-stats {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .ingredientes-tags {
+    gap: 4px;
+  }
+}
+

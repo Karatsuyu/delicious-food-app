@@ -25,6 +25,7 @@ import AdminRoute from './components/AdminRoute';
 import AdminPanel from './pages/AdminPanel';
 import AdminDashboard from './pages/AdminDashboard';
 import CombosPublicos from './pages/CombosPublicos';
+import ProductosPublicos from './pages/ProductosPublicos';
 import PerfilPublico from './pages/PerfilPublico';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -107,8 +108,9 @@ function App() {
                     </AdminRoute>
                   } 
                 />
-                {/* Rutas públicas de combos y perfiles */}
+                {/* Rutas públicas de combos, productos y perfiles */}
                 <Route path="/combos-publicos" element={<CombosPublicos />} />
+                <Route path="/productos-publicos" element={<ProductosPublicos />} />
                 <Route path="/perfil/:userId" element={<PerfilPublico />} />
               </Routes>
             </main>

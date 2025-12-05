@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { productService } from '../api/api';
+import api, { productService } from '../api/api';
 import { useCart } from '../context/CartContext';
 import './Personalizador.css';
 // Importar imágenes para el mapeo de hamburguesas
@@ -107,7 +107,7 @@ const Personalizador = () => {
                     categoriaParam === 'postre' ? 'postres' : 
                     categoriaParam;
   
-  // ✅ Estado actualizado: añadimos "pan" y "masa"
+  // ✅ Estado actualizado: añadimos "pan", "masa" y "nombrePersonalizado"
   const [personalizacion, setPersonalizacion] = useState({
     tamaño: '',
     pan: '',
@@ -116,7 +116,8 @@ const Personalizador = () => {
     ingredientes: [],
     extras: [],
     cantidad: 1,
-    observaciones: ''
+    observaciones: '',
+    nombrePersonalizado: ''
   });
 
   // Estado para animaciones de ingredientes (imágenes cayendo)
@@ -632,7 +633,9 @@ const Personalizador = () => {
       return 0;
     }
 
-    const precioBase = parseFloat(producto.precio) || 0;
+    // Para productos personalizados, no incluimos el precio base del producto
+    // Solo contamos los precios de los ingredientes, tamaños y extras seleccionados
+    const precioBase = 0; // Cambiado: era parseFloat(producto.precio) || 0;
     const precioTamaño = tamaños.find((t) => t.id === personalizacion.tamaño)
       ?.precio || 0;
 
@@ -875,37 +878,92 @@ const Personalizador = () => {
     }
   };
 
-  // ✅ Actualizado: usa calcularPrecio()
-  const agregarAlCarrito = () => {
+  // Función para abrir carrito y reiniciar personalizador
+  const abrirCarritoYReiniciar = () => {
+    // Reiniciar el estado del personalizador a sus valores iniciales
+    setPersonalizacion({
+      tamaño: '',
+      masa: '',
+      pan: '',
+      carnes: [],
+      ingredientes: [],
+      extras: [],
+      cantidad: 1,
+      observaciones: '',
+      nombrePersonalizado: ''
+    });
+    
+    // Reiniciar ingredientes apilados y animaciones
+    setStackedIngredients([]);
+    setAnimatingIngredients([]);
+    setZIndexCounter(0);
+    
+    // Abrir el modal del carrito pequeño usando el sistema original
+    window.dispatchEvent(new Event('open-cart-modal'));
+  };
+
+  // ✅ Actualizado: crea ProductoPersonalizado y usa calcularPrecio()
+  const agregarAlCarrito = async () => {
     if (!producto) return;
 
-    // Construir detalle legible de la "combinación" personalizada para mostrar en el carrito pequeño
-    const detalles = {
-      ...(personalizacion.tamaño && { tamaño: tamaños.find(t => t.id === personalizacion.tamaño)?.nombre || personalizacion.tamaño }),
-      ...(personalizacion.pan && { pan: personalizacion.pan }),
-      ...(personalizacion.masa && { masa: personalizacion.masa }),
-      ...(Array.isArray(personalizacion.carnes) && personalizacion.carnes.length > 0
-        ? { carnes: personalizacion.carnes }
-        : (personalizacion.carnes && typeof personalizacion.carnes === 'string'
-            ? { carnes: [personalizacion.carnes] }
-            : {})),
-      ...(Array.isArray(personalizacion.ingredientes) && personalizacion.ingredientes.length > 0 && { ingredientes: personalizacion.ingredientes }),
-      ...(Array.isArray(personalizacion.extras) && personalizacion.extras.length > 0 && { extras: personalizacion.extras }),
-      ...(personalizacion.observaciones && { observaciones: personalizacion.observaciones })
-    };
+    try {
+      // 1. Crear ProductoPersonalizado en el backend
+      const ingredientesSeleccionados = [
+        ...personalizacion.ingredientes,
+        ...personalizacion.extras,
+        ...(personalizacion.carnes ? (Array.isArray(personalizacion.carnes) ? personalizacion.carnes : [personalizacion.carnes]) : [])
+      ].filter(Boolean);
 
-    const productoParaCarrito = {
-      id: producto.id,
-      nombre: producto.nombre,
-      precio: calcularPrecio(),
-      imagen: producto.imagen,
-      cantidad: 1,
-      precioTotal: calcularPrecio(),
-      categoria: producto.categoria,
-      detalles
-    };
+      const productoPersonalizadoData = {
+        nombre_personalizado: personalizacion.nombrePersonalizado || `${producto.nombre} personalizado`,
+        producto_base: producto.id,
+        ingredientes: ingredientesSeleccionados,
+        precio_total: calcularPrecio()
+      };
 
-    addToCart(productoParaCarrito);
+      const response = await api.post('productos-personalizados/', productoPersonalizadoData);
+      const productoPersonalizadoCreado = response.data;
+
+      // 2. Construir detalle legible para mostrar en el carrito
+      const detalles = {
+        ...(personalizacion.nombrePersonalizado && { nombrePersonalizado: personalizacion.nombrePersonalizado }),
+        ...(personalizacion.tamaño && { tamaño: tamaños.find(t => t.id === personalizacion.tamaño)?.nombre || personalizacion.tamaño }),
+        ...(personalizacion.pan && { pan: personalizacion.pan }),
+        ...(personalizacion.masa && { masa: personalizacion.masa }),
+        ...(Array.isArray(personalizacion.carnes) && personalizacion.carnes.length > 0
+          ? { carnes: personalizacion.carnes }
+          : (personalizacion.carnes && typeof personalizacion.carnes === 'string'
+              ? { carnes: [personalizacion.carnes] }
+              : {})),
+        ...(Array.isArray(personalizacion.ingredientes) && personalizacion.ingredientes.length > 0 && { ingredientes: personalizacion.ingredientes }),
+        ...(Array.isArray(personalizacion.extras) && personalizacion.extras.length > 0 && { extras: personalizacion.extras }),
+        ...(personalizacion.observaciones && { observaciones: personalizacion.observaciones })
+      };
+
+      // 3. Agregar al carrito con el ID del producto personalizado
+      const productoParaCarrito = {
+        id: `producto-personalizado-${productoPersonalizadoCreado.id}`,
+        nombre: personalizacion.nombrePersonalizado || producto.nombre,
+        precio: calcularPrecio(),
+        imagen: producto.imagen,
+        cantidad: 1,
+        precioTotal: calcularPrecio(),
+        categoria: producto.categoria,
+        detalles,
+        // IMPORTANTE: Agregar el ID para el flujo de pago
+        producto_personalizado_id: productoPersonalizadoCreado.id,
+        es_producto_personalizado: true
+      };
+
+      addToCart(productoParaCarrito);
+      
+      // ✅ NUEVO: Abrir carrito automáticamente y reiniciar personalizador
+      abrirCarritoYReiniciar();
+      
+    } catch (error) {
+      console.error('Error creando producto personalizado:', error);
+      alert('Error al agregar el producto personalizado. Inténtalo de nuevo.');
+    }
   };
 
   if (loading) {
@@ -1367,6 +1425,25 @@ const Personalizador = () => {
             <div className="precio-total">
               <span className="precio-label">Total:</span>
               <span className="precio-valor">${calcularPrecio().toFixed(0)}</span>
+            </div>
+
+            {/* Campo para nombre personalizado */}
+            <div className="nombre-personalizado-container">
+              <label htmlFor="nombrePersonalizado" className="nombre-label">
+                Nombre de tu creación:
+              </label>
+              <input
+                type="text"
+                id="nombrePersonalizado"
+                value={personalizacion.nombrePersonalizado}
+                onChange={(e) => setPersonalizacion({
+                  ...personalizacion,
+                  nombrePersonalizado: e.target.value
+                })}
+                placeholder="Ej: Mi Hamburguesa Especial"
+                className="nombre-input"
+                maxLength={50}
+              />
             </div>
 
             <button className="agregar-carrito-btn" onClick={agregarAlCarrito}>

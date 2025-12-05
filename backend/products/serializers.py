@@ -1,7 +1,8 @@
 from rest_framework import serializers
-from .models import ComboPersonalizadoProducto, Producto, Ingrediente, Combo
-from rest_framework import serializers
-from .models import ComboPersonalizado, ComboPersonalizadoProducto, Producto
+from .models import (
+    ComboPersonalizadoProducto, Producto, Ingrediente, Combo,
+    ComboPersonalizado, ProductoPersonalizado
+)
 
 class IngredienteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -219,3 +220,44 @@ class ComboPersonalizadoSerializer(serializers.ModelSerializer):
             data['precio_total'] = str(suma_total)
         
         return data
+
+
+class ProductoPersonalizadoSerializer(serializers.ModelSerializer):
+    usuario_info = serializers.SerializerMethodField()
+    producto_base_detalle = ProductoSerializer(source='producto_base', read_only=True)
+    ingredientes_detalle = IngredienteSerializer(source='ingredientes', many=True, read_only=True)
+
+    class Meta:
+        model = ProductoPersonalizado
+        fields = [
+            "id", "usuario", "usuario_info", "nombre_personalizado", "producto_base", 
+            "producto_base_detalle", "ingredientes", "ingredientes_detalle", "precio_total", 
+            "creado_en", "publicado", "veces_comprado", "is_paid", "stripe_session_id", "paid_at"
+        ]
+        read_only_fields = ["usuario", "precio_total", "creado_en", "veces_comprado", "is_paid", "stripe_session_id", "paid_at"]
+
+    def get_usuario_info(self, obj):
+        if obj.usuario:
+            return {
+                'id': obj.usuario.id,
+                'username': obj.usuario.username,
+                'first_name': obj.usuario.first_name,
+                'last_name': obj.usuario.last_name,
+                'profile': {
+                    'imagen_perfil': getattr(obj.usuario.profile, 'imagen_perfil', None) if hasattr(obj.usuario, 'profile') else None
+                } if hasattr(obj.usuario, 'profile') else {}
+            }
+        return None
+
+    def create(self, validated_data):
+        """Crear producto personalizado calculando automáticamente el precio total"""
+        producto_base = validated_data.get('producto_base')
+        ingredientes = validated_data.get('ingredientes', [])
+        
+        # Calcular precio total
+        precio_total = float(producto_base.precio) if producto_base else 0
+        for ingrediente in ingredientes:
+            precio_total += float(ingrediente.precio_extra)
+        
+        validated_data['precio_total'] = precio_total
+        return super().create(validated_data)

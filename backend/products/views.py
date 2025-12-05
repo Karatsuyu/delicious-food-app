@@ -5,8 +5,8 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.views import APIView
 from django.db.models import Sum, Count, Q, F
 from django.http import JsonResponse
-from .models import Producto, Ingrediente, Combo, ComboPersonalizado
-from .serializers import ProductoSerializer, IngredienteSerializer, ComboSerializer, ComboPersonalizadoSerializer
+from .models import Producto, Ingrediente, Combo, ComboPersonalizado, ProductoPersonalizado
+from .serializers import ProductoSerializer, IngredienteSerializer, ComboSerializer, ComboPersonalizadoSerializer, ProductoPersonalizadoSerializer
 from orders.models import PedidoItem, Pedido
 
 class ProductoViewSet(viewsets.ReadOnlyModelViewSet):
@@ -274,6 +274,73 @@ class AdminEstadisticasView(generics.RetrieveAPIView):
             },
             'productos_por_categoria': list(productos_por_categoria)
         })
+
+
+class ProductoPersonalizadoViewSet(viewsets.ModelViewSet):
+    serializer_class = ProductoPersonalizadoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Mostrar TODOS los productos personalizados del usuario (pagados y no pagados)
+        # Los usuarios deben poder ver sus propias creaciones antes y después del pago
+        return ProductoPersonalizado.objects.filter(
+            usuario=self.request.user
+        ).prefetch_related('ingredientes', 'producto_base')
+
+    def perform_create(self, serializer):
+        serializer.save(usuario=self.request.user)
+
+    @action(detail=False, methods=['post'])
+    def marcar_todos_pagados(self, request):
+        """Marca todos los productos personalizados del usuario autenticado como pagados.
+        Útil para corregir estados cuando el webhook/confirmación no se ejecutó.
+        """
+        from django.utils import timezone
+        productos_actualizados = ProductoPersonalizado.objects.filter(
+            usuario=request.user,
+            is_paid=False
+        ).update(is_paid=True, paid_at=timezone.now())
+        
+        return Response({
+            'message': f'Se marcaron {productos_actualizados} productos personalizados como pagados'
+        })
+
+    @action(detail=False, methods=['get'])
+    def debug_info(self, request):
+        """Debug endpoint para analizar todos los productos del usuario."""
+        productos_todos = ProductoPersonalizado.objects.filter(usuario=request.user)
+        productos_pagados = productos_todos.filter(is_paid=True)
+        productos_pendientes = productos_todos.filter(is_paid=False)
+        
+        return Response({
+            'usuario': request.user.username,
+            'total_productos': productos_todos.count(),
+            'productos_pagados': productos_pagados.count(),
+            'productos_pendientes': productos_pendientes.count(),
+            'productos_lista': [
+                {
+                    'id': p.id,
+                    'nombre': p.nombre_personalizado,
+                    'precio': str(p.precio_total),
+                    'is_paid': p.is_paid,
+                    'paid_at': p.paid_at,
+                    'stripe_session_id': p.stripe_session_id
+                }
+                for p in productos_todos
+            ]
+        })
+
+
+class ProductoPersonalizadoPublicosView(generics.ListAPIView):
+    serializer_class = ProductoPersonalizadoSerializer
+    permission_classes = [permissions.AllowAny]
+    
+    def get_queryset(self):
+        # Mostrar solo productos personalizados que están publicados Y pagados
+        return ProductoPersonalizado.objects.filter(
+            publicado=True,
+            is_paid=True
+        ).select_related('usuario', 'producto_base').prefetch_related('ingredientes').order_by('-creado_en')
 
 
 

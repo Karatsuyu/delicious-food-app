@@ -13,6 +13,8 @@ function Perfil() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [combosPersonalizados, setCombosPersonalizados] = useState([]);
   const [loadingCombos, setLoadingCombos] = useState(true);
+  const [productosPersonalizados, setProductosPersonalizados] = useState([]);
+  const [loadingProductos, setLoadingProductos] = useState(true);
   const [imagenPerfil, setImagenPerfil] = useState(null);
   const [nuevaImagen, setNuevaImagen] = useState(null);
 
@@ -36,6 +38,18 @@ function Perfil() {
       console.error('Error cargando combos personalizados:', error);
     } finally {
       setLoadingCombos(false);
+    }
+  };
+
+  const loadProductosPersonalizados = async () => {
+    try {
+      // Mostrar TODOS los productos personalizados del usuario (pagados y pendientes)
+      const response = await api.get('productos-personalizados/');
+      setProductosPersonalizados(response.data);
+    } catch (error) {
+      console.error('Error cargando productos personalizados:', error);
+    } finally {
+      setLoadingProductos(false);
     }
   };
 
@@ -75,6 +89,7 @@ function Perfil() {
     if (isAuthenticated) {
       loadStats();
       loadCombosPersonalizados();
+      loadProductosPersonalizados();
       cargarImagenPerfil();
     }
   }, [isAuthenticated]);
@@ -93,6 +108,23 @@ function Perfil() {
     } catch (error) {
       console.error('Error actualizando estado de publicación:', error);
       alert('Error al actualizar el estado de publicación');
+    }
+  };
+
+  const togglePublicarProducto = async (productoId, publicado) => {
+    try {
+      const response = await api.patch(`productos-personalizados/${productoId}/`, {
+        publicado: !publicado
+      });
+      // Actualizar el estado local
+      setProductosPersonalizados(prevProductos =>
+        prevProductos.map(producto =>
+          producto.id === productoId ? { ...producto, publicado: !publicado } : producto
+        )
+      );
+    } catch (error) {
+      console.error('Error actualizando estado de publicación del producto:', error);
+      alert('Error al actualizar el estado de publicación del producto');
     }
   };
 
@@ -353,6 +385,113 @@ function Perfil() {
             </div>
           </div>
           )}
+
+          {/* Productos Personalizados - Solo mostrar si NO es administrador */}
+          {!user?.is_staff && (
+            <div className="perfil-card productos-card">
+              <div className="perfil-card-header">
+                <h2>✨ Mis Productos Personalizados</h2>
+              </div>
+              <div className="perfil-card-body">
+                {loadingProductos ? (
+                  <div className="productos-loading">Cargando...</div>
+                ) : productosPersonalizados.length === 0 ? (
+                  <div className="productos-empty">
+                    <p>No has creado ningún producto personalizado aún.</p>
+                    <button 
+                      className="btn-crear-producto"
+                      onClick={() => navigate('/menu')}
+                    >
+                      Personalizar productos
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="productos-list">
+                      {productosPersonalizados.map((producto) => (
+                        <div key={producto.id} className="producto-item">
+                          <div className="producto-info">
+                            <h3 className="producto-nombre">
+                              {producto.nombre_personalizado || `Producto #${producto.id}`}
+                            </h3>
+                            <div className="producto-details">
+                              <span className="producto-base">
+                                Basado en: {producto.producto_base_detalle?.nombre}
+                              </span>
+                              <span className="producto-precio">
+                                ${parseFloat(producto.precio_total || 0).toLocaleString('es-CO')}
+                              </span>
+                              <span className="producto-fecha">
+                                Creado: {new Date(producto.creado_en).toLocaleDateString('es-ES')}
+                              </span>
+                              {producto.ingredientes_detalle && producto.ingredientes_detalle.length > 0 && (
+                                <div className="producto-ingredientes">
+                                  <span className="ingredientes-label">Ingredientes:</span>
+                                  <div className="ingredientes-tags">
+                                    {producto.ingredientes_detalle.slice(0, 3).map((ing, index) => (
+                                      <span key={index} className="ingrediente-tag">
+                                        {ing.nombre}
+                                      </span>
+                                    ))}
+                                    {producto.ingredientes_detalle.length > 3 && (
+                                      <span className="ingredientes-mas">
+                                        +{producto.ingredientes_detalle.length - 3} más
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            <div className="producto-stats">
+                              {producto.veces_comprado > 0 && (
+                                <span className="producto-veces-comprado">
+                                  ❤️ Comprado {producto.veces_comprado} {producto.veces_comprado === 1 ? 'vez' : 'veces'}
+                                </span>
+                              )}
+                              <span className="producto-estado">
+                                {producto.is_paid ? (
+                                  <span className="estado-pagado">✅ Pagado</span>
+                                ) : (
+                                  <span className="estado-pendiente">⏳ Pendiente de pago</span>
+                                )}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="producto-actions">
+                            <button
+                              className={`btn-publicar ${producto.publicado ? 'publicado' : 'no-publicado'}`}
+                              onClick={() => togglePublicarProducto(producto.id, producto.publicado)}
+                              disabled={!producto.is_paid}
+                              title={!producto.is_paid ? 'Debe estar pagado para publicar' : ''}
+                            >
+                              {producto.publicado ? (
+                                <>
+                                  <span>👁️</span> Despublicar
+                                </>
+                              ) : (
+                                <>
+                                  <span>📢</span> Publicar
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="crear-producto-section">
+                      <button 
+                        className="btn-crear-producto-adicional"
+                        onClick={() => navigate('/menu')}
+                      >
+                        + Personalizar otro producto
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
     </div>
