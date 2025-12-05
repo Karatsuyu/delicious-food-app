@@ -21,7 +21,7 @@
 }
 
 .perfil-publico-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #F28c1e 0%, #e8413d 100%);
   border-radius: 15px;
   padding: 30px;
   margin-bottom: 30px;
@@ -82,7 +82,7 @@
 .stat-number {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #667eea;
+  color: #F28c1e;
   margin-bottom: 10px;
 }
 
@@ -175,7 +175,7 @@
 .combo-precio-perfil {
   font-size: 1.8rem;
   font-weight: bold;
-  color: #4CAF50;
+  color: #F28c1e;
 }
 
 .combo-veces-comprado {
@@ -189,7 +189,7 @@
 }
 
 .btn-agregar-carrito-perfil {
-  background: #4CAF50;
+  background: linear-gradient(135deg, #F28c1e 0%, #e8413d 100%);
   color: white;
   border: none;
   padding: 12px;
@@ -198,11 +198,13 @@
   font-weight: bold;
   font-size: 1rem;
   margin-top: auto;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
 }
 
 .btn-agregar-carrito-perfil:hover {
-  background: #45a049;
+  background: linear-gradient(135deg, #e8413d 0%, #F28c1e 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(242, 140, 30, 0.3);
 }
 
 .combos-empty-perfil {

@@ -241,48 +241,7 @@ function Perfil() {
             </div>
           )}
 
-          {/* Estadísticas - Solo mostrar si NO es administrador */}
-          {!user?.is_staff && stats && (
-            <div className="perfil-card">
-              <div className="perfil-card-header">
-                <h2>📊 Estadísticas</h2>
-              </div>
-              <div className="perfil-card-body">
-                <div className="stats-grid">
-                  <div className="stat-item">
-                    <span className="stat-icon">🛒</span>
-                    <span className="stat-value">{stats.total_pedidos || 0}</span>
-                    <span className="stat-label">Pedidos Realizados</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-icon">💵</span>
-                    <span className="stat-value">${(stats.total_gastado || 0).toLocaleString('es-CO')}</span>
-                    <span className="stat-label">Total Gastado</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-icon">🍔</span>
-                    <span className="stat-value">{stats.combos_personalizados_creados || 0}</span>
-                    <span className="stat-label">Combos Creados</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-icon">📢</span>
-                    <span className="stat-value">{stats.combos_publicados || 0}</span>
-                    <span className="stat-label">Combos Publicados</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-icon">🛍️</span>
-                    <span className="stat-value">{stats.total_veces_comprados || 0}</span>
-                    <span className="stat-label">Veces Comprados</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-icon">⭐</span>
-                    <span className="stat-value">{stats.total_reviews || 0}</span>
-                    <span className="stat-label">Reseñas Escritas</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+
 
           {/* Enlaces de administración - Solo para admins */}
           {user?.is_staff && (
@@ -316,9 +275,6 @@ function Perfil() {
             <div className="perfil-card combos-card">
               <div className="perfil-card-header">
                 <h2>🍔 Mis Combos Personalizados</h2>
-                <Link to="/combos-publicos" className="btn-ver-combos-publicos">
-                  Ver Combos de la Comunidad →
-                </Link>
               </div>
             <div className="perfil-card-body">
               {loadingCombos ? (
