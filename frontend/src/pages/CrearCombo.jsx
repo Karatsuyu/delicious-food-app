@@ -229,6 +229,35 @@ function CrearCombo() {
     return s;
   };
 
+  // 🔑 NUEVA FUNCIÓN: Extraer solo el nombre del archivo para imagen_seleccionada
+  const getImageFileName = (img) => {
+    if (!img) return null;
+    const s = String(img);
+    
+    // Si es un import de asset de Vite (contiene /assets/), extraer solo el nombre del archivo
+    if (s.includes('/assets/')) {
+      const parts = s.split('/');
+      return parts[parts.length - 1]; // Obtiene solo "hamburguesa1.png" de "/assets/hamburguesa1.png"
+    }
+    
+    // Si es una URL completa, extraer el nombre del archivo
+    if (s.startsWith('http')) {
+      const url = new URL(s);
+      const pathname = url.pathname;
+      const parts = pathname.split('/');
+      return parts[parts.length - 1];
+    }
+    
+    // Si ya es solo un nombre de archivo, devolverlo tal cual
+    if (!s.includes('/')) {
+      return s;
+    }
+    
+    // Para otros casos, extraer lo que esté después del último "/"
+    const parts = s.split('/');
+    return parts[parts.length - 1];
+  };
+
   const productosPorCategoria = useMemo(() => {
     const groups = {};
     (productos || []).forEach(p => {
@@ -356,7 +385,8 @@ function CrearCombo() {
         .filter(([, qty]) => qty > 0)
         .map(([id, qty]) => {
           const producto = productos.find(p => p.id === Number(id));
-          const imagenSeleccionada = producto?.imagen ? resolveImage(producto.imagen) : null;
+          // 🔑 USAR SOLO EL NOMBRE DEL ARCHIVO para consistencia con los mapeos de imagen
+          const imagenSeleccionada = producto?.imagen ? getImageFileName(producto.imagen) : null;
           return {
             producto: Number(id),
             cantidad: qty,
