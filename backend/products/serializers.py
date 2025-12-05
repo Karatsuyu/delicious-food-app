@@ -170,7 +170,6 @@ class ComboPersonalizadoSerializer(serializers.ModelSerializer):
                 'id': combo_producto.producto.id,
                 'nombre': combo_producto.producto.nombre,
                 'precio': precio_mostrar,  # Precio al momento de compra
-                'precio_actual': float(combo_producto.producto.precio),  # Precio actual (para referencia)
                 'imagen': imagen_url,
                 'imagen_seleccionada': combo_producto.imagen_seleccionada,
                 'cantidad': combo_producto.cantidad

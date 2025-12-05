@@ -168,11 +168,6 @@ export default function ComboPersonalizadoDetalle() {
                   <div className="unit">${Number(p.precio || 0).toLocaleString('es-CO')}</div>
                 </div>
                 <div className="sub">Cantidad: {p.cantidad}</div>
-                {p.precio_actual && p.precio_actual !== p.precio && (
-                  <div className="sub" style={{color: '#666', fontSize: '0.8em'}}>
-                    Precio actual: ${Number(p.precio_actual).toLocaleString('es-CO')}
-                  </div>
-                )}
               </div>
             </div>
           ))}
