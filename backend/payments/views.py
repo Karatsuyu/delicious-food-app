@@ -6,12 +6,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import permissions
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class CreateCheckoutSessionView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         try:
@@ -136,7 +136,8 @@ class ConfirmSessionView(APIView):
     - Verifica que el combo de metadata pertenezca al usuario autenticado.
     - Verifica que el combo tenga el mismo stripe_session_id que la sesión consultada.
     """
-    permission_classes = [IsAuthenticated]
+    # Permitir acceso sin autenticación; validamos con Stripe y la sesión almacenada
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         session_id = request.data.get("session_id")

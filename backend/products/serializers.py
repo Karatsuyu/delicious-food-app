@@ -77,9 +77,28 @@ class ComboSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ComboPersonalizadoProductoSerializer(serializers.ModelSerializer):
+    producto_info = serializers.SerializerMethodField()
+    precio_al_comprar = serializers.SerializerMethodField()
+    
     class Meta:
         model = ComboPersonalizadoProducto
-        fields = ["producto", "cantidad", "imagen_seleccionada"]
+        fields = ["producto", "cantidad", "imagen_seleccionada", "producto_info", "precio_al_comprar"]
+    
+    def get_producto_info(self, obj):
+        """Información completa del producto"""
+        return {
+            'id': obj.producto.id,
+            'nombre': obj.producto.nombre,
+            'precio_actual': float(obj.producto.precio),
+            'categoria': obj.producto.categoria
+        }
+    
+    def get_precio_al_comprar(self, obj):
+        """Precio que tenía el producto al momento de agregar al combo"""
+        if obj.precio_al_agregar:
+            return float(obj.precio_al_agregar)
+        # Fallback al precio actual si no se guardó
+        return float(obj.producto.precio)
 
 class ComboPersonalizadoSerializer(serializers.ModelSerializer):
     productos = ComboPersonalizadoProductoSerializer(many=True, write_only=True, required=False)
@@ -118,30 +137,45 @@ class ComboPersonalizadoSerializer(serializers.ModelSerializer):
         """Retorna los productos con sus detalles"""
         request = self.context.get('request')
         productos_data = []
-        for combo_producto in obj.combopersonalizadoproducto_set.all():
+        
+        # Obtener todos los productos del combo
+        combo_productos = obj.combopersonalizadoproducto_set.all()
+        
+        for combo_producto in combo_productos:
             imagen_url = None
+            
             # Priorizar la imagen seleccionada si existe
             if combo_producto.imagen_seleccionada:
-                # La imagen_seleccionada es la ruta completa del asset
                 imagen_url = combo_producto.imagen_seleccionada
             elif combo_producto.producto.imagen:
                 try:
                     if request:
                         imagen_url = request.build_absolute_uri(combo_producto.producto.imagen.url)
                     else:
-                        # Construir URL manualmente cuando no hay request
                         imagen_url = f"http://127.0.0.1:8000{combo_producto.producto.imagen.url}"
-                except Exception as e:
+                except Exception:
                     imagen_url = combo_producto.producto.imagen.url if combo_producto.producto.imagen else None
+            
+            # SIEMPRE usar el precio histórico (el que se pagó al crear el combo)
+            # Prioridad: precio_unitario (siempre existe) -> precio_al_agregar -> precio actual (fallback)
+            if hasattr(combo_producto, 'precio_unitario') and combo_producto.precio_unitario is not None:
+                precio_mostrar = float(combo_producto.precio_unitario)
+            elif combo_producto.precio_al_agregar is not None:
+                precio_mostrar = float(combo_producto.precio_al_agregar)
+            else:
+                # Fallback solo para combos muy antiguos
+                precio_mostrar = float(combo_producto.producto.precio)
             
             productos_data.append({
                 'id': combo_producto.producto.id,
                 'nombre': combo_producto.producto.nombre,
-                'precio': float(combo_producto.producto.precio),
+                'precio': precio_mostrar,  # Precio al momento de compra
+                'precio_actual': float(combo_producto.producto.precio),  # Precio actual (para referencia)
                 'imagen': imagen_url,
-                'imagen_seleccionada': combo_producto.imagen_seleccionada,  # Incluir también el campo directamente
+                'imagen_seleccionada': combo_producto.imagen_seleccionada,
                 'cantidad': combo_producto.cantidad
             })
+        
         return productos_data
 
     def create(self, validated_data):
@@ -156,9 +190,33 @@ class ComboPersonalizadoSerializer(serializers.ModelSerializer):
                 combo=combo, 
                 producto=producto, 
                 cantidad=cantidad,
-                imagen_seleccionada=imagen_seleccionada
+                imagen_seleccionada=imagen_seleccionada,
+                precio_al_agregar=producto.precio  # Guardar precio al momento de creación
             )
             total += producto.precio * cantidad
         combo.precio_total = total
         combo.save()
         return combo
+
+    def to_representation(self, instance):
+        """Serializa el combo con el precio que tenía al momento de comprarlo."""
+        data = super().to_representation(instance)
+        
+        # Mantener el precio_total que se guardó al momento de la compra
+        # No recalcular, porque los precios de productos pueden haber cambiado
+        if not data.get('precio_total') or float(data.get('precio_total', 0)) <= 0:
+            # Solo si no hay precio guardado, calcularlo desde productos
+            suma_total = 0
+            productos_relacionados = instance.combopersonalizadoproducto_set.all()
+            
+            for cp in productos_relacionados:
+                try:
+                    precio = float(cp.producto.precio or 0)
+                    cantidad = int(cp.cantidad or 1)
+                    suma_total += precio * cantidad
+                except Exception:
+                    continue
+            
+            data['precio_total'] = str(suma_total)
+        
+        return data

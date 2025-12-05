@@ -9,6 +9,7 @@ import hamburguesa1 from '../assets/hamburguesa1.png';
 import hamburguesa2 from '../assets/hamburguesa2.png';
 import hamburguesa3 from '../assets/hamburguesa3.png';
 import hamburguesa4 from '../assets/hamburguesa4.png';
+import hamburguesa8 from '../assets/hamburguesa8.png';
 import pizza from '../assets/pizza.png';
 import pizza1 from '../assets/pizza1.png';
 import pizza2 from '../assets/pizza2.png';
@@ -80,6 +81,10 @@ const getProductImage = (producto) => {
   
   // Fallback final - imagen por defecto según categoría
   const nombre = (producto.nombre || '').toLowerCase();
+  // Correcciones específicas para coincidir con el personalizador
+  if (nombre.includes('double') && nombre.includes('smash')) return hamburguesa8; // Double Smash => hamburguesa8.png
+  if (nombre.includes('pizza') && nombre.includes('pepperoni')) return peperoni;  // Pepperoni => peperoni.png
+  if (nombre.includes('alitas') && nombre.includes('simples')) return pollo1;    // Alitas simples => pollo1.png
   if (nombre.includes('hamburguesa') || nombre.includes('burger')) return hamburguesa;
   if (nombre.includes('pizza')) return pizza;
   if (nombre.includes('pollo') || nombre.includes('alita')) return pollo;
@@ -141,9 +146,7 @@ export default function ComboPersonalizadoDetalle() {
         <div className="meta">
           <span className="precio">${Number(combo.precio_total || 0).toLocaleString('es-CO')}</span>
           <span className="fecha">Creado: {new Date(combo.creado_en).toLocaleDateString('es-ES')}</span>
-          <span className={`combo-estado ${combo.is_paid ? 'pagado' : 'pendiente'}`}>
-            {combo.is_paid ? '✅ Pagado' : '⏳ Pendiente de pago'}
-          </span>
+
         </div>
       </div>
 
@@ -165,6 +168,11 @@ export default function ComboPersonalizadoDetalle() {
                   <div className="unit">${Number(p.precio || 0).toLocaleString('es-CO')}</div>
                 </div>
                 <div className="sub">Cantidad: {p.cantidad}</div>
+                {p.precio_actual && p.precio_actual !== p.precio && (
+                  <div className="sub" style={{color: '#666', fontSize: '0.8em'}}>
+                    Precio actual: ${Number(p.precio_actual).toLocaleString('es-CO')}
+                  </div>
+                )}
               </div>
             </div>
           ))}

@@ -11,9 +11,6 @@ import hamburguesa1 from '../assets/hamburguesa1.png';
 import hamburguesa2 from '../assets/hamburguesa2.png';
 import hamburguesa3 from '../assets/hamburguesa3.png';
 import hamburguesa4 from '../assets/hamburguesa4.png';
-import hamburguesa5 from '../assets/hamburguesa5.png';
-import hamburguesa6 from '../assets/hamburguesa6.png';
-import hamburguesa7 from '../assets/hamburguesa7.png';
 import hamburguesa8 from '../assets/hamburguesa8.png';
 import pizza from '../assets/pizza.png';
 import pizza1 from '../assets/pizza1.png';
@@ -86,6 +83,10 @@ const getProductImage = (producto) => {
   
   // Fallback final - imagen por defecto según categoría
   const nombre = (producto.nombre || '').toLowerCase();
+  // Correcciones específicas para coincidir con el personalizador
+  if (nombre.includes('double') && nombre.includes('smash')) return hamburguesa8; // Double Smash => hamburguesa8.png
+  if (nombre.includes('pizza') && nombre.includes('pepperoni')) return peperoni;  // Pepperoni => peperoni.png
+  if (nombre.includes('alitas') && nombre.includes('simples')) return pollo1;    // Alitas simples => pollo1.png
   if (nombre.includes('hamburguesa') || nombre.includes('burger')) return hamburguesa;
   if (nombre.includes('pizza')) return pizza;
   if (nombre.includes('pollo') || nombre.includes('alita')) return pollo;
@@ -122,11 +123,15 @@ function CombosPublicos() {
   };
 
   const handleAddToCart = (combo) => {
+    // Usar la imagen del primer producto del combo como imagen representativa
+    const firstProd = combo.productos_detalle && combo.productos_detalle.length > 0 ? combo.productos_detalle[0] : null;
+    const representativeImage = firstProd ? getProductImage(firstProd) : null;
+
     const productoData = {
       id: `combo-personalizado-${combo.id}`,
       nombre: combo.nombre || `Combo de ${combo.usuario_info?.username || 'Usuario'}`,
       precio: parseFloat(combo.precio_total),
-      imagen: combo.productos_detalle?.[0]?.imagen || null,
+      imagen: representativeImage,
       es_personalizable: false,
       combo_personalizado_id: combo.id
     };

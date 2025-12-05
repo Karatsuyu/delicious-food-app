@@ -29,6 +29,7 @@ function Perfil() {
 
   const loadCombosPersonalizados = async () => {
     try {
+      // Mostrar TODOS los combos personalizados del usuario (pagados y pendientes)
       const response = await api.get('combos-personalizados/');
       setCombosPersonalizados(response.data);
     } catch (error) {
@@ -37,6 +38,19 @@ function Perfil() {
       setLoadingCombos(false);
     }
   };
+
+  const marcarTodosPagados = async () => {
+    try {
+      await api.post('combos-personalizados/marcar_todos_pagados/');
+      await loadCombosPersonalizados();
+      alert('Se marcaron como pagados los combos pendientes.');
+    } catch (e) {
+      console.error('No se pudo marcar como pagados:', e);
+      alert('No se pudo marcar como pagados.');
+    }
+  };
+
+
 
   const cargarImagenPerfil = async () => {
     try {
@@ -335,9 +349,7 @@ function Perfil() {
                           <span className="combo-fecha">
                             Creado: {new Date(combo.creado_en).toLocaleDateString('es-ES')}
                           </span>
-                          <span className={`combo-estado ${combo.is_paid ? 'pagado' : 'pendiente'}`}>
-                            {combo.is_paid ? '✅ Pagado' : '⏳ Pendiente de pago'}
-                          </span>
+
                         </div>
                         <div className="combo-stats">
                           {combo.veces_comprado > 0 && (

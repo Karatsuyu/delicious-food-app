@@ -360,6 +360,7 @@ function CrearCombo() {
           return {
             producto: Number(id),
             cantidad: qty,
+            precio_actual: producto?.precio || 0, // 🔑 ENVIAR PRECIO ACTUAL PARA GUARDAR HISTÓRICO
             imagen_seleccionada: imagenSeleccionada
           };
         });

@@ -80,4 +80,6 @@ class ComboPersonalizadoProducto(models.Model):
     combo = models.ForeignKey(ComboPersonalizado, on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     cantidad = models.PositiveIntegerField(default=1)
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, help_text="Precio unitario del producto al momento de agregarlo al combo")
     imagen_seleccionada = models.CharField(max_length=200, blank=True, null=True, help_text="Ruta de la imagen específica seleccionada en el personalizador")
+    precio_al_agregar = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Precio del producto al momento de agregarlo al combo")

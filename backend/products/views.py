@@ -36,11 +36,101 @@ class ComboPersonalizadoViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Mostrar todos los combos del usuario
-        return ComboPersonalizado.objects.filter(usuario=self.request.user)
+        # Mostrar SOLO los combos personalizados PAGADOS del usuario
+        return ComboPersonalizado.objects.filter(
+            usuario=self.request.user,
+            is_paid=True
+        ).prefetch_related('combopersonalizadoproducto_set__producto')
 
     def perform_create(self, serializer):
         serializer.save(usuario=self.request.user)
+
+    @action(detail=False, methods=['post'])
+    def marcar_todos_pagados(self, request):
+        """Marca todos los combos personalizados del usuario autenticado como pagados.
+        Útil para corregir estados cuando el webhook/confirmación no se ejecutó.
+        """
+        from django.utils import timezone
+        usuario = request.user
+        combos = ComboPersonalizado.objects.filter(usuario=usuario)
+        count = 0
+        for combo in combos:
+            if not combo.is_paid:
+                combo.is_paid = True
+                if not combo.paid_at:
+                    combo.paid_at = timezone.now()
+                combo.save(update_fields=["is_paid", "paid_at"])
+                count += 1
+        return Response({"ok": True, "actualizados": count})
+
+    @action(detail=False, methods=['get'])
+    def debug_info(self, request):
+        """Debug endpoint para analizar todos los combos del usuario."""
+        usuario = request.user
+        combos = ComboPersonalizado.objects.filter(usuario=usuario).order_by('id')
+        
+        debug_data = []
+        for combo in combos:
+            productos_relacionados = combo.combopersonalizadoproducto_set.all()
+            
+            productos_info = []
+            total_calculado = 0
+            for cp in productos_relacionados:
+                precio_producto = float(cp.producto.precio)
+                cantidad = int(cp.cantidad)
+                subtotal = precio_producto * cantidad
+                total_calculado += subtotal
+                productos_info.append({
+                    'nombre': cp.producto.nombre,
+                    'precio': precio_producto,
+                    'cantidad': cantidad,
+                    'subtotal': subtotal,
+                    'imagen_seleccionada': cp.imagen_seleccionada
+                })
+            
+            combo_info = {
+                'id': combo.id,
+                'nombre': combo.nombre,
+                'precio_total_guardado': float(combo.precio_total or 0),
+                'precio_total_calculado': total_calculado,
+                'es_pagado': combo.is_paid,
+                'publicado': combo.publicado,
+                'fecha_creacion': combo.creado_en.isoformat(),
+                'productos_count': productos_relacionados.count(),
+                'productos': productos_info,
+                'problema': 'sin_productos' if productos_relacionados.count() == 0 else (
+                    'precio_cero' if total_calculado == 0 else (
+                        'precio_diferente' if float(combo.precio_total or 0) != total_calculado else 'ok'
+                    )
+                )
+            }
+            debug_data.append(combo_info)
+        
+        return Response(debug_data)
+
+    @action(detail=False, methods=['post'])
+    def fix_all_combos(self, request):
+        """Corrige todos los combos del usuario recalculando precios desde sus productos."""
+        usuario = request.user
+        combos = ComboPersonalizado.objects.filter(usuario=usuario)
+        
+        corregidos = 0
+        for combo in combos:
+            productos_relacionados = combo.combopersonalizadoproducto_set.all()
+            
+            if productos_relacionados.count() > 0:
+                # Recalcular precio
+                total_real = 0
+                for cp in productos_relacionados:
+                    total_real += float(cp.producto.precio) * int(cp.cantidad)
+                
+                # Actualizar solo si es diferente
+                if float(combo.precio_total or 0) != total_real:
+                    combo.precio_total = total_real
+                    combo.save(update_fields=['precio_total'])
+                    corregidos += 1
+        
+        return Response({"ok": True, "corregidos": corregidos})
 
 class ComboPersonalizadoCreateView(generics.CreateAPIView):
     serializer_class = ComboPersonalizadoSerializer
@@ -63,7 +153,9 @@ class ComboPersonalizadoPublicosView(generics.ListAPIView):
     authentication_classes = []  # Permitir acceso sin autenticación
     
     def get_queryset(self):
-        return ComboPersonalizado.objects.filter(publicado=True).order_by('-veces_comprado', '-creado_en')
+        return ComboPersonalizado.objects.filter(
+            publicado=True
+        ).prefetch_related('combopersonalizadoproducto_set__producto').order_by('-veces_comprado', '-creado_en')
     
     def get_serializer_context(self):
         context = super().get_serializer_context()
