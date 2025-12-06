@@ -251,15 +251,21 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'])
     def perfil_publico(self, request, pk=None):
-        """Obtener perfil público de un usuario con sus combos personalizados publicados"""
+        """Obtener perfil público de un usuario con sus combos y productos personalizados publicados"""
         try:
             usuario = self.get_object()
-            from products.models import ComboPersonalizado
-            from products.serializers import ComboPersonalizadoSerializer
+            from products.models import ComboPersonalizado, ProductoPersonalizado
+            from products.serializers import ComboPersonalizadoSerializer, ProductoPersonalizadoSerializer
             from django.db.models import Sum
             
             # Obtener combos publicados del usuario
             combos_publicados = ComboPersonalizado.objects.filter(
+                usuario=usuario,
+                publicado=True
+            ).order_by('-veces_comprado', '-creado_en')
+            
+            # Obtener productos personalizados publicados del usuario
+            productos_personalizados_publicados = ProductoPersonalizado.objects.filter(
                 usuario=usuario,
                 publicado=True
             ).order_by('-veces_comprado', '-creado_en')
@@ -271,8 +277,20 @@ class UserViewSet(viewsets.ModelViewSet):
                 total=Sum('veces_comprado')
             )['total'] or 0
             
+            total_productos_creados = ProductoPersonalizado.objects.filter(usuario=usuario).count()
+            total_productos_publicados = productos_personalizados_publicados.count()
+            total_productos_veces_comprados = productos_personalizados_publicados.aggregate(
+                total=Sum('veces_comprado')
+            )['total'] or 0
+            
             combos_serializer = ComboPersonalizadoSerializer(
                 combos_publicados, 
+                many=True, 
+                context={'request': request}
+            )
+            
+            productos_serializer = ProductoPersonalizadoSerializer(
+                productos_personalizados_publicados, 
                 many=True, 
                 context={'request': request}
             )
@@ -297,9 +315,13 @@ class UserViewSet(viewsets.ModelViewSet):
                 'estadisticas': {
                     'total_combos_creados': total_combos_creados,
                     'total_combos_publicados': total_combos_publicados,
-                    'total_veces_comprados': total_veces_comprados
+                    'total_veces_comprados': total_veces_comprados,
+                    'total_productos_creados': total_productos_creados,
+                    'total_productos_publicados': total_productos_publicados,
+                    'total_productos_veces_comprados': total_productos_veces_comprados
                 },
-                'combos_publicados': combos_serializer.data
+                'combos_publicados': combos_serializer.data,
+                'productos_personalizados_publicados': productos_serializer.data
             })
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

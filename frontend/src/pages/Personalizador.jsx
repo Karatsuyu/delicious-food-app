@@ -33,6 +33,10 @@ import singlutenImg from '../assets/sin gluten.png';
 import venadoImg from '../assets/venado.png';
 import veganoImg from '../assets/vegano.png';
 import hamburguesaImg from '../assets/hamburguesa.png';
+import pizza1Img from '../assets/pizza1.png';
+import perroImg from '../assets/perro.png';
+import polloImg from '../assets/pollo.png';
+import postresImg from '../assets/postres1.png';
 
 
 
@@ -93,6 +97,32 @@ const getIngredientImage = (ingredienteId, categoria) => {
   
   // Para otras categorías, retornar imagen base de hamburguesa como fallback
   return hamburguesaImg;
+};
+
+// Función para obtener la imagen de la categoría para el carrito
+const getCategoryImage = (categoria) => {
+  const cat = categoria?.toLowerCase();
+  
+  // Usar imágenes representativas según la categoría
+  switch (cat) {
+    case 'hamburguesas':
+    case 'hamburguesa':
+      return hamburguesaImg;
+    case 'pizzas':
+    case 'pizza':
+      return pizza1Img;
+    case 'perros':
+    case 'perro':
+      return perroImg;
+    case 'pollo':
+    case 'alitas':
+      return polloImg;
+    case 'postres':
+    case 'postre':
+      return postresImg;
+    default:
+      return hamburguesaImg;
+  }
 };
 
 const Personalizador = () => {
@@ -945,7 +975,7 @@ const Personalizador = () => {
         id: `producto-personalizado-${productoPersonalizadoCreado.id}`,
         nombre: personalizacion.nombrePersonalizado || producto.nombre,
         precio: calcularPrecio(),
-        imagen: producto.imagen,
+        imagen: getCategoryImage(categoria),
         cantidad: 1,
         precioTotal: calcularPrecio(),
         categoria: producto.categoria,

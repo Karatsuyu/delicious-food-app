@@ -244,13 +244,53 @@
   background: #0b7dda;
 }
 
+/* Estilos específicos para productos personalizados */
+.seccion-productos-perfil {
+  margin-top: 30px;
+}
+
+.productos-grid-publico {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.producto-base-info {
+  margin: 15px 0;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.producto-base-label {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+.producto-base-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.precio-extra {
+  color: #F28c1e;
+  font-weight: 500;
+  font-size: 0.85rem;
+  margin-left: 5px;
+}
+
 @media (max-width: 768px) {
   .perfil-publico-info {
     flex-direction: column;
     text-align: center;
   }
 
-  .combos-grid-publico {
+  .combos-grid-publico,
+  .productos-grid-publico {
     grid-template-columns: 1fr;
   }
 

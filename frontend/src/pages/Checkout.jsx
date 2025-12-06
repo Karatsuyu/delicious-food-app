@@ -4,7 +4,9 @@ import './Checkout.css';
 import { loadStripe } from '@stripe/stripe-js';
 import api from '../api/api';
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+// Solo cargar Stripe si hay una clave válida configurada
+const STRIPE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = STRIPE_KEY && STRIPE_KEY !== 'undefined' ? loadStripe(STRIPE_KEY) : null;
 
 function Checkout() {
   const { cartItems } = useCart();
@@ -31,6 +33,12 @@ function Checkout() {
   const total = useMemo(() => itemsForSummary.reduce((acc, i) => acc + (i.subtotal || 0), 0), [itemsForSummary]);
 
   const onPay = async () => {
+    // Verificar si Stripe está configurado
+    if (!stripePromise) {
+      setError('Stripe no está configurado correctamente. Contacta al administrador.');
+      return;
+    }
+
     try {
       setLoading(true);
       setError('');
