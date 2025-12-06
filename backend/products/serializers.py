@@ -234,7 +234,7 @@ class ProductoPersonalizadoSerializer(serializers.ModelSerializer):
             "producto_base_detalle", "ingredientes", "ingredientes_detalle", "precio_total", 
             "creado_en", "publicado", "veces_comprado", "is_paid", "stripe_session_id", "paid_at"
         ]
-        read_only_fields = ["usuario", "precio_total", "creado_en", "veces_comprado", "is_paid", "stripe_session_id", "paid_at"]
+        read_only_fields = ["usuario", "creado_en", "veces_comprado", "is_paid", "stripe_session_id", "paid_at"]
 
     def get_usuario_info(self, obj):
         if obj.usuario:
@@ -250,14 +250,7 @@ class ProductoPersonalizadoSerializer(serializers.ModelSerializer):
         return None
 
     def create(self, validated_data):
-        """Crear producto personalizado calculando automáticamente el precio total"""
-        producto_base = validated_data.get('producto_base')
-        ingredientes = validated_data.get('ingredientes', [])
-        
-        # Calcular precio total
-        precio_total = float(producto_base.precio) if producto_base else 0
-        for ingrediente in ingredientes:
-            precio_total += float(ingrediente.precio_extra)
-        
-        validated_data['precio_total'] = precio_total
+        """Crear producto personalizado usando el precio enviado desde el frontend"""
+        # El precio_total ya viene calculado desde el frontend con tamaños, ingredientes y extras
+        # No lo recalculamos aquí para mantener consistencia
         return super().create(validated_data)

@@ -288,7 +288,14 @@ class ProductoPersonalizadoViewSet(viewsets.ModelViewSet):
         ).prefetch_related('ingredientes', 'producto_base')
 
     def perform_create(self, serializer):
-        serializer.save(usuario=self.request.user)
+        # Log para debuggear el precio
+        precio_recibido = self.request.data.get('precio_total')
+        print(f"💰 Precio recibido del frontend: {precio_recibido}")
+        
+        producto = serializer.save(usuario=self.request.user)
+        print(f"💾 Precio guardado en BD: {producto.precio_total}")
+        
+        return producto
 
     @action(detail=False, methods=['post'])
     def marcar_todos_pagados(self, request):
