@@ -3,6 +3,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
+import api from '../api/api';
 
 // Importar imágenes
 import hamburguesa1 from '../assets/hamburguesa1.png';
@@ -69,6 +70,15 @@ const ProductoDetalle = () => {
   const [tipoPolloSeleccionado, setTipoPolloSeleccionado] = useState('alitas'); 
   const { addToCart } = useCart();
   const { user } = useContext(AuthContext);
+  
+  // Estados para reseñas
+  const [reseñas, setReseñas] = useState([]);
+  const [loadingReseñas, setLoadingReseñas] = useState(true);
+  const [nuevaReseña, setNuevaReseña] = useState({
+    texto: '',
+    calificacion: 5
+  });
+  const [mostrandoFormulario, setMostrandoFormulario] = useState(false);
   const isAdmin = user?.is_staff;
 
   // Definir tamaños de pizzas
@@ -527,6 +537,7 @@ const tiposPollo = {
 
     if (id) {
       cargarProducto();
+      cargarReseñas();
     }
   }, [id]);
 
@@ -597,6 +608,70 @@ const tiposPollo = {
 
     addToCart(productoParaCarrito);
   };
+
+  // Funciones para manejar reseñas
+  const cargarReseñas = async () => {
+    try {
+      const response = await api.get(`reviews/?producto=${id}`);
+      setReseñas(response.data);
+    } catch (error) {
+      console.error('Error cargando reseñas:', error);
+    } finally {
+      setLoadingReseñas(false);
+    }
+  };
+
+  const enviarReseña = async () => {
+    if (!user) {
+      alert('Debes iniciar sesión para escribir una reseña');
+      return;
+    }
+
+    if (!nuevaReseña.texto.trim()) {
+      alert('Por favor escribe un comentario');
+      return;
+    }
+
+    try {
+      const response = await api.post('reviews/', {
+        producto: id,
+        texto: nuevaReseña.texto,
+        calificacion: nuevaReseña.calificacion
+      });
+
+      // Agregar la nueva reseña al estado local
+      setReseñas([response.data, ...reseñas]);
+      setNuevaReseña({ texto: '', calificacion: 5 });
+      setMostrandoFormulario(false);
+      alert('¡Reseña enviada exitosamente!');
+    } catch (error) {
+      console.error('Error enviando reseña:', error);
+      if (error.response?.data?.detail) {
+        alert(error.response.data.detail);
+      } else {
+        alert('Error enviando la reseña. Intenta nuevamente.');
+      }
+    }
+  };
+
+  const calcularPromedioCalificacion = () => {
+    if (reseñas.length === 0) return 0;
+    const suma = reseñas.reduce((acc, reseña) => acc + reseña.calificacion, 0);
+    return (suma / reseñas.length).toFixed(1);
+  };
+
+  const renderEstrellas = (calificacion) => {
+    const estrellas = [];
+    for (let i = 1; i <= 5; i++) {
+      estrellas.push(
+        <span key={i} className={i <= calificacion ? 'estrella-llena' : 'estrella-vacia'}>
+          ⭐
+        </span>
+      );
+    }
+    return estrellas;
+  };
+
   if (loading) {
     return <div className="loading">Cargando producto...</div>;
   }
@@ -688,6 +763,112 @@ const tiposPollo = {
             >
               ✏️ Editar Producto
             </button>
+          )}
+        </div>
+      </div>
+
+      {/* Sección de Reseñas */}
+      <div className="resenas-section">
+        <div className="resenas-header">
+          <h2>Reseñas del Producto</h2>
+          {reseñas.length > 0 && (
+            <div className="calificacion-promedio">
+              <span className="promedio-numero">{calcularPromedioCalificacion()}</span>
+              <div className="estrellas-promedio">
+                {renderEstrellas(Math.round(calcularPromedioCalificacion()))}
+              </div>
+              <span className="total-resenas">({reseñas.length} reseña{reseñas.length !== 1 ? 's' : ''})</span>
+            </div>
+          )}
+        </div>
+
+        {user && (
+          <div className="escribir-resena">
+            {!mostrandoFormulario ? (
+              <button 
+                className="btn-escribir-resena"
+                onClick={() => setMostrandoFormulario(true)}
+              >
+                ✍️ Escribir una reseña
+              </button>
+            ) : (
+              <div className="formulario-resena">
+                <h3>Escribe tu reseña</h3>
+                
+                <div className="calificacion-selector">
+                  <label>Calificación:</label>
+                  <div className="estrellas-selector">
+                    {[1, 2, 3, 4, 5].map(num => (
+                      <button
+                        key={num}
+                        type="button"
+                        className={`estrella-btn ${num <= nuevaReseña.calificacion ? 'activa' : ''}`}
+                        onClick={() => setNuevaReseña({...nuevaReseña, calificacion: num})}
+                      >
+                        ⭐
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <textarea
+                  value={nuevaReseña.texto}
+                  onChange={(e) => setNuevaReseña({...nuevaReseña, texto: e.target.value})}
+                  placeholder="Comparte tu experiencia con este producto..."
+                  rows={4}
+                  className="textarea-resena"
+                />
+
+                <div className="botones-resena">
+                  <button onClick={enviarReseña} className="btn-enviar">
+                    📤 Enviar Reseña
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setMostrandoFormulario(false);
+                      setNuevaReseña({ texto: '', calificacion: 5 });
+                    }}
+                    className="btn-cancelar"
+                  >
+                    ❌ Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="lista-resenas">
+          {loadingReseñas ? (
+            <div className="loading-resenas">Cargando reseñas...</div>
+          ) : reseñas.length === 0 ? (
+            <div className="sin-resenas">
+              <p>Aún no hay reseñas para este producto.</p>
+              <p>¡Sé el primero en compartir tu experiencia!</p>
+            </div>
+          ) : (
+            reseñas.map((reseña) => (
+              <div key={reseña.id} className="resena-item">
+                <div className="resena-header">
+                  <div className="usuario-info">
+                    <span className="usuario-email">{reseña.usuario_email}</span>
+                    <div className="estrellas-resena">
+                      {renderEstrellas(reseña.calificacion)}
+                    </div>
+                  </div>
+                  <span className="fecha-resena">
+                    {new Date(reseña.creado).toLocaleDateString('es-ES', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </span>
+                </div>
+                <div className="resena-texto">
+                  {reseña.texto}
+                </div>
+              </div>
+            ))
           )}
         </div>
       </div>

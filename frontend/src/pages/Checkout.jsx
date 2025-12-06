@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import './Checkout.css';
 import { loadStripe } from '@stripe/stripe-js';
@@ -13,6 +13,23 @@ function Checkout() {
   const [buyer, setBuyer] = useState({ nombre: '', apellidos: '', email: '', telefono: '', direccion: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [userPoints, setUserPoints] = useState(0);
+  const [pointsToUse, setPointsToUse] = useState(0);
+  const [showPointsSection, setShowPointsSection] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+
+  // Función para verificar si todos los campos están válidos
+  const todosLosCamposValidos = () => {
+    const camposRequeridos = ['nombre', 'apellidos', 'email', 'telefono', 'direccion'];
+    
+    // Verificar que todos los campos tengan valores
+    const camposCompletos = camposRequeridos.every(campo => buyer[campo]?.trim());
+    
+    // Verificar que no haya errores
+    const sinErrores = camposRequeridos.every(campo => !fieldErrors[campo]);
+    
+    return camposCompletos && sinErrores;
+  };
 
   const itemsForSummary = useMemo(() => {
     return (cartItems || []).map(it => {
@@ -30,9 +47,119 @@ function Checkout() {
     });
   }, [cartItems]);
 
-  const total = useMemo(() => itemsForSummary.reduce((acc, i) => acc + (i.subtotal || 0), 0), [itemsForSummary]);
+  const subtotal = useMemo(() => itemsForSummary.reduce((acc, i) => acc + (i.subtotal || 0), 0), [itemsForSummary]);
+  const pointsDiscount = pointsToUse;
+  const total = Math.max(0, subtotal - pointsDiscount);
+
+  // Cargar puntos del usuario
+  useEffect(() => {
+    const loadUserPoints = async () => {
+      try {
+        const response = await api.get('/users/users/points_balance/');
+        setUserPoints(response.data.points || 0);
+      } catch (error) {
+        console.error('Error cargando puntos:', error);
+      }
+    };
+    loadUserPoints();
+  }, []);
+
+  const validarCampos = () => {
+    const errores = [];
+
+    // Validar campos obligatorios
+    if (!buyer.nombre?.trim()) {
+      errores.push('El nombre es obligatorio');
+    }
+
+    if (!buyer.apellidos?.trim()) {
+      errores.push('Los apellidos son obligatorios');
+    }
+
+    if (!buyer.email?.trim()) {
+      errores.push('El email es obligatorio');
+    } else {
+      // Validar formato de email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(buyer.email)) {
+        errores.push('El formato del email no es válido');
+      }
+    }
+
+    if (!buyer.telefono?.trim()) {
+      errores.push('El teléfono es obligatorio');
+    } else {
+      // Validar que el teléfono tenga al menos 7 dígitos
+      const telefonoLimpio = buyer.telefono.replace(/[^0-9]/g, '');
+      if (telefonoLimpio.length < 7) {
+        errores.push('El teléfono debe tener al menos 7 dígitos');
+      }
+    }
+
+    if (!buyer.direccion?.trim()) {
+      errores.push('La dirección es obligatoria');
+    }
+
+    return errores;
+  };
+
+  const validarCampo = (campo, valor) => {
+    let error = '';
+    
+    switch (campo) {
+      case 'nombre':
+        if (!valor?.trim()) error = 'El nombre es obligatorio';
+        break;
+      case 'apellidos':
+        if (!valor?.trim()) error = 'Los apellidos son obligatorios';
+        break;
+      case 'email':
+        if (!valor?.trim()) {
+          error = 'El email es obligatorio';
+        } else {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(valor)) {
+            error = 'El formato del email no es válido';
+          }
+        }
+        break;
+      case 'telefono':
+        if (!valor?.trim()) {
+          error = 'El teléfono es obligatorio';
+        } else {
+          const telefonoLimpio = valor.replace(/[^0-9]/g, '');
+          if (telefonoLimpio.length < 7) {
+            error = 'El teléfono debe tener al menos 7 dígitos';
+          }
+        }
+        break;
+      case 'direccion':
+        if (!valor?.trim()) error = 'La dirección es obligatoria';
+        break;
+    }
+    
+    setFieldErrors(prev => ({
+      ...prev,
+      [campo]: error
+    }));
+    
+    return error;
+  };
+
+  const handleInputChange = (campo, valor) => {
+    setBuyer(prev => ({ ...prev, [campo]: valor }));
+    // Validar el campo cuando el usuario deja de escribir
+    setTimeout(() => validarCampo(campo, valor), 300);
+  };
 
   const onPay = async () => {
+    // Validar campos obligatorios primero
+    const errores = validarCampos();
+    if (errores.length > 0) {
+      setError(`Por favor completa los siguientes campos:\n• ${errores.join('\n• ')}`);
+      return;
+    }
+
     // Verificar si Stripe está configurado
     if (!stripePromise) {
       setError('Stripe no está configurado correctamente. Contacta al administrador.');
@@ -89,6 +216,12 @@ function Checkout() {
       } else if (customProducto) {
         bodyPayload.producto_personalizado_id = customProducto.producto_personalizado_id;
         console.log('[Checkout] Enviando producto_personalizado_id:', customProducto.producto_personalizado_id);
+      }
+
+      // Incluir puntos utilizados si hay alguno
+      if (pointsToUse > 0) {
+        bodyPayload.points_used = pointsToUse;
+        console.log('[Checkout] Enviando points_used:', pointsToUse);
       }
       // Usar el cliente API con JWT para que el backend pueda validar al usuario y asociar el combo
       const { data } = await api.post('payments/create-checkout-session/', bodyPayload);
@@ -163,35 +296,100 @@ function Checkout() {
           )}
         </section>
 
+        {showPointsSection && userPoints > 0 && (
+          <section className="checkout-card">
+            <h3>Usar Puntos como Descuento</h3>
+            <div className="points-section">
+              <p>Tienes <strong>{userPoints} puntos</strong> disponibles. Cada punto equivale a $1 COP de descuento.</p>
+              <label>
+                Puntos a usar (máximo {Math.min(userPoints, subtotal)}):
+                <input 
+                  type="number" 
+                  min="0" 
+                  max={Math.min(userPoints, subtotal)}
+                  value={pointsToUse}
+                  onChange={(e) => {
+                    const value = Math.min(Math.max(0, parseInt(e.target.value) || 0), Math.min(userPoints, subtotal));
+                    setPointsToUse(value);
+                  }}
+                />
+              </label>
+              {pointsToUse > 0 && (
+                <div className="points-discount">
+                  <p>Descuento aplicado: <strong>-${pointsToUse.toLocaleString('es-CO')}</strong></p>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
         <section className="checkout-card">
           <h3>Datos del comprador</h3>
+          <p className="campos-obligatorios">Los campos marcados con * son obligatorios</p>
           <div className="form-grid">
             <label>
-              Nombre
-              <input value={buyer.nombre} onChange={(e)=>setBuyer(b=>({...b, nombre:e.target.value}))} />
+              Nombre *
+              <input 
+                value={buyer.nombre} 
+                onChange={(e) => handleInputChange('nombre', e.target.value)}
+                className={fieldErrors.nombre ? 'input-error' : ''}
+                placeholder="Ingresa tu nombre"
+              />
+              {fieldErrors.nombre && <span className="error-message">{fieldErrors.nombre}</span>}
             </label>
             <label>
-              Apellidos
-              <input value={buyer.apellidos} onChange={(e)=>setBuyer(b=>({...b, apellidos:e.target.value}))} />
+              Apellidos *
+              <input 
+                value={buyer.apellidos} 
+                onChange={(e) => handleInputChange('apellidos', e.target.value)}
+                className={fieldErrors.apellidos ? 'input-error' : ''}
+                placeholder="Ingresa tus apellidos"
+              />
+              {fieldErrors.apellidos && <span className="error-message">{fieldErrors.apellidos}</span>}
             </label>
             <label>
-              Email
-              <input type="email" value={buyer.email} onChange={(e)=>setBuyer(b=>({...b, email:e.target.value}))} />
+              Email *
+              <input 
+                type="email" 
+                value={buyer.email} 
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                className={fieldErrors.email ? 'input-error' : ''}
+                placeholder="ejemplo@correo.com"
+              />
+              {fieldErrors.email && <span className="error-message">{fieldErrors.email}</span>}
             </label>
             <label>
-              Teléfono
-              <input value={buyer.telefono} onChange={(e)=>setBuyer(b=>({...b, telefono:e.target.value}))} />
+              Teléfono *
+              <input 
+                value={buyer.telefono} 
+                onChange={(e) => handleInputChange('telefono', e.target.value)}
+                className={fieldErrors.telefono ? 'input-error' : ''}
+                placeholder="Ej: 3001234567"
+              />
+              {fieldErrors.telefono && <span className="error-message">{fieldErrors.telefono}</span>}
             </label>
             <label className="wide">
-              Dirección
-              <input value={buyer.direccion} onChange={(e)=>setBuyer(b=>({...b, direccion:e.target.value}))} />
+              Dirección *
+              <input 
+                value={buyer.direccion} 
+                onChange={(e) => handleInputChange('direccion', e.target.value)}
+                className={fieldErrors.direccion ? 'input-error' : ''}
+                placeholder="Dirección completa de entrega"
+              />
+              {fieldErrors.direccion && <span className="error-message">{fieldErrors.direccion}</span>}
             </label>
           </div>
 
           {error && <div className="checkout-error">{error}</div>}
 
-          <button className="btn-mp" onClick={onPay} disabled={loading || total<=0}>
-            {loading ? 'Creando sesión…' : 'Pagar con tarjeta (Stripe)'}
+          <button 
+            className="btn-mp" 
+            onClick={onPay} 
+            disabled={loading || total<=0 || !todosLosCamposValidos()}
+          >
+            {loading ? 'Creando sesión…' : 
+             !todosLosCamposValidos() ? 'Completa todos los campos' :
+             'Pagar con tarjeta (Stripe)'}
           </button>
           <p className="note">Se abrirá el checkout seguro de Stripe.</p>
         </section>

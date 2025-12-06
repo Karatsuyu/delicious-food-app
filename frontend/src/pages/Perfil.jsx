@@ -17,6 +17,19 @@ function Perfil() {
   const [loadingProductos, setLoadingProductos] = useState(true);
   const [imagenPerfil, setImagenPerfil] = useState(null);
   const [nuevaImagen, setNuevaImagen] = useState(null);
+  
+  // Estados para edición de perfil
+  const [editandoPerfil, setEditandoPerfil] = useState(false);
+  const [perfilEditado, setPerfilEditado] = useState({
+    first_name: '',
+    last_name: '',
+    username: '',
+    phone_number: ''
+  });
+  
+  // Estados para historial de compras
+  const [historialCompras, setHistorialCompras] = useState([]);
+  const [loadingHistorial, setLoadingHistorial] = useState(true);
 
   const loadStats = async () => {
     try {
@@ -50,6 +63,17 @@ function Perfil() {
       console.error('Error cargando productos personalizados:', error);
     } finally {
       setLoadingProductos(false);
+    }
+  };
+
+  const loadHistorialCompras = async () => {
+    try {
+      const response = await api.get('users/users/purchase_history/');
+      setHistorialCompras(response.data);
+    } catch (error) {
+      console.error('Error cargando historial de compras:', error);
+    } finally {
+      setLoadingHistorial(false);
     }
   };
 
@@ -91,6 +115,7 @@ function Perfil() {
       loadCombosPersonalizados();
       loadProductosPersonalizados();
       cargarImagenPerfil();
+      loadHistorialCompras();
     }
   }, [isAuthenticated]);
 
@@ -161,6 +186,45 @@ function Perfil() {
     }
   };
 
+  const iniciarEdicionPerfil = () => {
+    setPerfilEditado({
+      first_name: user?.first_name || '',
+      last_name: user?.last_name || '',
+      username: user?.username || '',
+      phone_number: user?.phone_number || ''
+    });
+    setEditandoPerfil(true);
+  };
+
+  const cancelarEdicionPerfil = () => {
+    setEditandoPerfil(false);
+    setPerfilEditado({
+      first_name: '',
+      last_name: '',
+      username: '',
+      phone_number: ''
+    });
+  };
+
+  const guardarCambiosPerfil = async () => {
+    try {
+      const response = await api.patch('users/users/update_profile/', perfilEditado);
+      updateUser(response.data);
+      setEditandoPerfil(false);
+      alert("✅ Perfil actualizado correctamente");
+    } catch (error) {
+      console.error('Error actualizando perfil:', error);
+      if (error.response?.data) {
+        const errors = Object.entries(error.response.data)
+          .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+          .join('\n');
+        alert(`❌ Error actualizando perfil:\n${errors}`);
+      } else {
+        alert("❌ Hubo un problema al actualizar el perfil");
+      }
+    }
+  };
+
   if (loading || (loadingStats && loadingCombos)) {
     return (
       <div className="perfil-loading">
@@ -211,34 +275,101 @@ function Perfil() {
           <div className="perfil-card">
             <div className="perfil-card-header">
               <h2>📋 Información Personal</h2>
-            </div>
-            <div className="perfil-card-body">
-              <div className="info-row">
-                <span className="info-label">Nombre:</span>
-                <span className="info-value">
-                  {user?.first_name || 'No especificado'} {user?.last_name || ''}
-                </span>
-              </div>
-              <div className="info-row">
-                <span className="info-label">Usuario:</span>
-                <span className="info-value">{user?.username || 'N/A'}</span>
-              </div>
-              <div className="info-row">
-                <span className="info-label">Email:</span>
-                <span className="info-value">{user?.email || 'N/A'}</span>
-              </div>
-              {user?.phone_number && (
-                <div className="info-row">
-                  <span className="info-label">Teléfono:</span>
-                  <span className="info-value">{user.phone_number}</span>
+              {!editandoPerfil ? (
+                <button onClick={iniciarEdicionPerfil} className="btn-editar-perfil">
+                  ✏️ Editar
+                </button>
+              ) : (
+                <div className="botones-edicion">
+                  <button onClick={guardarCambiosPerfil} className="btn-guardar">
+                    ✅ Guardar
+                  </button>
+                  <button onClick={cancelarEdicionPerfil} className="btn-cancelar">
+                    ❌ Cancelar
+                  </button>
                 </div>
               )}
-              <div className="info-row">
-                <span className="info-label">Miembro desde:</span>
-                <span className="info-value">
-                  {user?.date_joined ? new Date(user.date_joined).toLocaleDateString('es-ES') : 'N/A'}
-                </span>
-              </div>
+            </div>
+            <div className="perfil-card-body">
+              {!editandoPerfil ? (
+                <>
+                  <div className="info-row">
+                    <span className="info-label">Nombre:</span>
+                    <span className="info-value">
+                      {user?.first_name || 'No especificado'} {user?.last_name || ''}
+                    </span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Usuario:</span>
+                    <span className="info-value">{user?.username || 'N/A'}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Email:</span>
+                    <span className="info-value">{user?.email || 'N/A'}</span>
+                  </div>
+                  {user?.phone_number && (
+                    <div className="info-row">
+                      <span className="info-label">Teléfono:</span>
+                      <span className="info-value">{user.phone_number}</span>
+                    </div>
+                  )}
+                  <div className="info-row">
+                    <span className="info-label">Miembro desde:</span>
+                    <span className="info-value">
+                      {user?.date_joined ? new Date(user.date_joined).toLocaleDateString('es-ES') : 'N/A'}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <div className="formulario-edicion">
+                  <div className="campo-edicion">
+                    <label>Nombre:</label>
+                    <input
+                      type="text"
+                      value={perfilEditado.first_name}
+                      onChange={(e) => setPerfilEditado({...perfilEditado, first_name: e.target.value})}
+                      placeholder="Ingrese su nombre"
+                    />
+                  </div>
+                  <div className="campo-edicion">
+                    <label>Apellidos:</label>
+                    <input
+                      type="text"
+                      value={perfilEditado.last_name}
+                      onChange={(e) => setPerfilEditado({...perfilEditado, last_name: e.target.value})}
+                      placeholder="Ingrese sus apellidos"
+                    />
+                  </div>
+                  <div className="campo-edicion">
+                    <label>Usuario:</label>
+                    <input
+                      type="text"
+                      value={perfilEditado.username}
+                      onChange={(e) => setPerfilEditado({...perfilEditado, username: e.target.value})}
+                      placeholder="Nombre de usuario"
+                    />
+                  </div>
+                  <div className="campo-edicion">
+                    <label>Teléfono:</label>
+                    <input
+                      type="tel"
+                      value={perfilEditado.phone_number}
+                      onChange={(e) => setPerfilEditado({...perfilEditado, phone_number: e.target.value})}
+                      placeholder="Número de teléfono (opcional)"
+                    />
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Email:</span>
+                    <span className="info-value">{user?.email || 'N/A'} (no editable)</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-label">Miembro desde:</span>
+                    <span className="info-value">
+                      {user?.date_joined ? new Date(user.date_joined).toLocaleDateString('es-ES') : 'N/A'}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -273,7 +404,94 @@ function Perfil() {
             </div>
           )}
 
-
+          {/* Historial de Compras - Solo mostrar si NO es administrador */}
+          {!user?.is_staff && (
+            <div className="perfil-card historial-card">
+              <div className="perfil-card-header">
+                <h2>🛒 Historial de Compras</h2>
+              </div>
+              <div className="perfil-card-body">
+                {loadingHistorial ? (
+                  <div className="historial-loading">Cargando...</div>
+                ) : historialCompras.length === 0 ? (
+                  <div className="historial-empty">
+                    <p>No tienes compras registradas aún.</p>
+                    <p>¡Explora nuestros productos y haz tu primera compra!</p>
+                  </div>
+                ) : (
+                  <div className="historial-list">
+                    {historialCompras.map((compra) => (
+                      <div key={compra.id} className="compra-item">
+                        <div className="compra-header">
+                          <div className="compra-fecha">
+                            <span className="fecha-icono">📅</span>
+                            <span>{new Date(compra.created_at).toLocaleDateString('es-ES', {
+                              year: 'numeric',
+                              month: 'long', 
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}</span>
+                          </div>
+                          <div className="compra-total">
+                            <span className="total-label">Total:</span>
+                            <span className="total-amount">${parseFloat(compra.total_amount).toLocaleString('es-CO')}</span>
+                          </div>
+                        </div>
+                        
+                        {compra.items && compra.items.length > 0 && (
+                          <div className="compra-items">
+                            <h4>Productos comprados:</h4>
+                            {compra.items.map((item, index) => (
+                              <div key={index} className="item-comprado">
+                                <div className="item-info">
+                                  <span className="item-nombre">{item.item_name}</span>
+                                  <span className="item-tipo">
+                                    {item.item_type === 'combo_personalizado' ? '🍔 Combo' : 
+                                     item.item_type === 'producto_personalizado' ? '🍕 Producto' : '📦 Item'}
+                                  </span>
+                                </div>
+                                <div className="item-precio">
+                                  <span className="cantidad">x{item.quantity}</span>
+                                  <span className="precio">${parseFloat(item.unit_price).toLocaleString('es-CO')}</span>
+                                </div>
+                                {item.creator_user && (
+                                  <div className="item-creator">
+                                    Creado por: <strong>{item.creator_user}</strong>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        
+                        <div className="compra-footer">
+                          {compra.points_used > 0 && (
+                            <div className="puntos-usados">
+                              <span className="puntos-icono">⭐</span>
+                              <span>Puntos usados: {compra.points_used}</span>
+                            </div>
+                          )}
+                          {compra.points_earned > 0 && (
+                            <div className="puntos-ganados">
+                              <span className="puntos-icono">💰</span>
+                              <span>Puntos ganados: {compra.points_earned}</span>
+                            </div>
+                          )}
+                          {compra.stripe_session_id && (
+                            <div className="stripe-session">
+                              <span className="session-label">ID de transacción:</span>
+                              <span className="session-id">{compra.stripe_session_id.substring(0, 20)}...</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Enlaces de administración - Solo para admins */}
           {user?.is_staff && (

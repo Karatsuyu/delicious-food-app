@@ -141,3 +141,259 @@
   z-index: 9999;
 }
 
+/* Estilos para reseñas */
+.resenas-section {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.resenas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 20px;
+}
+
+.resenas-header h2 {
+  color: #F28C1E;
+  font-size: 28px;
+  margin: 0;
+}
+
+.calificacion-promedio {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.promedio-numero {
+  font-size: 24px;
+  font-weight: bold;
+  color: #F28C1E;
+}
+
+.estrellas-promedio {
+  display: flex;
+  gap: 2px;
+}
+
+.estrella-llena {
+  color: #FFD700;
+  font-size: 18px;
+}
+
+.estrella-vacia {
+  color: #ddd;
+  font-size: 18px;
+}
+
+.total-resenas {
+  color: #666;
+  font-size: 14px;
+}
+
+.escribir-resena {
+  margin-bottom: 30px;
+}
+
+.btn-escribir-resena {
+  background: #F28C1E;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-escribir-resena:hover {
+  background: #e67b00;
+}
+
+.formulario-resena {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px solid #F28C1E;
+}
+
+.formulario-resena h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+}
+
+.calificacion-selector {
+  margin-bottom: 15px;
+}
+
+.calificacion-selector label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.estrellas-selector {
+  display: flex;
+  gap: 5px;
+}
+
+.estrella-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #ddd;
+  transition: color 0.2s ease;
+}
+
+.estrella-btn.activa {
+  color: #FFD700;
+}
+
+.estrella-btn:hover {
+  color: #FFD700;
+}
+
+.textarea-resena {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  margin-bottom: 15px;
+}
+
+.textarea-resena:focus {
+  outline: none;
+  border-color: #F28C1E;
+}
+
+.botones-resena {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-enviar {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-enviar:hover {
+  background: #45a049;
+}
+
+.btn-cancelar {
+  background: #f44336;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-cancelar:hover {
+  background: #da190b;
+}
+
+.lista-resenas {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.loading-resenas, .sin-resenas {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+.sin-resenas p {
+  margin: 8px 0;
+}
+
+.resena-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 20px;
+  background: #fafafa;
+  transition: box-shadow 0.3s ease;
+}
+
+.resena-item:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.resena-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.usuario-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.usuario-email {
+  font-weight: 600;
+  color: #333;
+}
+
+.estrellas-resena {
+  display: flex;
+  gap: 2px;
+}
+
+.fecha-resena {
+  color: #888;
+  font-size: 14px;
+}
+
+.resena-texto {
+  color: #555;
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+@media (max-width: 768px) {
+  .resenas-section {
+    margin: 20px;
+    padding: 20px;
+  }
+  
+  .resenas-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .resena-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .botones-resena {
+    flex-direction: column;
+  }
+}
+

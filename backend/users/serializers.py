@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import Profile
+from .models import Profile, PurchaseHistory, PurchaseItem
 
 User = get_user_model()
 
@@ -161,3 +161,21 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ['id', 'user', 'imagen']
         read_only_fields = ['user']
+
+
+class PurchaseItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PurchaseItem
+        fields = ['id', 'item_type', 'item_name', 'quantity', 'unit_price', 'creator_user']
+
+
+class PurchaseHistorySerializer(serializers.ModelSerializer):
+    items = PurchaseItemSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = PurchaseHistory
+        fields = [
+            'id', 'created_at', 'total_amount', 'points_earned', 
+            'points_used', 'stripe_session_id', 'items'
+        ]
+        read_only_fields = ['buyer', 'created_at']

@@ -51,24 +51,56 @@ class CreateCheckoutSessionView(APIView):
             metadata = {}
             combo_id = data.get('combo_personalizado_id')
             producto_personalizado_id = data.get('producto_personalizado_id')
+            points_used = data.get('points_used', 0)
             combo_obj = None
             producto_personalizado_obj = None
+
+            # Validar y procesar puntos utilizados
+            if points_used > 0:
+                if points_used > request.user.points:
+                    return Response({"error": "No tienes suficientes puntos"}, status=400)
+                
+                # Calcular el descuento en centavos
+                discount_amount = points_used * 100  # 1 punto = 1 COP = 100 centavos
+                
+                # Calcular el total actual
+                total_amount = sum(li["price_data"]["unit_amount"] * li["quantity"] for li in line_items)
+                
+                if discount_amount > total_amount:
+                    return Response({"error": "El descuento no puede ser mayor al total"}, status=400)
+                
+                # Aplicar descuento creando un item con precio negativo
+                if discount_amount > 0:
+                    line_items.append({
+                        "price_data": {
+                            "currency": "cop",
+                            "product_data": {"name": f"Descuento por {points_used} puntos"},
+                            "unit_amount": -discount_amount,
+                        },
+                        "quantity": 1,
+                    })
+                
+                metadata['points_used'] = str(points_used)
             
             if combo_id:
-                # Validar que el combo pertenezca al usuario y actualizar stripe_session_id posteriormente
+                # Validar que el combo exista (puede ser propio o de otro usuario)
                 from products.models import ComboPersonalizado
                 try:
-                    combo_obj = ComboPersonalizado.objects.get(id=combo_id, usuario=request.user)
+                    combo_obj = ComboPersonalizado.objects.get(id=combo_id)
                     metadata['combo_personalizado_id'] = str(combo_obj.id)
+                    metadata['buyer_id'] = str(request.user.id)
+                    metadata['creator_id'] = str(combo_obj.usuario.id)
                 except ComboPersonalizado.DoesNotExist:
                     return Response({"error": "combo_personalizado_id inválido"}, status=400)
             
             elif producto_personalizado_id:
-                # Validar que el producto personalizado pertenezca al usuario
+                # Validar que el producto personalizado exista (puede ser propio o de otro usuario)
                 from products.models import ProductoPersonalizado
                 try:
-                    producto_personalizado_obj = ProductoPersonalizado.objects.get(id=producto_personalizado_id, usuario=request.user)
+                    producto_personalizado_obj = ProductoPersonalizado.objects.get(id=producto_personalizado_id)
                     metadata['producto_personalizado_id'] = str(producto_personalizado_obj.id)
+                    metadata['buyer_id'] = str(request.user.id)
+                    metadata['creator_id'] = str(producto_personalizado_obj.usuario.id)
                 except ProductoPersonalizado.DoesNotExist:
                     return Response({"error": "producto_personalizado_id inválido"}, status=400)
 
@@ -114,38 +146,126 @@ def stripe_webhook(request):
 
     if event.get("type") == "checkout.session.completed":
         session = event["data"]["object"]
-        print("Pago completado para session:", session.get("id"))
+        session_id = session.get("id")
+        print(f"🎉 Pago completado para session: {session_id}")
         
-        # Procesar combo personalizado
-        combo_id = session.get("metadata", {}).get("combo_personalizado_id")
-        if combo_id:
-            from products.models import ComboPersonalizado
-            from django.utils import timezone
-            try:
-                combo_obj = ComboPersonalizado.objects.get(id=combo_id)
-                if not combo_obj.is_paid:
-                    combo_obj.is_paid = True
-                    combo_obj.paid_at = timezone.now()
-                    # Aumentar contador propio (veces_comprado se usa para compras de otros; aquí sólo confirmamos creación pagada)
-                    combo_obj.save(update_fields=["is_paid", "paid_at"])
-                    print(f"ComboPersonalizado {combo_id} marcado como pagado.")
-            except ComboPersonalizado.DoesNotExist:
-                print(f"ComboPersonalizado {combo_id} no encontrado para marcar pago.")
+        # Obtener metadata
+        metadata = session.get("metadata", {})
+        buyer_id = metadata.get("buyer_id")
+        creator_id = metadata.get("creator_id")
+        combo_id = metadata.get("combo_personalizado_id")
+        producto_personalizado_id = metadata.get("producto_personalizado_id")
         
-        # Procesar producto personalizado
-        producto_personalizado_id = session.get("metadata", {}).get("producto_personalizado_id")
-        if producto_personalizado_id:
-            from products.models import ProductoPersonalizado
-            from django.utils import timezone
-            try:
-                producto_obj = ProductoPersonalizado.objects.get(id=producto_personalizado_id)
-                if not producto_obj.is_paid:
-                    producto_obj.is_paid = True
-                    producto_obj.paid_at = timezone.now()
-                    producto_obj.save(update_fields=["is_paid", "paid_at"])
-                    print(f"ProductoPersonalizado {producto_personalizado_id} marcado como pagado.")
-            except ProductoPersonalizado.DoesNotExist:
-                print(f"ProductoPersonalizado {producto_personalizado_id} no encontrado para marcar pago.")
+        from django.contrib.auth import get_user_model
+        from users.models import PurchaseHistory, PurchaseItem
+        from django.utils import timezone
+        User = get_user_model()
+        
+        try:
+            # Obtener usuarios
+            buyer = User.objects.get(id=buyer_id) if buyer_id else None
+            creator = User.objects.get(id=creator_id) if creator_id else None
+            
+            # Crear registro de compra
+            purchase = PurchaseHistory.objects.create(
+                buyer=buyer,
+                total_amount=session.get("amount_total", 0) / 100,  # Convertir de centavos
+                stripe_session_id=session_id
+            )
+            
+            # Procesar combo personalizado
+            if combo_id:
+                from products.models import ComboPersonalizado
+                try:
+                    combo_obj = ComboPersonalizado.objects.get(id=combo_id)
+                    
+                    # Marcar como pagado si es del creador
+                    if str(combo_obj.usuario.id) == buyer_id:
+                        if not combo_obj.is_paid:
+                            combo_obj.is_paid = True
+                            combo_obj.paid_at = timezone.now()
+                            combo_obj.save(update_fields=["is_paid", "paid_at"])
+                            print(f"✅ Combo propio {combo_id} marcado como pagado")
+                    else:
+                        # Es compra de combo de otro usuario
+                        combo_obj.veces_comprado += 1
+                        combo_obj.save(update_fields=["veces_comprado"])
+                        
+                        # 🎯 OTORGAR PUNTOS AL CREADOR (10 puntos por compra)
+                        if creator and buyer and creator != buyer:
+                            creator.points += 10
+                            creator.save(update_fields=["points"])
+                            purchase.points_earned = 10
+                            purchase.save(update_fields=["points_earned"])
+                            print(f"🎁 {creator.username} ganó 10 puntos por venta de combo")
+                    
+                    # Crear item de compra
+                    PurchaseItem.objects.create(
+                        purchase=purchase,
+                        item_type='combo_personalizado',
+                        item_name=combo_obj.nombre or f"Combo #{combo_obj.id}",
+                        quantity=1,
+                        unit_price=combo_obj.precio_total,
+                        creator_user=combo_obj.usuario
+                    )
+                    
+                except ComboPersonalizado.DoesNotExist:
+                    print(f"❌ ComboPersonalizado {combo_id} no encontrado")
+            
+            # Procesar producto personalizado
+            elif producto_personalizado_id:
+                from products.models import ProductoPersonalizado
+                try:
+                    producto_obj = ProductoPersonalizado.objects.get(id=producto_personalizado_id)
+                    
+                    # Marcar como pagado si es del creador
+                    if str(producto_obj.usuario.id) == buyer_id:
+                        if not producto_obj.is_paid:
+                            producto_obj.is_paid = True
+                            producto_obj.paid_at = timezone.now()
+                            producto_obj.save(update_fields=["is_paid", "paid_at"])
+                            print(f"✅ Producto propio {producto_personalizado_id} marcado como pagado")
+                    else:
+                        # Es compra de producto de otro usuario
+                        producto_obj.veces_comprado += 1
+                        producto_obj.save(update_fields=["veces_comprado"])
+                        
+                        # 🎯 OTORGAR PUNTOS AL CREADOR (10 puntos por compra)
+                        if creator and buyer and creator != buyer:
+                            creator.points += 10
+                            creator.save(update_fields=["points"])
+                            purchase.points_earned = 10
+                            purchase.save(update_fields=["points_earned"])
+                            print(f"🎁 {creator.username} ganó 10 puntos por venta de producto")
+                    
+                    # Crear item de compra
+                    PurchaseItem.objects.create(
+                        purchase=purchase,
+                        item_type='producto_personalizado',
+                        item_name=producto_obj.nombre_personalizado,
+                        quantity=1,
+                        unit_price=producto_obj.precio_total,
+                        creator_user=producto_obj.usuario
+                    )
+                    
+                except ProductoPersonalizado.DoesNotExist:
+                    print(f"❌ ProductoPersonalizado {producto_personalizado_id} no encontrado")
+            
+            # 💳 DEDUCIR PUNTOS UTILIZADOS DEL COMPRADOR
+            points_used = metadata.get('points_used')
+            if points_used and buyer:
+                points_to_deduct = int(points_used)
+                if buyer.points >= points_to_deduct:
+                    buyer.points -= points_to_deduct
+                    buyer.save(update_fields=["points"])
+                    purchase.points_used = points_to_deduct
+                    purchase.save(update_fields=["points_used"])
+                    print(f"💰 Se dedujo {points_to_deduct} puntos de {buyer.username}")
+                else:
+                    print(f"⚠️ {buyer.username} no tenía suficientes puntos para deducir {points_to_deduct}")
+        
+        except Exception as e:
+            print(f"❌ Error procesando puntos: {e}")
 
     return HttpResponse(status=200)
 

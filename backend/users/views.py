@@ -10,9 +10,10 @@ from .serializers import (
     UserSerializer, 
     UserRegistrationSerializer, 
     UserProfileUpdateSerializer,
-    ChangePasswordSerializer
+    ChangePasswordSerializer,
+    PurchaseHistorySerializer
 )
-from .models import Profile
+from .models import Profile, PurchaseHistory
 from .serializers import ProfileSerializer
 
 User = get_user_model()
@@ -375,6 +376,34 @@ class UserViewSet(viewsets.ModelViewSet):
             'total_veces_comprados': total_veces_comprados,
             'cuenta_activa': user.is_active
         })
+
+    @action(detail=False, methods=['get'])
+    def purchase_history(self, request):
+        """Obtener historial de compras del usuario"""
+        user = request.user
+        purchases = PurchaseHistory.objects.filter(buyer=user)
+        serializer = PurchaseHistorySerializer(purchases, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get']) 
+    def points_balance(self, request):
+        """Obtener balance de puntos del usuario"""
+        user = request.user
+        return Response({
+            'points': user.points,
+            'username': user.username
+        })
+
+    @action(detail=False, methods=['patch'])
+    def update_profile(self, request):
+        """Actualizar información básica del perfil del usuario"""
+        user = request.user
+        serializer = UserProfileUpdateSerializer(user, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
