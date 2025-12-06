@@ -164,9 +164,15 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class PurchaseItemSerializer(serializers.ModelSerializer):
+    creator_username = serializers.CharField(source='creator_user.username', read_only=True)
+    
     class Meta:
         model = PurchaseItem
-        fields = ['id', 'item_type', 'item_name', 'quantity', 'unit_price', 'creator_user']
+        fields = [
+            'id', 'item_type', 'item_name', 'quantity', 'unit_price', 
+            'creator_user', 'creator_username',
+            'original_product_name', 'original_product_image', 'original_product_id'
+        ]
 
 
 class PurchaseHistorySerializer(serializers.ModelSerializer):

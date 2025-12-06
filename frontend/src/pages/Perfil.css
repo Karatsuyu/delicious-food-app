@@ -9,6 +9,7 @@
 .perfil-container {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .perfil-header {
@@ -34,9 +35,11 @@
 }
 
 .perfil-content {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(650px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .perfil-card {
@@ -45,6 +48,9 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  max-width: 100%;
+  flex-shrink: 0;
 }
 
 .perfil-card:hover {
@@ -89,8 +95,8 @@
 }
 
 .admin-links-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
 }
 
@@ -224,7 +230,7 @@
 
 /* Puntos Card */
 .puntos-card {
-  grid-column: 1 / -1;
+  /* Tarjeta de puntos con el mismo ancho que las demás */
 }
 
 .puntos-display {
@@ -353,7 +359,7 @@
 
 /* Combos Personalizados */
 .combos-card {
-  grid-column: 1 / -1;
+  /* Tarjeta de combos con el mismo ancho que las demás */
 }
 
 .combos-loading,
@@ -554,12 +560,8 @@
 
 @media (max-width: 768px) {
   .perfil-content {
-    grid-template-columns: 1fr;
-  }
-  
-  .puntos-card,
-  .combos-card {
-    grid-column: 1;
+    max-width: 100%;
+    padding: 0 1rem;
   }
   
   .stats-grid {
@@ -875,8 +877,7 @@
 
 /* Estilos para historial de compras */
 .historial-card {
-  grid-column: span 2;
-  max-width: none;
+  /* Tarjeta de historial con el mismo ancho que las demás */
 }
 
 .historial-loading, .historial-empty {
@@ -958,6 +959,25 @@
   padding: 0.8rem;
   margin-bottom: 0.6rem;
   display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.item-imagen {
+  flex-shrink: 0;
+}
+
+.producto-imagen-historial {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #f28c1e;
+}
+
+.item-detalles {
+  flex: 1;
+  display: flex;
   justify-content: space-between;
   align-items: center;
 }
@@ -977,6 +997,12 @@
 .item-tipo {
   font-size: 0.85rem;
   color: #666;
+}
+
+.item-producto-base {
+  font-size: 0.8rem;
+  color: #f28c1e;
+  font-style: italic;
 }
 
 .item-precio {
@@ -1053,9 +1079,7 @@
 }
 
 @media (max-width: 768px) {
-  .historial-card {
-    grid-column: span 1;
-  }
+  /* Estilos responsivos para el historial de compras */
   
   .compra-header {
     flex-direction: column;

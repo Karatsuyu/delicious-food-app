@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { authService, absolutizeMediaUrl } from '../api/api';
 import defaultAvatar from '../assets/icono-perfil-vacio-inicio.jpg';
 import api from '../api/api';
+import { getProductImageAndName } from '../utils/productImageMapper';
 import './Perfil.css';
 
 function Perfil() {
@@ -442,26 +443,57 @@ function Perfil() {
                         {compra.items && compra.items.length > 0 && (
                           <div className="compra-items">
                             <h4>Productos comprados:</h4>
-                            {compra.items.map((item, index) => (
-                              <div key={index} className="item-comprado">
-                                <div className="item-info">
-                                  <span className="item-nombre">{item.item_name}</span>
-                                  <span className="item-tipo">
-                                    {item.item_type === 'combo_personalizado' ? '🍔 Combo' : 
-                                     item.item_type === 'producto_personalizado' ? '🍕 Producto' : '📦 Item'}
-                                  </span>
-                                </div>
-                                <div className="item-precio">
-                                  <span className="cantidad">x{item.quantity}</span>
-                                  <span className="precio">${parseFloat(item.unit_price).toLocaleString('es-CO')}</span>
-                                </div>
-                                {item.creator_user && (
-                                  <div className="item-creator">
-                                    Creado por: <strong>{item.creator_user}</strong>
+                            {compra.items.map((item, index) => {
+                              // Debug: log del item para verificar datos
+                              console.log('Item del historial:', item);
+                              
+                              // Obtener información del producto original si está disponible
+                              const productInfo = item.original_product_id ? 
+                                getProductImageAndName(item.original_product_id) : 
+                                { imagen: null, nombre: item.original_product_name || null };
+                              
+                              console.log('Product Info:', productInfo);
+                              
+                              return (
+                                <div key={index} className="item-comprado">
+                                  {/* Imagen del producto original */}
+                                  {productInfo.imagen && (
+                                    <div className="item-imagen">
+                                      <img 
+                                        src={productInfo.imagen} 
+                                        alt={productInfo.nombre}
+                                        className="producto-imagen-historial"
+                                      />
+                                    </div>
+                                  )}
+                                  
+                                  <div className="item-detalles">
+                                    <div className="item-info">
+                                      <span className="item-nombre">{item.item_name}</span>
+                                      <span className="item-tipo">
+                                        {item.item_type === 'combo_personalizado' ? '🍔 Combo' : 
+                                         item.item_type === 'producto_personalizado' ? '🍕 Producto' : '📦 Item'}
+                                      </span>
+                                      {/* Mostrar producto base si está disponible */}
+                                      {(item.original_product_name || productInfo.nombre) && (
+                                        <span className="item-producto-base">
+                                          Basado en: <strong>{item.original_product_name || productInfo.nombre}</strong>
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="item-precio">
+                                      <span className="cantidad">x{item.quantity}</span>
+                                      <span className="precio">${parseFloat(item.unit_price).toLocaleString('es-CO')}</span>
+                                    </div>
+                                    {item.creator_username && (
+                                      <div className="item-creator">
+                                        Creado por: <strong>{item.creator_username}</strong>
+                                      </div>
+                                    )}
                                   </div>
-                                )}
-                              </div>
-                            ))}
+                                </div>
+                              );
+                            })}
                           </div>
                         )}
                         

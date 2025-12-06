@@ -170,7 +170,10 @@ function ProductosPublicos() {
       precio: parseFloat(producto.precio_total),
       imagen: productImage,
       es_personalizable: false,
-      producto_personalizado_id: producto.id
+      es_producto_personalizado: true, // ¡AGREGADO! Para que el checkout lo detecte
+      producto_personalizado_id: producto.id,
+      creator_user_id: producto.usuario_info?.id, // ID del creador para otorgar puntos
+      creator_username: producto.usuario_info?.username // Nombre del creador
     };
     addToCart(productoData);
   };

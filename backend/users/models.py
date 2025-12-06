@@ -60,5 +60,10 @@ class PurchaseItem(models.Model):
         help_text="Usuario que creó este producto/combo personalizado (para dar puntos)"
     )
     
+    # Información del producto original
+    original_product_name = models.CharField(max_length=200, blank=True, null=True, help_text="Nombre del producto base original")
+    original_product_image = models.CharField(max_length=500, blank=True, null=True, help_text="URL/path de la imagen del producto original")
+    original_product_id = models.CharField(max_length=50, blank=True, null=True, help_text="ID del producto base original")
+    
     def __str__(self):
         return f"{self.item_name} x{self.quantity}"

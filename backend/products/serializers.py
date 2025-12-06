@@ -232,7 +232,8 @@ class ProductoPersonalizadoSerializer(serializers.ModelSerializer):
         fields = [
             "id", "usuario", "usuario_info", "nombre_personalizado", "producto_base", 
             "producto_base_detalle", "ingredientes", "ingredientes_detalle", "precio_total", 
-            "creado_en", "publicado", "veces_comprado", "is_paid", "stripe_session_id", "paid_at"
+            "creado_en", "publicado", "veces_comprado", "is_paid", "stripe_session_id", "paid_at",
+            "local_product_id", "local_product_name", "local_product_image"
         ]
         read_only_fields = ["usuario", "creado_en", "veces_comprado", "is_paid", "stripe_session_id", "paid_at"]
 

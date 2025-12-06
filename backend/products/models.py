@@ -92,7 +92,11 @@ class ProductoPersonalizado(models.Model):
         related_name="productos_personalizados"
     )
     nombre_personalizado = models.CharField(max_length=200, help_text="Nombre dado por el usuario al producto personalizado")
-    producto_base = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name="personalizaciones")
+    producto_base = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name="personalizaciones", null=True, blank=True)
+    # Campos para productos locales (hardcodeados en frontend)
+    local_product_id = models.CharField(max_length=50, blank=True, null=True, help_text="ID del producto local (ej: hamburguesa1)")
+    local_product_name = models.CharField(max_length=200, blank=True, null=True, help_text="Nombre del producto base local")
+    local_product_image = models.CharField(max_length=500, blank=True, null=True, help_text="Path de la imagen del producto local")
     ingredientes = models.ManyToManyField(
         Ingrediente,
         through="ProductoPersonalizadoIngrediente",

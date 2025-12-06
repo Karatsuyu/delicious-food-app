@@ -56,7 +56,10 @@ function Checkout() {
     const loadUserPoints = async () => {
       try {
         const response = await api.get('/users/users/points_balance/');
-        setUserPoints(response.data.points || 0);
+        const points = response.data.points || 0;
+        setUserPoints(points);
+        // Mostrar sección de puntos si el usuario tiene puntos
+        setShowPointsSection(points > 0);
       } catch (error) {
         console.error('Error cargando puntos:', error);
       }
@@ -206,16 +209,33 @@ function Checkout() {
       // Detectar producto personalizado propio para pasar su ID al backend (solo uno por sesión)
       const customProducto = (cartItems || []).find(ci => ci.es_producto_personalizado && ci.producto_personalizado_id);
 
+      // Detectar TODOS los productos personalizados (propios y de otros usuarios)
+      const productosPersonalizados = (cartItems || []).filter(ci => ci.es_producto_personalizado && ci.producto_personalizado_id);
+      
       console.log('[Checkout] Payload enviado a backend:', { items });
+      console.log('[Checkout] Productos personalizados detectados:', productosPersonalizados.length);
       
       // Determinar qué metadata enviar (combo o producto personalizado)
       let bodyPayload = { items };
+      
       if (customCombo) {
         bodyPayload.combo_personalizado_id = customCombo.comboPersonalizadoId;
         console.log('[Checkout] Enviando combo_personalizado_id:', customCombo.comboPersonalizadoId);
-      } else if (customProducto) {
+      } else if (customProducto && productosPersonalizados.length === 1) {
+        // Solo un producto personalizado (lógica original)
         bodyPayload.producto_personalizado_id = customProducto.producto_personalizado_id;
         console.log('[Checkout] Enviando producto_personalizado_id:', customProducto.producto_personalizado_id);
+      } else if (productosPersonalizados.length > 0) {
+        // Múltiples productos personalizados - enviar lista en metadata
+        bodyPayload.productos_personalizados = productosPersonalizados.map(p => ({
+          producto_personalizado_id: p.producto_personalizado_id,
+          creator_user_id: p.creator_user_id,
+          creator_username: p.creator_username,
+          nombre: p.nombre,
+          precio: p.precio,
+          cantidad: p.cantidad || 1
+        }));
+        console.log('[Checkout] Enviando productos_personalizados:', bodyPayload.productos_personalizados);
       }
 
       // Incluir puntos utilizados si hay alguno
