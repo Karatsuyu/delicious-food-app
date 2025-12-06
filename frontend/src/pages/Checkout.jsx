@@ -39,6 +39,11 @@ function Checkout() {
       return;
     }
 
+    // Mostrar información sobre claves de prueba si aplica
+    if (STRIPE_KEY && STRIPE_KEY.startsWith('pk_test_')) {
+      console.log('🔧 Usando claves de prueba de Stripe para desarrollo');
+    }
+
     try {
       setLoading(true);
       setError('');
