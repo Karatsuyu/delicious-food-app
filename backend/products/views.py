@@ -295,6 +295,45 @@ class ProductoPersonalizadoViewSet(viewsets.ModelViewSet):
         producto = serializer.save(usuario=self.request.user)
         print(f"💾 Precio guardado en BD: {producto.precio_total}")
         
+        # 🎯 GARANTIZAR INGREDIENTES: Todos los productos personalizados deben tener ingredientes
+        # para que se muestren correctamente en la página de productos de la comunidad
+        try:
+            ingredientes_enviados = self.request.data.get('ingredientes', [])
+            ingredientes_asignados = 0
+            
+            if ingredientes_enviados and isinstance(ingredientes_enviados, list):
+                # Si se enviaron ingredientes específicos desde el frontend, usarlos
+                from .models import Ingrediente, ProductoPersonalizadoIngrediente
+                for ingrediente_id in ingredientes_enviados:
+                    try:
+                        ingrediente = Ingrediente.objects.get(id=ingrediente_id)
+                        rel, created = ProductoPersonalizadoIngrediente.objects.get_or_create(
+                            producto_personalizado=producto,
+                            ingrediente=ingrediente
+                        )
+                        if created:
+                            ingredientes_asignados += 1
+                    except (Ingrediente.DoesNotExist, ValueError):
+                        continue
+                print(f"🧄 Ingredientes específicos asignados: {ingredientes_asignados}")
+            
+            # Si no se asignaron ingredientes o fueron muy pocos, agregar ingredientes por defecto
+            if ingredientes_asignados == 0:
+                from .models import Ingrediente, ProductoPersonalizadoIngrediente
+                ingredientes_default = Ingrediente.objects.all()[:4]  # Primeros 4 ingredientes comunes
+                for ingrediente in ingredientes_default:
+                    rel, created = ProductoPersonalizadoIngrediente.objects.get_or_create(
+                        producto_personalizado=producto,
+                        ingrediente=ingrediente
+                    )
+                    if created:
+                        ingredientes_asignados += 1
+                print(f"🧄 Ingredientes por defecto asignados: {ingredientes_asignados}")
+                
+        except Exception as e:
+            print(f"⚠️ Error asignando ingredientes automáticamente: {e}")
+            # Si hay un error, no fallar la creación del producto
+        
         return producto
 
     @action(detail=False, methods=['post'])
