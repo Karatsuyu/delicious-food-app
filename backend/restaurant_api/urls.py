@@ -2,10 +2,32 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
 from rest_framework_simplejwt.views import TokenRefreshView
 from users.views import CustomTokenObtainPairView
 
+def api_status(request):
+    """Vista simple para la raíz que muestra el status de la API"""
+    return JsonResponse({
+        'status': 'online',
+        'message': 'Delicious Food API is running!',
+        'version': '1.0.0',
+        'endpoints': {
+            'api': '/api/',
+            'admin': '/admin/',
+            'products': '/api/products/',
+            'users': '/api/users/',
+            'orders': '/api/orders/',
+            'reviews': '/api/reviews/',
+            'payments': '/api/payments/',
+            'notifications': '/api/notification/'
+        }
+    })
+
 urlpatterns = [
+    # Página de bienvenida en la raíz
+    path('', api_status, name='api_status'),
+    
     path('admin/', admin.site.urls),
     
     # Rutas de autenticación
