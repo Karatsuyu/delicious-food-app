@@ -1,8 +1,9 @@
 import axios from "axios";
 
 // Base URLs centralizados para reuso
-export const API_BASE_URL = "http://127.0.0.1:8000/api/";
-export const API_ORIGIN = API_BASE_URL.replace(/\/?api\/?$/i, "");
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
+export const API_BASE_URL = `${BACKEND_URL}/api/`;
+export const API_ORIGIN = BACKEND_URL;
 
 // Convierte una ruta /media/... o relativa en URL absoluta al backend
 export const absolutizeMediaUrl = (url) => {
