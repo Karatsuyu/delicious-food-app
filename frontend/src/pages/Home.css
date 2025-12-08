@@ -17,12 +17,8 @@
    =========================================== */
 
 .banner-section {
-  margin-top: 0;
+  margin-top: 72px; /* Exactamente la altura del header */
   padding-top: 0;
-}
-
-.banner-section{
-  margin-top: -20px;
 }
 
 .banner-container {
@@ -454,4 +450,113 @@ footer, .footer {
 
 @media (prefers-reduced-motion: reduce) {
   .reviews-marquee-group { animation: none; }
+}
+
+/* ========================================= 
+   MOBILE RESPONSIVE (Solo para móvil - no afecta PC)
+   ========================================= */
+@media (max-width: 768px) {
+  
+  /* Banner ajustes para móvil */
+  .banner-section {
+    margin-top: 60px; /* Ajustado al header móvil más pequeño */
+  }
+  
+  .banner-container {
+    height: 250px; /* Más pequeño para móvil */
+  }
+  
+  .banner-arrow {
+    font-size: 1.2rem; /* Más pequeño para móvil */
+    padding: 0.3rem;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .banner-arrow.left {
+    left: 8px;
+  }
+  
+  .banner-arrow.right {
+    right: 8px;
+  }
+  
+  .banner-dots {
+    bottom: 8px;
+  }
+  
+  .dot {
+    width: 8px;
+    height: 8px;
+    margin: 0 3px;
+  }
+  
+  /* Categories ajustes para móvil */
+  .categories-section {
+    padding: 15px 10px;
+  }
+  
+  .categories-container1 {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .category-item1, .category-item2, .category-item3, .category-item4, .category-item5 {
+    margin-right: 0; /* Quitar margin negativo en móvil */
+    margin-bottom: 20px;
+    width: 100%;
+    text-align: center;
+    top: 0; /* Resetear posición para móvil */
+  }
+  
+  .hamburguesa-img, .pizza-img, .pollo-img, .perro-img, .postre-img {
+    width: 90%; /* Más pequeño para móvil */
+    max-width: 300px;
+    height: auto;
+  }
+  
+  .category-item1 p, .category-item2 p, .category-item3 p, .category-item4 p, .category-item5 p {
+    margin-top: -30px; /* Menos overlap en móvil */
+    font-size: 16px;
+  }
+  
+  /* Reviews ajustes para móvil */
+  .reviews-section {
+    padding: 20px 10px;
+  }
+  
+  .review-card {
+    flex: 0 0 85%; /* Más ancho para móvil */
+    min-width: 280px;
+  }
+  
+  .review-avatar {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .review-text {
+    font-size: 16px;
+  }
+  
+  /* Sección view-all para móvil */
+  .view-all-container {
+    padding: 20px 10px;
+  }
+  
+  .btn-view-all {
+    padding: 10px 30px;
+    font-size: 14px;
+  }
+  
+  /* Featured section para móvil */
+  .featured-section {
+    padding: 15px 10px;
+  }
+  
 }

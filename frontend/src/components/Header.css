@@ -235,20 +235,53 @@
   color: #f28c1e;
 }
 
-/* Responsive */
+/* ========================================= 
+   MOBILE RESPONSIVE (Solo para móvil - no afecta PC)
+   ========================================= */
 @media (max-width: 768px) {
   .header {
-    padding: 15px 20px;
+    height: 60px; /* Más compacto para móvil */
+    padding: 8px 15px;
+  }
+  
+  .header-container {
+    padding: 5px 15px; /* Menos padding para móvil */
+  }
+
+  .logo-image {
+    height: 70px; /* Logo más pequeño para móvil */
+    top: -18px; /* Reajustado para el nuevo tamaño */
+  }
+
+  .lupa-image {
+    height: 35px; /* Más pequeño para móvil */
+  }
+
+  .carrito-image {
+    height: 35px; /* Más pequeño para móvil */
+    top: -5px;
   }
 
   .menu-icon {
     display: block;
+    font-size: 22px; /* Ligeramente más pequeño */
+    top: -25px; /* Ajustado para móvil */
+  }
+
+  .icon-btn {
+    top: -15px; /* Reajustado para móvil */
+  }
+
+  .btn-signin, .btn-register {
+    top: -20px; /* Reajustado para móvil */
+    padding: 6px 12px; /* Más compacto */
+    font-size: 13px;
   }
 
   .nav-menu {
     display: none;
     position: absolute;
-    top: 70px;
+    top: 60px; /* Ajustado al nuevo height del header */
     left: 0;
     right: 0;
     background: white;
@@ -263,6 +296,7 @@
 
   .auth-buttons {
     flex-direction: column;
+    gap: 8px;
   }
 }
 

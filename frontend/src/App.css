@@ -23,7 +23,7 @@ html, body {
 
 .main-content {
   flex: 1;
-  padding-top: 80px;
+  padding-top: 0px; /* Eliminando el padding extra */
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
@@ -41,6 +41,19 @@ html, body {
 @media (max-width: 768px) {
   .main-content {
     padding-top: 70px;
+  }
+  
+  .container {
+    padding: 0 15px;
+  }
+}
+
+/* ========================================= 
+   MOBILE RESPONSIVE (Solo para móvil - no afecta PC)
+   ========================================= */
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 0px; /* Sin padding extra en móvil */
   }
   
   .container {
