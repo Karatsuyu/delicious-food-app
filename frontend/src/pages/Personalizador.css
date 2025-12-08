@@ -738,9 +738,17 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+  /* Ajustar container para que no lo tape el header */
+  .personalizador-container {
+    padding: 10px;
+    margin-top: 80px !important; /* Bajar el contenido para que no lo tape el header */
+    padding-top: 10px !important;
+  }
+
   .personalizador-content {
     grid-template-columns: 1fr;
     gap: 20px;
+    padding: 20px;
   }
 
   .ingredientes-grid,
@@ -752,12 +760,11 @@
     position: static;
   }
 
-  .personalizador-container {
-    padding: 10px;
-  }
-
-  .personalizador-content {
-    padding: 20px;
+  /* Asegurar que el botón volver sea visible */
+  .back-button {
+    margin-top: 10px !important;
+    margin-bottom: 20px !important;
+    z-index: 1000 !important;
   }
 
   @keyframes fallToSummary {
