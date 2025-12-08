@@ -470,18 +470,24 @@ footer, .footer {
     margin-bottom: 0 !important;
     position: relative;
     z-index: 1;
+    height: 300px !important; /* Altura fija para evitar interferencia */
+    overflow: hidden; /* Evitar desbordamiento */
   }
 
   .banner-container {
     height: 300px; /* Altura óptima para móvil */
     width: 100%;
     overflow: hidden;
+    position: relative; /* Contener elementos hijos */
+    z-index: 1; /* Z-index bajo para no interferir */
   }
 
   .banner-slide {
-    height: 100%; /* Asegurar que ocupe toda la altura */
+    height: 300px !important; /* Altura fija para evitar desbordamiento */
     width: 100%;
-    top: 0; left: 0; right: 0; /* asegurar posicionamiento */
+    top: 0; left: 0; right: 0;
+    position: absolute; /* Posicionamiento absoluto dentro del contenedor */
+    overflow: hidden; /* Evitar que se desborde */
   }
 
   .banner-image {
@@ -530,6 +536,9 @@ footer, .footer {
     margin: 0 !important;
     margin-top: -120px !important; /* Subir mucho más para que quede casi debajo del carrusel */
     padding-top: 0px !important; /* Sin padding superior */
+    position: relative; /* Para que esté por encima del banner */
+    z-index: 10; /* Z-index alto para que los clics funcionen */
+    pointer-events: auto; /* Asegurar que sea clicable */
   }
   
   .section-title-custom {
