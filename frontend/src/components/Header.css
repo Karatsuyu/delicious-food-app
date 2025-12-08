@@ -240,48 +240,83 @@
    ========================================= */
 @media (max-width: 768px) {
   .header {
-    height: 60px; /* Más compacto para móvil */
-    padding: 8px 15px;
+    height: 70px; /* Más altura para acomodar elementos */
+    padding: 8px 10px; /* Menos padding lateral */
+    display: flex;
+    align-items: center; /* Centrar verticalmente todo el header */
   }
   
   .header-container {
-    padding: 5px 15px; /* Menos padding para móvil */
+    padding: 5px 10px; /* Menos padding para móvil */
+    align-items: center;
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+
+  .logo-container {
+    justify-content: flex-start; /* Alineado a la izquierda */
+    margin-left: -5px; /* Más a la izquierda */
+    display: flex;
+    align-items: center; /* Centrar verticalmente logo y menú */
   }
 
   .logo-image {
-    height: 70px; /* Logo más pequeño para móvil */
-    top: -18px; /* Reajustado para el nuevo tamaño */
-  }
-
-  .lupa-image {
-    height: 35px; /* Más pequeño para móvil */
-  }
-
-  .carrito-image {
-    height: 35px; /* Más pequeño para móvil */
-    top: -5px;
+    height: 85px; /* Logo aún más grande para móvil */
+    top: 0px; /* Centrado verticalmente */
+    left: -5px; /* Más pegado al menú lateral */
   }
 
   .menu-icon {
     display: block;
-    font-size: 22px; /* Ligeramente más pequeño */
-    top: -25px; /* Ajustado para móvil */
+    font-size: 24px; /* Ligeramente más grande */
+    top: 0px; /* Centrado verticalmente igual que logo */
+    left: 0px; /* Más a la izquierda */
+    position: relative;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 100%; /* Ocupar toda la altura del header */
+  }
+
+  .lupa-image {
+    height: 35px; /* Mismo tamaño que carrito */
+    top: 0px; /* Centrado verticalmente */
+  }
+
+  .carrito-image {
+    height: 35px; /* Mismo tamaño que lupa */
+    top: 0px; /* Centrado verticalmente */
   }
 
   .icon-btn {
-    top: -15px; /* Reajustado para móvil */
+    top: 0px; /* Centrado verticalmente */
   }
 
-  .btn-signin, .btn-register {
-    top: -20px; /* Reajustado para móvil */
-    padding: 6px 12px; /* Más compacto */
-    font-size: 13px;
+  .auth-buttons {
+    flex-direction: row; /* Botones en la misma línea */
+    gap: 5px;
+    align-items: center;
+  }
+
+  .btn-register {
+    display: none; /* Ocultar botón de registrar solo en móvil */
+  }
+
+  .btn-signin {
+    top: 0px; /* Centrado verticalmente con los iconos */
+    padding: 5px 10px; /* Más compacto */
+    font-size: 12px;
+    white-space: nowrap; /* No romper texto */
   }
 
   .nav-menu {
     display: none;
     position: absolute;
-    top: 60px; /* Ajustado al nuevo height del header */
+    top: 70px; /* Ajustado al height del header móvil */
     left: 0;
     right: 0;
     background: white;

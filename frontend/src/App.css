@@ -37,17 +37,6 @@ html, body {
   padding: 0 20px;
 }
 
-/* Mobile First - Base styles para móvil */
-@media (max-width: 768px) {
-  .main-content {
-    padding-top: 70px;
-  }
-  
-  .container {
-    padding: 0 15px;
-  }
-}
-
 /* ========================================= 
    MOBILE RESPONSIVE (Solo para móvil - no afecta PC)
    ========================================= */

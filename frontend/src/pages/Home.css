@@ -457,13 +457,39 @@ footer, .footer {
    ========================================= */
 @media (max-width: 768px) {
   
-  /* Banner ajustes para móvil */
-  .banner-section {
-    margin-top: 60px; /* Ajustado al header móvil más pequeño */
+  /* Home container mobile */
+  .home {
+    margin: 0 !important;
+    padding-top: 70px !important; /* Reservar espacio del header fijo */
   }
-  
+
+  /* Banner - sin offsets conflictivos */
+  .banner-section {
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+    position: relative;
+    z-index: 1;
+  }
+
   .banner-container {
-    height: 250px; /* Más pequeño para móvil */
+    height: 300px; /* Altura óptima para móvil */
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .banner-slide {
+    height: 100%; /* Asegurar que ocupe toda la altura */
+    width: 100%;
+    top: 0; left: 0; right: 0; /* asegurar posicionamiento */
+  }
+
+  .banner-image {
+    height: 100%;
+    width: 100%;
+    object-fit: contain; /* Mostrar imagen completa sin cortes */
+    object-position: top center !important; /* Alinear la imagen al tope para quitar franja blanca */
+    display: block;
   }
   
   .banner-arrow {
@@ -475,6 +501,8 @@ footer, .footer {
     display: flex;
     align-items: center;
     justify-content: center;
+    top: 15% !important; /* Subir aún más las flechas */
+    transform: translateY(-50%) !important; /* Ajuste perfecto al centro */
   }
   
   .banner-arrow.left {
@@ -495,9 +523,19 @@ footer, .footer {
     margin: 0 3px;
   }
   
-  /* Categories ajustes para móvil */
+  /* Categories ajustes para móvil - casi debajo del carrusel */
   .categories-section {
-    padding: 15px 10px;
+    padding: 0px 10px !important; /* Eliminar padding superior */
+    text-align: center; /* Centrar la sección completa */
+    margin: 0 !important;
+    margin-top: -120px !important; /* Subir mucho más para que quede casi debajo del carrusel */
+    padding-top: 0px !important; /* Sin padding superior */
+  }
+  
+  .section-title-custom {
+    display: block; /* Para que el centrado funcione */
+    margin: 0 auto 20px auto; /* Centrado y margen inferior */
+    text-align: center;
   }
   
   .categories-container1 {
@@ -512,17 +550,29 @@ footer, .footer {
     width: 100%;
     text-align: center;
     top: 0; /* Resetear posición para móvil */
+    position: relative; /* Resetear position */
   }
   
   .hamburguesa-img, .pizza-img, .pollo-img, .perro-img, .postre-img {
-    width: 90%; /* Más pequeño para móvil */
-    max-width: 300px;
+    width: 90%; /* Tamaño consistente para móvil */
+    max-width: 280px; /* Máximo más pequeño */
+    height: auto;
+    margin: 0 auto; /* Centrado */
+    display: block; /* Para que el centrado funcione */
+  }
+  
+  /* Específico para hamburguesas para que se vea igual */
+  .hamburguesa-img {
+    width: 90%;
+    max-width: 280px;
     height: auto;
   }
   
   .category-item1 p, .category-item2 p, .category-item3 p, .category-item4 p, .category-item5 p {
-    margin-top: -30px; /* Menos overlap en móvil */
+    margin-top: -25px; /* Overlap consistente en móvil */
     font-size: 16px;
+    font-weight: bold;
+    position: relative;
   }
   
   /* Reviews ajustes para móvil */
