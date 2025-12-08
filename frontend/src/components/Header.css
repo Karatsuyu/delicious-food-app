@@ -469,20 +469,20 @@
    =========================================== */
 @media (max-width: 767px) {
   .header {
-    height: 55px;
+    height: 75px; /* Aumentado de 55px */
   }
   
   .header-container {
-    padding: 5px 10px;
+    padding: 10px 15px; /* Aumentado de 5px 10px */
   }
   
   .logo-image {
-    height: 70px;
-    top: -12px;
+    height: 85px; /* Aumentado de 70px */
+    top: -18px; /* Ajustado */
   }
   
   .lupa-image {
-    height: 40px;
+    height: 50px; /* Aumentado de 40px */
   }
   
   .nav-links {
@@ -534,20 +534,20 @@
    =========================================== */
 @media (min-width: 768px) and (max-width: 1024px) {
   .header {
-    height: 65px;
+    height: 80px; /* Aumentado de 65px */
   }
   
   .header-container {
-    padding: 8px 20px;
+    padding: 12px 25px; /* Aumentado de 8px 20px */
   }
   
   .logo-image {
-    height: 100px;
-    top: -20px;
+    height: 110px; /* Aumentado de 100px */
+    top: -25px; /* Ajustado */
   }
   
   .lupa-image {
-    height: 60px;
+    height: 70px; /* Aumentado de 60px */
   }
   
   .nav-links {
@@ -580,20 +580,20 @@
    =========================================== */
 @media (min-width: 1025px) {
   .header {
-    height: 72px;
+    height: 85px; /* Aumentado de 72px */
   }
   
   .header-container {
-    padding: 10px 30px;
+    padding: 15px 35px; /* Aumentado de 10px 30px */
   }
   
   .logo-image {
-    height: 120px;
-    top: -28px;
+    height: 130px; /* Aumentado de 120px */
+    top: -32px; /* Ajustado */
   }
   
   .lupa-image {
-    height: 80px;
+    height: 45px; /* Reducido de 80px para mejor proporción */
   }
   
   .nav-links {
@@ -628,12 +628,6 @@
   .header-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 10px 40px;
+    padding: 15px 50px; /* Aumentado */
   }
-}
-}
-
-.btn-admin:hover {
-  background: #7B1FA2;
-  color: white;
 }
