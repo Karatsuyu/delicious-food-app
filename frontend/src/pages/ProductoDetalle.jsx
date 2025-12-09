@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import api from '../api/api';
+import axios from 'axios';
 
 // Importar imágenes
 import hamburguesa1 from '../assets/hamburguesa1.png';
@@ -70,6 +71,61 @@ const ProductoDetalle = () => {
   const [tipoPolloSeleccionado, setTipoPolloSeleccionado] = useState('alitas'); 
   const { addToCart } = useCart();
   const { user } = useContext(AuthContext);
+
+  // Mapeo de IDs locales a IDs de base de datos
+  const productIdMapping = {
+    'hamburguesa1': 1,
+    'hamburguesa2': 13,
+    'hamburguesa3': 14,
+    'hamburguesa4': 15,
+    'hamburguesa5': 16,
+    'hamburguesa6': 17,
+    'hamburguesa7': 18, // BBQ Crunch Burger
+    'hamburguesa8': 19, // Double Smash
+    'pizza1': 2,
+    'pizza2': 6,
+    'pizza3': 20,
+    'pizza4': 21,
+    'pizza5': 22,
+    'pizza6': 23,
+    'pizza7': 24, // Pepperoni Lovers
+    'pizza8': 25, // Pizza Campesina
+    'pollo1': 3,
+    'pollo2': 26,
+    'pollo3': 27,
+    'pollo4': 28,
+    'pollo5': 29,
+    'pollo6': 30,
+    'perro1': 4,
+    'perro2': 31,
+    'perro3': 32,
+    'perro4': 42,
+    'perro5': 43,
+    'perro6': 63, // Perro Especial
+    'postres1': 5,
+    'postres2': 44,
+    'postres3': 45,
+    'postres4': 46,
+    'postres5': 47,
+    'postres6': 48,
+    'postres7': 49,
+    'postres8': 50,
+    'postres9': 64, // Brownie de Chocolate
+    'postres10': 65, // Cheesecake
+    'postres11': 66, // Helado de Vainilla
+    'papas1': 51,
+    'papas2': 52,
+    'papas3': 53,
+    'bebida1': 54,
+    'bebida2': 55,
+    'bebida3': 56,
+    'bebida4': 57,
+    'bebida5': 58,
+    'bebida6': 59,
+    'bebida7': 60,
+    'bebida8': 61,
+    'bebida9': 62
+  };
   
   // Estados para reseñas
   const [reseñas, setReseñas] = useState([]);
@@ -537,7 +593,11 @@ const tiposPollo = {
 
     if (id) {
       cargarProducto();
-      cargarReseñas();
+      // Cargar reseñas solo si tenemos el mapeo del producto
+      const productoIdBD = productIdMapping[id];
+      if (productoIdBD) {
+        cargarReseñas(productoIdBD);
+      }
     }
   }, [id]);
 
@@ -610,9 +670,13 @@ const tiposPollo = {
   };
 
   // Funciones para manejar reseñas
-  const cargarReseñas = async () => {
+  const cargarReseñas = async (productoId) => {
     try {
-      const response = await api.get(`reviews/?producto=${id}`);
+      const response = await axios.get(`http://127.0.0.1:8000/api/reviews/?producto=${productoId}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       setReseñas(response.data);
     } catch (error) {
       console.error('Error cargando reseñas:', error);
@@ -633,10 +697,23 @@ const tiposPollo = {
     }
 
     try {
-      const response = await api.post('reviews/', {
-        producto: id,
+      const token = localStorage.getItem('access_token');
+      const productoIdBD = productIdMapping[id];
+      
+      if (!productoIdBD) {
+        alert('Error: No se pudo identificar el producto');
+        return;
+      }
+      
+      const response = await axios.post('http://127.0.0.1:8000/api/reviews/', {
+        producto: productoIdBD,
         texto: nuevaReseña.texto,
-        calificacion: nuevaReseña.calificacion
+        calificacion: parseInt(nuevaReseña.calificacion)
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
 
       // Agregar la nueva reseña al estado local
@@ -646,11 +723,22 @@ const tiposPollo = {
       alert('¡Reseña enviada exitosamente!');
     } catch (error) {
       console.error('Error enviando reseña:', error);
-      if (error.response?.data?.detail) {
-        alert(error.response.data.detail);
-      } else {
-        alert('Error enviando la reseña. Intenta nuevamente.');
+      console.error('Error response:', error.response);
+      console.error('Error data:', error.response?.data);
+      
+      let errorMessage = 'Error enviando la reseña. Intenta nuevamente.';
+      
+      if (error.response?.data) {
+        if (error.response.data.error) {
+          errorMessage = error.response.data.error;
+        } else if (error.response.data.detail) {
+          errorMessage = error.response.data.detail;
+        } else if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data;
+        }
       }
+      
+      alert(errorMessage);
     }
   };
 
@@ -851,9 +939,33 @@ const tiposPollo = {
               <div key={reseña.id} className="resena-item">
                 <div className="resena-header">
                   <div className="usuario-info">
-                    <span className="usuario-email">{reseña.usuario_email}</span>
-                    <div className="estrellas-resena">
-                      {renderEstrellas(reseña.calificacion)}
+                    <div className="usuario-avatar-container">
+                      {reseña.usuario_profile_image ? (
+                        <img 
+                          src={reseña.usuario_profile_image} 
+                          alt={`Perfil de ${reseña.usuario_username || reseña.usuario_email}`}
+                          className="usuario-avatar"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : (
+                        <div className="usuario-avatar-default">
+                          {(reseña.usuario_username || reseña.usuario_email).charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div className="usuario-avatar-fallback" style={{display: 'none'}}>
+                        {(reseña.usuario_username || reseña.usuario_email).charAt(0).toUpperCase()}
+                      </div>
+                    </div>
+                    <div className="usuario-datos">
+                      <span className="usuario-nombre">
+                        {reseña.usuario_username || reseña.usuario_email}
+                      </span>
+                      <div className="estrellas-resena">
+                        {renderEstrellas(reseña.calificacion)}
+                      </div>
                     </div>
                   </div>
                   <span className="fecha-resena">

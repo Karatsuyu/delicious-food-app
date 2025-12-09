@@ -4,12 +4,68 @@ import { AuthContext } from '../context/AuthContext';
 import { authService, absolutizeMediaUrl } from '../api/api';
 import defaultAvatar from '../assets/icono-perfil-vacio-inicio.jpg';
 import api from '../api/api';
+import axios from 'axios';
 import { getProductImageAndName } from '../utils/productImageMapper';
 import './Perfil.css';
 
 function Perfil() {
   const { user, isAuthenticated, loading, updateUser } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  // Mapeo de IDs locales a IDs de base de datos
+  const productIdMapping = {
+    'hamburguesa1': 1,
+    'hamburguesa2': 13,
+    'hamburguesa3': 14,
+    'hamburguesa4': 15,
+    'hamburguesa5': 16,
+    'hamburguesa6': 17,
+    'hamburguesa7': 18, // BBQ Crunch Burger
+    'hamburguesa8': 19, // Double Smash
+    'pizza1': 2,
+    'pizza2': 6,
+    'pizza3': 20,
+    'pizza4': 21,
+    'pizza5': 22,
+    'pizza6': 23,
+    'pizza7': 24, // Pepperoni Lovers
+    'pizza8': 25, // Pizza Campesina
+    'pollo1': 3,
+    'pollo2': 26,
+    'pollo3': 27,
+    'pollo4': 28,
+    'pollo5': 29,
+    'pollo6': 30,
+    'perro1': 4,
+    'perro2': 31,
+    'perro3': 32,
+    'perro4': 42,
+    'perro5': 43,
+    'perro6': 63, // Perro Especial
+    'postres1': 5,
+    'postres2': 44,
+    'postres3': 45,
+    'postres4': 46,
+    'postres5': 47,
+    'postres6': 48,
+    'postres7': 49,
+    'postres8': 50,
+    'postres9': 64, // Brownie de Chocolate
+    'postres10': 65, // Cheesecake
+    'postres11': 66, // Helado de Vainilla
+    'papas1': 51,
+    'papas2': 52,
+    'papas3': 53,
+    'bebida1': 54,
+    'bebida2': 55,
+    'bebida3': 56,
+    'bebida4': 57,
+    'bebida5': 58,
+    'bebida6': 59,
+    'bebida7': 60,
+    'bebida8': 61,
+    'bebida9': 62
+  };
   const [stats, setStats] = useState(null);
   const [loadingStats, setLoadingStats] = useState(true);
   const [combosPersonalizados, setCombosPersonalizados] = useState([]);
@@ -31,6 +87,14 @@ function Perfil() {
   // Estados para historial de compras
   const [historialCompras, setHistorialCompras] = useState([]);
   const [loadingHistorial, setLoadingHistorial] = useState(true);
+  
+  // Estados para reseñas
+  const [mostrandoModalResena, setMostrandoModalResena] = useState(false);
+  const [productoAResenar, setProductoAResenar] = useState(null);
+  const [calificacion, setCalificacion] = useState(5);
+  const [textoResena, setTextoResena] = useState('');
+  const [resenasUsuario, setResenasUsuario] = useState([]);
+  const [loadingResenasUsuario, setLoadingResenasUsuario] = useState(true);
 
   const loadStats = async () => {
     try {
@@ -78,6 +142,27 @@ function Perfil() {
     }
   };
 
+  const loadResenasUsuario = async () => {
+    try {
+      const response = await axios.get('http://127.0.0.1:8000/api/reviews/', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      // Filtrar solo las reseñas del usuario actual
+      const resenasDelUsuario = response.data.filter(resena => resena.usuario === user?.id);
+      setResenasUsuario(resenasDelUsuario);
+    } catch (error) {
+      console.error('Error cargando reseñas del usuario:', error);
+      setResenasUsuario([]);
+    } finally {
+      setLoadingResenasUsuario(false);
+    }
+  };
+
+
+
   const marcarTodosPagados = async () => {
     try {
       await api.post('combos-personalizados/marcar_todos_pagados/');
@@ -86,6 +171,132 @@ function Perfil() {
     } catch (e) {
       console.error('No se pudo marcar como pagados:', e);
       alert('No se pudo marcar como pagados.');
+    }
+  };
+
+  // Funciones para reseñas
+  const yaReseno = (productoId) => {
+    return resenasUsuario.some(resena => resena.producto === productoId);
+  };
+
+  const abrirModalResena = (producto) => {
+    setProductoAResenar(producto);
+    setMostrandoModalResena(true);
+    setCalificacion(5);
+    setTextoResena('');
+  };
+
+  const cerrarModalResena = () => {
+    setMostrandoModalResena(false);
+    setProductoAResenar(null);
+    setCalificacion(5);
+    setTextoResena('');
+  };
+
+  const enviarResena = async () => {
+    console.log('=== INICIANDO ENVÍO DE RESEÑA ===');
+    console.log('Producto a reseñar:', productoAResenar);
+    console.log('Usuario actual:', user);
+    console.log('Token en localStorage:', localStorage.getItem('access_token'));
+    
+    if (!productoAResenar) return;
+    
+    // Validaciones
+    if (!user) {
+      alert('Debes iniciar sesión para enviar una reseña.');
+      return;
+    }
+    
+    if (!textoResena.trim()) {
+      alert('Por favor escribe un comentario.');
+      return;
+    }
+    
+    if (calificacion < 1 || calificacion > 5) {
+      alert('La calificación debe estar entre 1 y 5 estrellas.');
+      return;
+    }
+    
+    // Validar que tengamos un ID de producto válido
+    if (!productoAResenar.original_product_id) {
+      alert('Error: No se puede identificar el producto a reseñar.');
+      console.error('original_product_id es null o undefined:', productoAResenar);
+      return;
+    }
+
+    try {
+      // Convertir ID local a ID de base de datos
+      const productoIdBD = productIdMapping[productoAResenar.original_product_id] || parseInt(productoAResenar.original_product_id);
+      
+      if (!productoIdBD || isNaN(productoIdBD)) {
+        alert('Error: No se pudo identificar el ID del producto en la base de datos.');
+        console.error('No se pudo mapear el producto:', productoAResenar.original_product_id);
+        return;
+      }
+
+      const requestData = {
+        producto: productoIdBD,
+        calificacion: parseInt(calificacion),
+        texto: textoResena.trim()
+      };
+      
+      console.log('Enviando reseña:', requestData);
+      console.log('ID del producto original:', productoAResenar.original_product_id);
+      console.log('ID del producto en BD:', productoIdBD);
+      console.log('Producto completo:', productoAResenar);
+      
+      // Ya no necesitamos validar isNaN porque ya lo validamos arriba
+      
+      // Primero verificar si el producto existe
+      try {
+        const productCheck = await axios.get(`http://127.0.0.1:8000/api/productos/${productoIdBD}/`);
+        console.log('Producto encontrado:', productCheck.data);
+      } catch (checkError) {
+        console.error('Producto no encontrado:', checkError);
+        alert('Error: El producto no existe en la base de datos.');
+        return;
+      }
+      
+      // Usar axios directamente con URL completa para evitar duplicación
+      const response = await axios.post('http://127.0.0.1:8000/api/reviews/', requestData, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('Reseña enviada exitosamente:', response.data);
+      alert('¡Reseña enviada exitosamente!');
+      cerrarModalResena();
+      // Recargar datos para actualizar la UI
+      loadHistorialCompras();
+      loadResenasUsuario();
+    } catch (error) {
+      console.error('Error completo:', error);
+      console.error('Status del error:', error.response?.status);
+      console.error('Data del error:', error.response?.data);
+      
+      if (error.response?.status === 400) {
+        // Error de validación - mostrar detalles específicos
+        const errorData = error.response.data;
+        if (errorData.producto) {
+          alert(`Error en el campo producto: ${errorData.producto.join(', ')}`);
+        } else if (errorData.calificacion) {
+          alert(`Error en la calificación: ${errorData.calificacion.join(', ')}`);
+        } else if (errorData.texto) {
+          alert(`Error en el texto: ${errorData.texto.join(', ')}`);
+        } else if (errorData.detail) {
+          alert(`Error: ${errorData.detail}`);
+        } else {
+          alert(`Error de validación: ${JSON.stringify(errorData)}`);
+        }
+      } else if (error.response?.status === 401) {
+        alert('Error de autenticación. Por favor, inicia sesión nuevamente.');
+      } else if (error.response?.status === 403) {
+        alert('No tienes permisos para realizar esta acción.');
+      } else {
+        alert('Error al enviar la reseña. Inténtalo nuevamente.');
+      }
     }
   };
 
@@ -117,6 +328,7 @@ function Perfil() {
       loadProductosPersonalizados();
       cargarImagenPerfil();
       loadHistorialCompras();
+      loadResenasUsuario();
     }
   }, [isAuthenticated]);
 
@@ -490,6 +702,31 @@ function Perfil() {
                                         Creado por: <strong>{item.creator_username}</strong>
                                       </div>
                                     )}
+                                    
+                                    {/* Botón para dejar reseña solo en productos normales */}
+                                    {item.original_product_id && item.item_type !== 'combo_personalizado' && item.item_type !== 'producto_personalizado' && (() => {
+                                      const productoIdBD = productIdMapping[item.original_product_id] || parseInt(item.original_product_id);
+                                      const yaResenado = resenasUsuario.some(resena => 
+                                        resena.producto === productoIdBD
+                                      );
+                                      
+                                      if (yaResenado) {
+                                        return (
+                                          <span className="ya-resenado">
+                                            ✅ Ya reseñado
+                                          </span>
+                                        );
+                                      }
+                                      
+                                      return (
+                                        <button 
+                                          className="btn-resena"
+                                          onClick={() => abrirModalResena(item)}
+                                        >
+                                          ⭐ Dejar Reseña
+                                        </button>
+                                      );
+                                    })()}
                                   </div>
                                 </div>
                               );
@@ -744,6 +981,51 @@ function Perfil() {
 
         </div>
       </div>
+
+      {/* Modal para escribir reseña */}
+      {mostrandoModalResena && productoAResenar && (
+        <div className="modal-overlay" onClick={cerrarModalResena}>
+          <div className="modal-resena" onClick={(e) => e.stopPropagation()}>
+            <h3>Dejar Reseña</h3>
+            <p><strong>Producto:</strong> {productoAResenar.item_name}</p>
+            
+            <div className="calificacion-selector">
+              <label>Calificación:</label>
+              <div className="estrellas">
+                {[1, 2, 3, 4, 5].map((num) => (
+                  <button
+                    key={num}
+                    type="button"
+                    className={`estrella ${num <= calificacion ? 'activa' : ''}`}
+                    onClick={() => setCalificacion(num)}
+                  >
+                    ⭐
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="texto-resena">
+              <label>Comentario:</label>
+              <textarea
+                value={textoResena}
+                onChange={(e) => setTextoResena(e.target.value)}
+                placeholder="Comparte tu experiencia con este producto..."
+                rows={4}
+              />
+            </div>
+            
+            <div className="modal-acciones">
+              <button onClick={cerrarModalResena} className="btn-cancelar">
+                Cancelar
+              </button>
+              <button onClick={enviarResena} className="btn-enviar">
+                Enviar Reseña
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

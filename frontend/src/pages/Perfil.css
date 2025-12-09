@@ -20,7 +20,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 50px;
+  margin-top: 120px; /* Aumentado de 50px a 120px */
 }
 
 .perfil-header h1 {
@@ -1098,5 +1098,174 @@
     align-items: flex-start;
     gap: 0.5rem;
   }
+}
+
+/* Estilos para reseñas */
+.btn-resena {
+  background: #F28c1e;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-resena:hover {
+  background: #e8413d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(242, 140, 30, 0.4);
+}
+
+/* Modal de reseña */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.modal-resena {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-resena h3 {
+  color: #e8413d;
+  font-family: 'Pacifico', cursive;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.calificacion-selector {
+  margin: 1rem 0;
+}
+
+.calificacion-selector label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.estrellas {
+  display: flex;
+  gap: 5px;
+}
+
+.estrella {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  opacity: 0.3;
+  transition: opacity 0.2s ease;
+}
+
+.estrella.activa {
+  opacity: 1;
+}
+
+.texto-resena {
+  margin: 1rem 0;
+}
+
+.texto-resena label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.texto-resena textarea {
+  width: 100%;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+}
+
+.texto-resena textarea:focus {
+  outline: none;
+  border-color: #F28c1e;
+}
+
+.modal-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-cancelar {
+  background: #ccc;
+  color: #666;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-enviar {
+  background: #F28c1e;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-enviar:hover {
+  background: #e8413d;
+}
+
+/* Estilo para productos ya reseñados */
+.ya-resenado {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #28a745;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: #f8f9fa;
+  border: 1px solid #28a745;
+  border-radius: 20px;
+}
+
+/* Estado ya reseñado */
+.ya-resenado {
+  background: #28a745;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
 }
 

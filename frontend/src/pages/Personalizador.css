@@ -2,7 +2,7 @@
 
 .personalizador-container {
   max-width: 1200px;
-  margin: 40px auto;
+  margin: 100px auto 40px auto; /* Aumentado margen superior de 40px a 100px */
   padding: 20px;
 }
 
