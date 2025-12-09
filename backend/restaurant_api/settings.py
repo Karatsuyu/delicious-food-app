@@ -143,6 +143,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5175",
     "https://delicious-food-app-beta.netlify.app",
     "https://netlify.app",
+    "https://delicious-food-app-chi.vercel.app",
+    "https://vercel.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
