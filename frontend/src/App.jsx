@@ -29,13 +29,15 @@ import ProductosPublicos from './pages/ProductosPublicos';
 import PerfilPublico from './pages/PerfilPublico';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { NotificationProvider } from './context/NotificationContext';
 import './App.css';
 
 function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <Router>
+        <NotificationProvider>
+          <Router>
           <div className="app">
             <Header />
             <main className='main-content'>
@@ -119,6 +121,7 @@ function App() {
             <Carrito />
           </div>
         </Router>
+        </NotificationProvider>
       </CartProvider>
     </AuthProvider>
   );

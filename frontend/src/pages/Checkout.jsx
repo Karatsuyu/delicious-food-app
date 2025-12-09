@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import './Checkout.css';
 import { loadStripe } from '@stripe/stripe-js';
@@ -17,6 +17,12 @@ function Checkout() {
   const [pointsToUse, setPointsToUse] = useState(0);
   const [showPointsSection, setShowPointsSection] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const nombreRef = useRef(null);
+  const apellidosRef = useRef(null);
+  const emailRef = useRef(null);
+  const telefonoRef = useRef(null);
+  const direccionRef = useRef(null);
+  const payButtonRef = useRef(null);
 
   // Función para verificar si todos los campos están válidos
   const todosLosCamposValidos = () => {
@@ -155,6 +161,15 @@ function Checkout() {
     setTimeout(() => validarCampo(campo, valor), 300);
   };
 
+  const handleEnterFocus = (nextRef) => (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (nextRef?.current) {
+        nextRef.current.focus();
+      }
+    }
+  };
+
   const onPay = async () => {
     // Validar campos obligatorios primero
     const errores = validarCampos();
@@ -251,18 +266,13 @@ function Checkout() {
         return;
       }
 
-      // Stripe.js reciente ha desaprobado redirectToCheckout; usa la URL devuelta
+      // Abrir checkout de Stripe en una nueva pestaña
       if (data.url) {
-        window.location.href = data.url;
+        window.open(data.url, '_blank');
       } else if (data.id) {
-        // Fallback legacy: si existe session id pero no URL, intenta con redirectToCheckout si está disponible
-        const stripe = await stripePromise;
-        if (stripe && typeof stripe.redirectToCheckout === 'function') {
-          const { error } = await stripe.redirectToCheckout({ sessionId: data.id });
-          if (error) throw error;
-        } else {
-          setError('Stripe: no se pudo redirigir. Usa la URL de sesión devuelta por el backend.');
-        }
+        // Fallback: construir URL manualmente si solo tenemos el session ID
+        const checkoutUrl = `https://checkout.stripe.com/pay/${data.id}`;
+        window.open(checkoutUrl, '_blank');
       } else {
         setError('Stripe: respuesta sin id ni url.');
       }
@@ -350,8 +360,10 @@ function Checkout() {
             <label>
               Nombre *
               <input 
+                ref={nombreRef}
                 value={buyer.nombre} 
                 onChange={(e) => handleInputChange('nombre', e.target.value)}
+                onKeyDown={handleEnterFocus(apellidosRef)}
                 className={fieldErrors.nombre ? 'input-error' : ''}
                 placeholder="Ingresa tu nombre"
               />
@@ -360,8 +372,10 @@ function Checkout() {
             <label>
               Apellidos *
               <input 
+                ref={apellidosRef}
                 value={buyer.apellidos} 
                 onChange={(e) => handleInputChange('apellidos', e.target.value)}
+                onKeyDown={handleEnterFocus(emailRef)}
                 className={fieldErrors.apellidos ? 'input-error' : ''}
                 placeholder="Ingresa tus apellidos"
               />
@@ -370,9 +384,11 @@ function Checkout() {
             <label>
               Email *
               <input 
+                ref={emailRef}
                 type="email" 
                 value={buyer.email} 
                 onChange={(e) => handleInputChange('email', e.target.value)}
+                onKeyDown={handleEnterFocus(telefonoRef)}
                 className={fieldErrors.email ? 'input-error' : ''}
                 placeholder="ejemplo@correo.com"
               />
@@ -381,8 +397,10 @@ function Checkout() {
             <label>
               Teléfono *
               <input 
+                ref={telefonoRef}
                 value={buyer.telefono} 
                 onChange={(e) => handleInputChange('telefono', e.target.value)}
+                onKeyDown={handleEnterFocus(direccionRef)}
                 className={fieldErrors.telefono ? 'input-error' : ''}
                 placeholder="Ej: 3001234567"
               />
@@ -391,8 +409,10 @@ function Checkout() {
             <label className="wide">
               Dirección *
               <input 
+                ref={direccionRef}
                 value={buyer.direccion} 
                 onChange={(e) => handleInputChange('direccion', e.target.value)}
+                onKeyDown={handleEnterFocus(payButtonRef)}
                 className={fieldErrors.direccion ? 'input-error' : ''}
                 placeholder="Dirección completa de entrega"
               />
@@ -403,6 +423,7 @@ function Checkout() {
           {error && <div className="checkout-error">{error}</div>}
 
           <button 
+            ref={payButtonRef}
             className="btn-mp" 
             onClick={onPay} 
             disabled={loading || total<=0 || !todosLosCamposValidos()}

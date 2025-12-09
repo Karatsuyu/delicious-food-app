@@ -775,7 +775,18 @@ const Personalizador = () => {
       }
     });
 
-    // Animación removida para carnes de pizza
+    // Animar carne cayendo solo para hamburguesas
+    if ((categoria === 'hamburguesas' || categoria === 'hamburguesa') && isAdding) {
+      const carneSeleccionada = carnes.find((c) => c.id === carneId);
+      if (carneSeleccionada) {
+        animateIngredient({
+          id: carneId,
+          tipo: 'carne',
+          nombre: carneSeleccionada.nombre,
+          imagen: getIngredientImage(carneId, categoria),
+        });
+      }
+    }
   };
 
   const handleIngredienteToggle = (ingredienteId) => {
