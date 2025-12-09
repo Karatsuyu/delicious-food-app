@@ -229,6 +229,35 @@ function CrearCombo() {
     return s;
   };
 
+  // 🔑 NUEVA FUNCIÓN: Extraer solo el nombre del archivo para imagen_seleccionada
+  const getImageFileName = (img) => {
+    if (!img) return null;
+    const s = String(img);
+    
+    // Si es un import de asset de Vite (contiene /assets/), extraer solo el nombre del archivo
+    if (s.includes('/assets/')) {
+      const parts = s.split('/');
+      return parts[parts.length - 1]; // Obtiene solo "hamburguesa1.png" de "/assets/hamburguesa1.png"
+    }
+    
+    // Si es una URL completa, extraer el nombre del archivo
+    if (s.startsWith('http')) {
+      const url = new URL(s);
+      const pathname = url.pathname;
+      const parts = pathname.split('/');
+      return parts[parts.length - 1];
+    }
+    
+    // Si ya es solo un nombre de archivo, devolverlo tal cual
+    if (!s.includes('/')) {
+      return s;
+    }
+    
+    // Para otros casos, extraer lo que esté después del último "/"
+    const parts = s.split('/');
+    return parts[parts.length - 1];
+  };
+
   const productosPorCategoria = useMemo(() => {
     const groups = {};
     (productos || []).forEach(p => {
@@ -354,7 +383,17 @@ function CrearCombo() {
     try {
       const productosPayload = Object.entries(seleccion)
         .filter(([, qty]) => qty > 0)
-        .map(([id, qty]) => ({ producto: Number(id), cantidad: qty }));
+        .map(([id, qty]) => {
+          const producto = productos.find(p => p.id === Number(id));
+          // 🔑 USAR SOLO EL NOMBRE DEL ARCHIVO para consistencia con los mapeos de imagen
+          const imagenSeleccionada = producto?.imagen ? getImageFileName(producto.imagen) : null;
+          return {
+            producto: Number(id),
+            cantidad: qty,
+            precio_actual: producto?.precio || 0, // 🔑 ENVIAR PRECIO ACTUAL PARA GUARDAR HISTÓRICO
+            imagen_seleccionada: imagenSeleccionada
+          };
+        });
       if (productosPayload.length === 0) {
         setError('Selecciona al menos un producto');
         return;
@@ -380,9 +419,11 @@ function CrearCombo() {
           };
         });
 
+      let cartItemId;
       if (editId) {
         // Modo edición: actualizar el ítem existente en el carrito
-        updateCartItem(String(editId), (prev) => ({
+        cartItemId = String(editId);
+        updateCartItem(cartItemId, (prev) => ({
           nombre: comboNombre,
           precio: total,
           imagen,
@@ -393,9 +434,9 @@ function CrearCombo() {
         try { window.dispatchEvent(new CustomEvent('open-cart-modal')); } catch {}
       } else {
         // Modo creación: crear un nuevo ítem en el carrito
-        const syntheticId = `combo-${Date.now()}`;
+        cartItemId = `combo-${Date.now()}`;
         addToCart({
-          id: syntheticId,
+          id: cartItemId,
           nombre: comboNombre,
           precio: total, // precio unitario será el total, cantidad inicia en 1
           imagen,
@@ -405,12 +446,16 @@ function CrearCombo() {
         });
       }
 
-      // 2) Persistir en backend (si falla, mostramos un error no bloqueante)
+      // 2) Persistir en backend y actualizar el item del carrito con comboPersonalizadoId
       try {
-        await api.post('orders/add-custom-combo/', {
+        const resp = await api.post('orders/add-custom-combo/', {
           nombre: comboNombre,
           productos: productosPayload
         });
+        if (resp?.data?.combo_id) {
+          updateCartItem(cartItemId, { comboPersonalizadoId: resp.data.combo_id });
+          console.log('[CrearCombo] comboPersonalizadoId asignado:', resp.data.combo_id);
+        }
       } catch (persistErr) {
         console.warn('No se pudo persistir el combo en backend, se mantiene en carrito local:', persistErr);
         setError('El combo se agregó al carrito, pero no pudo guardarse en tu perfil. Inténtalo nuevamente.');

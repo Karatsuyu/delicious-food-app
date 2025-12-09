@@ -22,6 +22,49 @@ function Home() {
   const carouselRef = useRef(null);
   const [reviews, setReviews] = useState([]);
 
+  // Mapeo inverso: de ID de BD a ID local para navegación
+  const productIdToLocalMapping = {
+    1: 'hamburguesa1',
+    13: 'hamburguesa2',
+    14: 'hamburguesa3',
+    15: 'hamburguesa4',
+    16: 'hamburguesa5',
+    17: 'hamburguesa6',
+    18: 'hamburguesa7',
+    19: 'hamburguesa8',
+    2: 'pizza1',
+    6: 'pizza2',
+    20: 'pizza3',
+    21: 'pizza4',
+    22: 'pizza5',
+    23: 'pizza6',
+    24: 'pizza7',
+    25: 'pizza8',
+    3: 'pollo1',
+    26: 'pollo2',
+    27: 'pollo3',
+    28: 'pollo4',
+    29: 'pollo5',
+    30: 'pollo6',
+    4: 'perro1',
+    31: 'perro2',
+    32: 'perro3',
+    42: 'perro4',
+    43: 'perro5',
+    63: 'perro6',
+    5: 'postres1',
+    44: 'postres2',
+    45: 'postres3',
+    46: 'postres4',
+    47: 'postres5',
+    48: 'postres6',
+    49: 'postres7',
+    50: 'postres8',
+    64: 'postres9',
+    65: 'postres10',
+    66: 'postres11'
+  };
+
   // Mapear cada banner a un combo específico
   const banners = [
     { path: '/combo-bbq-crispy', img: banner1, titulo: 'COMBO BBQ CRISPY' },
@@ -48,10 +91,15 @@ function Home() {
     let mounted = true;
     const fetchReviews = async () => {
       try {
-        const resp = await api.get('reviews/');
+        const resp = await fetch('http://127.0.0.1:8000/api/reviews/', {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        const data = await resp.json();
         if (!mounted) return;
-        // Resp puede ser lista de objetos {id, usuario, texto, calificacion, creado}
-        setReviews(Array.isArray(resp.data) ? resp.data : []);
+        // Mostrar las primeras 20 reseñas para el carrusel
+        setReviews(Array.isArray(data) ? data.slice(0, 20) : []);
       } catch (err) {
         console.error('Error cargando reseñas:', err);
         setReviews([]);
@@ -181,13 +229,37 @@ function Home() {
           >
             <div className="reviews-marquee-group">
               {reviews.map((r) => {
-                const rating = r.calificacion || r.rating || 5;
-                const text = r.texto || r.comment || '';
-                const uid = r.usuario || (r.user && r.user.id) || Math.floor(Math.random() * 1000);
-                const avatar = r.usuario_profile_image || r.profile_image || `https://i.pravatar.cc/80?img=${(uid % 70) + 1}`;
+                const rating = r.calificacion || 5;
+                const text = r.texto || '';
+                const userName = r.usuario_username || r.usuario_email || 'Usuario';
+                const avatar = r.usuario_profile_image;
+                const localProductId = productIdToLocalMapping[r.producto];
+                
                 return (
-                  <article key={`g1-${r.id}`} className="review-card">
-                    <img className="review-avatar" src={avatar} alt="Foto de perfil" />
+                  <article 
+                    key={`g1-${r.id}`} 
+                    className="review-card"
+                    onClick={() => localProductId && navigate(`/producto/${localProductId}`)}
+                    style={{ cursor: localProductId ? 'pointer' : 'default' }}
+                  >
+                    {avatar ? (
+                      <img 
+                        className="review-avatar" 
+                        src={avatar} 
+                        alt={`Foto de perfil de ${userName}`}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : (
+                      <div className="review-avatar review-avatar-fallback">
+                        {userName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="review-avatar review-avatar-fallback" style={{display: 'none'}}>
+                      {userName.charAt(0).toUpperCase()}
+                    </div>
                     <div className="review-body">
                       <div className="review-header">
                         <div className="review-stars" aria-label={`${rating} estrellas`}>
@@ -196,6 +268,7 @@ function Home() {
                         </div>
                       </div>
                       <p className="review-text">{text}</p>
+                      <p className="review-product">{r.producto_nombre}</p>
                       <div className="review-underline" />
                     </div>
                     <img className="review-logo" src={logo} alt="Logo Delicious Food" />
@@ -206,13 +279,37 @@ function Home() {
             {/* Segunda copia para efecto infinito */}
             <div className="reviews-marquee-group" aria-hidden="true">
               {reviews.map((r) => {
-                const rating = r.calificacion || r.rating || 5;
-                const text = r.texto || r.comment || '';
-                const uid = r.usuario || (r.user && r.user.id) || Math.floor(Math.random() * 1000);
-                const avatar = r.usuario_profile_image || r.profile_image || `https://i.pravatar.cc/80?img=${(uid % 70) + 1}`;
+                const rating = r.calificacion || 5;
+                const text = r.texto || '';
+                const userName = r.usuario_username || r.usuario_email || 'Usuario';
+                const avatar = r.usuario_profile_image;
+                const localProductId = productIdToLocalMapping[r.producto];
+                
                 return (
-                  <article key={`g2-${r.id}`} className="review-card">
-                    <img className="review-avatar" src={avatar} alt="Foto de perfil" />
+                  <article 
+                    key={`g2-${r.id}`} 
+                    className="review-card"
+                    onClick={() => localProductId && navigate(`/producto/${localProductId}`)}
+                    style={{ cursor: localProductId ? 'pointer' : 'default' }}
+                  >
+                    {avatar ? (
+                      <img 
+                        className="review-avatar" 
+                        src={avatar} 
+                        alt={`Foto de perfil de ${userName}`}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : (
+                      <div className="review-avatar review-avatar-fallback">
+                        {userName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="review-avatar review-avatar-fallback" style={{display: 'none'}}>
+                      {userName.charAt(0).toUpperCase()}
+                    </div>
                     <div className="review-body">
                       <div className="review-header">
                         <div className="review-stars" aria-label={`${rating} estrellas`}>
@@ -221,6 +318,7 @@ function Home() {
                         </div>
                       </div>
                       <p className="review-text">{text}</p>
+                      <p className="review-product">{r.producto_nombre}</p>
                       <div className="review-underline" />
                     </div>
                     <img className="review-logo" src={logo} alt="Logo Delicious Food" />

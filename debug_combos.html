@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Combos</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .combo { border: 1px solid #ccc; margin: 10px 0; padding: 15px; border-radius: 5px; }
+        .ok { background-color: #e8f5e8; }
+        .problema { background-color: #ffe8e8; }
+        .producto { margin-left: 20px; padding: 5px; background: #f5f5f5; margin: 5px 0; }
+        h1 { color: #333; }
+        h3 { margin: 5px 0; }
+        .status { font-weight: bold; padding: 3px 8px; border-radius: 3px; }
+        .status.ok { background: #4CAF50; color: white; }
+        .status.error { background: #f44336; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Debug Combos Personalizados</h1>
+    <div id="content">Cargando...</div>
+
+    <script>
+        async function loadDebugInfo() {
+            try {
+                const token = localStorage.getItem('access_token');
+                if (!token) {
+                    document.getElementById('content').innerHTML = '<p style="color: red;">No hay token de autenticación. Ve a la app y loguéate primero.</p>';
+                    return;
+                }
+
+                const response = await fetch('http://127.0.0.1:8000/api/combos-personalizados/debug_info/', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const combos = await response.json();
+                let html = `<h2>Total de combos: ${combos.length}</h2>`;
+                
+                combos.forEach(combo => {
+                    const isOk = combo.problema === 'ok';
+                    html += `
+                        <div class="combo ${isOk ? 'ok' : 'problema'}">
+                            <h3>Combo ID: ${combo.id} - "${combo.nombre}"</h3>
+                            <p><strong>Status:</strong> <span class="status ${isOk ? 'ok' : 'error'}">${combo.problema}</span></p>
+                            <p><strong>Precio guardado:</strong> $${combo.precio_total_guardado}</p>
+                            <p><strong>Precio calculado:</strong> $${combo.precio_total_calculado}</p>
+                            <p><strong>Pagado:</strong> ${combo.es_pagado ? 'Sí' : 'No'}</p>
+                            <p><strong>Publicado:</strong> ${combo.publicado ? 'Sí' : 'No'}</p>
+                            <p><strong>Productos (${combo.productos_count}):</strong></p>
+                    `;
+                    
+                    if (combo.productos.length > 0) {
+                        combo.productos.forEach(prod => {
+                            html += `
+                                <div class="producto">
+                                    ${prod.nombre}: $${prod.precio} x ${prod.cantidad} = $${prod.subtotal}
+                                    ${prod.imagen_seleccionada ? `<br><small>Imagen: ${prod.imagen_seleccionada}</small>` : ''}
+                                </div>
+                            `;
+                        });
+                    } else {
+                        html += '<p style="color: red;">❌ No tiene productos relacionados</p>';
+                    }
+                    
+                    html += '</div>';
+                });
+                
+                document.getElementById('content').innerHTML = html;
+            } catch (error) {
+                document.getElementById('content').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        loadDebugInfo();
+    </script>
+</body>
+</html>

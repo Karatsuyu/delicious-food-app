@@ -6,6 +6,39 @@ import { useCart } from '../context/CartContext';
 import './PerfilPublico.css';
 import defaultAvatar from '../assets/icono-perfil-vacio-inicio.jpg';
 
+// Importar imágenes para categorías
+import hamburguesa from '../assets/hamburguesa.png';
+import pizza1 from '../assets/pizza1.png';
+import perro from '../assets/perro.png';
+import pollo from '../assets/pollo.png';
+import postres1 from '../assets/postres1.png';
+
+// Función para obtener la imagen de la categoría para el carrito
+const getCategoryImage = (categoria) => {
+  const cat = categoria?.toLowerCase();
+  
+  // Usar imágenes representativas según la categoría
+  switch (cat) {
+    case 'hamburguesas':
+    case 'hamburguesa':
+      return hamburguesa;
+    case 'pizzas':
+    case 'pizza':
+      return pizza1;
+    case 'perros':
+    case 'perro':
+      return perro;
+    case 'pollo':
+    case 'alitas':
+      return pollo;
+    case 'postres':
+    case 'postre':
+      return postres1;
+    default:
+      return hamburguesa;
+  }
+};
+
 function PerfilPublico() {
   const { userId } = useParams();
   const navigate = useNavigate();
@@ -42,6 +75,18 @@ function PerfilPublico() {
       imagen: combo.productos_detalle?.[0]?.imagen || null,
       es_personalizable: false,
       combo_personalizado_id: combo.id
+    };
+    addToCart(productoData);
+  };
+
+  const handleAddProductoToCart = (producto) => {
+    const productoData = {
+      id: `producto-personalizado-${producto.id}`,
+      nombre: producto.nombre_personalizado || `Producto de ${perfil?.usuario?.username || 'Usuario'}`,
+      precio: parseFloat(producto.precio_total),
+      imagen: getCategoryImage(producto.producto_base?.categoria) || producto.producto_base?.imagen,
+      es_personalizable: false,
+      producto_personalizado_id: producto.id
     };
     addToCart(productoData);
   };
@@ -124,13 +169,11 @@ function PerfilPublico() {
                     <div className="productos-list">
                       {combo.productos_detalle.map((prod, idx) => (
                         <div key={idx} className="producto-item">
-                          {prod.imagen && (
-                            <img
-                              src={absolutizeMediaUrl(prod.imagen)}
-                              alt={prod.nombre}
-                              className="producto-mini-img"
-                            />
-                          )}
+                          <img
+                            src={prod.imagen ? absolutizeMediaUrl(prod.imagen) : getCategoryImage(prod.categoria)}
+                            alt={prod.nombre}
+                            className="producto-mini-img"
+                          />
                           <span>{prod.nombre} x{prod.cantidad}</span>
                         </div>
                       ))}
@@ -164,6 +207,78 @@ function PerfilPublico() {
         ) : (
           <div className="combos-empty-perfil">
             <p>Este usuario aún no ha publicado ningún combo.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Sección de Productos Personalizados Publicados */}
+      <div className="seccion-productos-perfil">
+        <h2 className="seccion-titulo">Productos Personalizados Publicados</h2>
+        
+        {perfil.productos_personalizados_publicados && perfil.productos_personalizados_publicados.length > 0 ? (
+          <div className="productos-grid-publico">
+            {perfil.productos_personalizados_publicados.map((producto) => (
+              <div key={producto.id} className="combo-card-perfil">
+                <h3 className="combo-nombre-perfil">
+                  {producto.nombre_personalizado}
+                </h3>
+                
+                <div className="producto-base-info">
+                  <p className="producto-base-label">Basado en:</p>
+                  <div className="producto-base-item">
+                    <img
+                      src={getCategoryImage(producto.producto_base?.categoria) || producto.producto_base?.imagen || defaultAvatar}
+                      alt={producto.producto_base?.nombre}
+                      className="producto-mini-img"
+                    />
+                    <span>{producto.producto_base?.nombre}</span>
+                  </div>
+                </div>
+
+                {producto.ingredientes_detalle && producto.ingredientes_detalle.length > 0 && (
+                  <div className="combo-productos-perfil">
+                    <p className="productos-label">Ingredientes personalizados:</p>
+                    <div className="productos-list">
+                      {producto.ingredientes_detalle.map((ingrediente, idx) => (
+                        <div key={idx} className="producto-item">
+                          <span>• {ingrediente.nombre}</span>
+                          {ingrediente.precio_extra > 0 && (
+                            <span className="precio-extra">
+                              (+${parseFloat(ingrediente.precio_extra).toLocaleString('es-CO')})
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="combo-info-perfil">
+                  <div className="combo-precio-perfil">
+                    ${parseFloat(producto.precio_total || 0).toLocaleString('es-CO')}
+                  </div>
+                  {producto.veces_comprado > 0 && (
+                    <div className="combo-veces-comprado">
+                      🛍️ {producto.veces_comprado} compra{producto.veces_comprado !== 1 ? 's' : ''}
+                    </div>
+                  )}
+                  <div className="combo-fecha-perfil">
+                    {new Date(producto.creado_en).toLocaleDateString('es-ES')}
+                  </div>
+                </div>
+
+                <button
+                  className="btn-agregar-carrito-perfil"
+                  onClick={() => handleAddProductoToCart(producto)}
+                >
+                  Agregar al Carrito
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="combos-empty-perfil">
+            <p>Este usuario aún no ha publicado ningún producto personalizado.</p>
           </div>
         )}
       </div>

@@ -1,0 +1,279 @@
+/* ===========================================
+   UTILIDADES RESPONSIVAS GLOBALES
+   =========================================== */
+
+/* Prevenir overflow horizontal en toda la app */
+* {
+  max-width: 100%;
+}
+
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Utilidades de display responsivo */
+.mobile-only {
+  display: block;
+}
+
+.tablet-only {
+  display: none;
+}
+
+.desktop-only {
+  display: none;
+}
+
+/* Grids responsivos */
+.responsive-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr; /* Mobile: 1 columna */
+}
+
+.responsive-grid-2 {
+  display: grid;
+  gap: 15px;
+  grid-template-columns: 1fr; /* Mobile: 1 columna */
+}
+
+.responsive-grid-3 {
+  display: grid;
+  gap: 15px;
+  grid-template-columns: 1fr; /* Mobile: 1 columna */
+}
+
+.responsive-grid-4 {
+  display: grid;
+  gap: 15px;
+  grid-template-columns: 1fr 1fr; /* Mobile: 2 columnas */
+}
+
+/* Flexbox responsivo */
+.responsive-flex {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Espaciado responsivo */
+.padding-responsive {
+  padding: 15px;
+}
+
+.margin-responsive {
+  margin: 15px 0;
+}
+
+/* Texto responsivo */
+.text-responsive {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.heading-responsive {
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+/* ===========================================
+   TABLET (768px - 1024px)
+   =========================================== */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .mobile-only {
+    display: none;
+  }
+  
+  .tablet-only {
+    display: block;
+  }
+  
+  .desktop-only {
+    display: none;
+  }
+  
+  .responsive-grid {
+    grid-template-columns: 1fr 1fr; /* Tablet: 2 columnas */
+    gap: 25px;
+  }
+  
+  .responsive-grid-2 {
+    grid-template-columns: 1fr 1fr; /* Tablet: 2 columnas */
+    gap: 20px;
+  }
+  
+  .responsive-grid-3 {
+    grid-template-columns: repeat(3, 1fr); /* Tablet: 3 columnas */
+    gap: 20px;
+  }
+  
+  .responsive-grid-4 {
+    grid-template-columns: repeat(3, 1fr); /* Tablet: 3 columnas */
+    gap: 20px;
+  }
+  
+  .responsive-flex {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .padding-responsive {
+    padding: 25px;
+  }
+  
+  .margin-responsive {
+    margin: 25px 0;
+  }
+  
+  .text-responsive {
+    font-size: 18px;
+  }
+  
+  .heading-responsive {
+    font-size: 28px;
+  }
+}
+
+/* ===========================================
+   DESKTOP (1025px+)
+   =========================================== */
+@media (min-width: 1025px) {
+  .mobile-only {
+    display: none;
+  }
+  
+  .tablet-only {
+    display: none;
+  }
+  
+  .desktop-only {
+    display: block;
+  }
+  
+  .responsive-grid {
+    grid-template-columns: repeat(3, 1fr); /* Desktop: 3 columnas */
+    gap: 30px;
+  }
+  
+  .responsive-grid-2 {
+    grid-template-columns: 1fr 1fr; /* Desktop: 2 columnas */
+    gap: 30px;
+  }
+  
+  .responsive-grid-3 {
+    grid-template-columns: repeat(3, 1fr); /* Desktop: 3 columnas */
+    gap: 30px;
+  }
+  
+  .responsive-grid-4 {
+    grid-template-columns: repeat(4, 1fr); /* Desktop: 4 columnas */
+    gap: 30px;
+  }
+  
+  .responsive-flex {
+    flex-direction: row;
+    gap: 30px;
+  }
+  
+  .padding-responsive {
+    padding: 30px;
+  }
+  
+  .margin-responsive {
+    margin: 30px 0;
+  }
+  
+  .text-responsive {
+    font-size: 20px;
+  }
+  
+  .heading-responsive {
+    font-size: 32px;
+  }
+}
+
+/* ===========================================
+   UTILIDADES ESPECÍFICAS PARA COMPONENTES
+   =========================================== */
+
+/* Botones responsivos */
+.btn-responsive {
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+  transition: all 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .btn-responsive {
+    width: auto;
+    padding: 15px 30px;
+    font-size: 18px;
+  }
+}
+
+/* Cards responsivas */
+.card-responsive {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 768px) {
+  .card-responsive {
+    padding: 25px;
+    margin-bottom: 25px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .card-responsive {
+    padding: 30px;
+    margin-bottom: 30px;
+  }
+}
+
+/* Imágenes responsivas */
+.img-responsive {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Contenedores de ancho fijo que pueden causar overflow */
+.overflow-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+/* Scrollbar personalizado para contenedores overflow */
+.overflow-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.overflow-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.overflow-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.overflow-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

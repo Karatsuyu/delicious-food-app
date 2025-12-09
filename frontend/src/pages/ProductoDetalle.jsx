@@ -3,6 +3,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
+import api from '../api/api';
+import axios from 'axios';
 
 // Importar imágenes
 import hamburguesa1 from '../assets/hamburguesa1.png';
@@ -69,6 +71,70 @@ const ProductoDetalle = () => {
   const [tipoPolloSeleccionado, setTipoPolloSeleccionado] = useState('alitas'); 
   const { addToCart } = useCart();
   const { user } = useContext(AuthContext);
+
+  // Mapeo de IDs locales a IDs de base de datos
+  const productIdMapping = {
+    'hamburguesa1': 1,
+    'hamburguesa2': 13,
+    'hamburguesa3': 14,
+    'hamburguesa4': 15,
+    'hamburguesa5': 16,
+    'hamburguesa6': 17,
+    'hamburguesa7': 18, // BBQ Crunch Burger
+    'hamburguesa8': 19, // Double Smash
+    'pizza1': 2,
+    'pizza2': 6,
+    'pizza3': 20,
+    'pizza4': 21,
+    'pizza5': 22,
+    'pizza6': 23,
+    'pizza7': 24, // Pepperoni Lovers
+    'pizza8': 25, // Pizza Campesina
+    'pollo1': 3,
+    'pollo2': 26,
+    'pollo3': 27,
+    'pollo4': 28,
+    'pollo5': 29,
+    'pollo6': 30,
+    'perro1': 4,
+    'perro2': 31,
+    'perro3': 32,
+    'perro4': 42,
+    'perro5': 43,
+    'perro6': 63, // Perro Especial
+    'postres1': 5,
+    'postres2': 44,
+    'postres3': 45,
+    'postres4': 46,
+    'postres5': 47,
+    'postres6': 48,
+    'postres7': 49,
+    'postres8': 50,
+    'postres9': 64, // Brownie de Chocolate
+    'postres10': 65, // Cheesecake
+    'postres11': 66, // Helado de Vainilla
+    'papas1': 51,
+    'papas2': 52,
+    'papas3': 53,
+    'bebida1': 54,
+    'bebida2': 55,
+    'bebida3': 56,
+    'bebida4': 57,
+    'bebida5': 58,
+    'bebida6': 59,
+    'bebida7': 60,
+    'bebida8': 61,
+    'bebida9': 62
+  };
+  
+  // Estados para reseñas
+  const [reseñas, setReseñas] = useState([]);
+  const [loadingReseñas, setLoadingReseñas] = useState(true);
+  const [nuevaReseña, setNuevaReseña] = useState({
+    texto: '',
+    calificacion: 5
+  });
+  const [mostrandoFormulario, setMostrandoFormulario] = useState(false);
   const isAdmin = user?.is_staff;
 
   // Definir tamaños de pizzas
@@ -527,6 +593,11 @@ const tiposPollo = {
 
     if (id) {
       cargarProducto();
+      // Cargar reseñas solo si tenemos el mapeo del producto
+      const productoIdBD = productIdMapping[id];
+      if (productoIdBD) {
+        cargarReseñas(productoIdBD);
+      }
     }
   }, [id]);
 
@@ -597,6 +668,98 @@ const tiposPollo = {
 
     addToCart(productoParaCarrito);
   };
+
+  // Funciones para manejar reseñas
+  const cargarReseñas = async (productoId) => {
+    try {
+      const response = await axios.get(`http://127.0.0.1:8000/api/reviews/?producto=${productoId}`, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      setReseñas(response.data);
+    } catch (error) {
+      console.error('Error cargando reseñas:', error);
+    } finally {
+      setLoadingReseñas(false);
+    }
+  };
+
+  const enviarReseña = async () => {
+    if (!user) {
+      alert('Debes iniciar sesión para escribir una reseña');
+      return;
+    }
+
+    if (!nuevaReseña.texto.trim()) {
+      alert('Por favor escribe un comentario');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('access_token');
+      const productoIdBD = productIdMapping[id];
+      
+      if (!productoIdBD) {
+        alert('Error: No se pudo identificar el producto');
+        return;
+      }
+      
+      const response = await axios.post('http://127.0.0.1:8000/api/reviews/', {
+        producto: productoIdBD,
+        texto: nuevaReseña.texto,
+        calificacion: parseInt(nuevaReseña.calificacion)
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      // Agregar la nueva reseña al estado local
+      setReseñas([response.data, ...reseñas]);
+      setNuevaReseña({ texto: '', calificacion: 5 });
+      setMostrandoFormulario(false);
+      alert('¡Reseña enviada exitosamente!');
+    } catch (error) {
+      console.error('Error enviando reseña:', error);
+      console.error('Error response:', error.response);
+      console.error('Error data:', error.response?.data);
+      
+      let errorMessage = 'Error enviando la reseña. Intenta nuevamente.';
+      
+      if (error.response?.data) {
+        if (error.response.data.error) {
+          errorMessage = error.response.data.error;
+        } else if (error.response.data.detail) {
+          errorMessage = error.response.data.detail;
+        } else if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data;
+        }
+      }
+      
+      alert(errorMessage);
+    }
+  };
+
+  const calcularPromedioCalificacion = () => {
+    if (reseñas.length === 0) return 0;
+    const suma = reseñas.reduce((acc, reseña) => acc + reseña.calificacion, 0);
+    return (suma / reseñas.length).toFixed(1);
+  };
+
+  const renderEstrellas = (calificacion) => {
+    const estrellas = [];
+    for (let i = 1; i <= 5; i++) {
+      estrellas.push(
+        <span key={i} className={i <= calificacion ? 'estrella-llena' : 'estrella-vacia'}>
+          ⭐
+        </span>
+      );
+    }
+    return estrellas;
+  };
+
   if (loading) {
     return <div className="loading">Cargando producto...</div>;
   }
@@ -688,6 +851,136 @@ const tiposPollo = {
             >
               ✏️ Editar Producto
             </button>
+          )}
+        </div>
+      </div>
+
+      {/* Sección de Reseñas */}
+      <div className="resenas-section">
+        <div className="resenas-header">
+          <h2>Reseñas del Producto</h2>
+          {reseñas.length > 0 && (
+            <div className="calificacion-promedio">
+              <span className="promedio-numero">{calcularPromedioCalificacion()}</span>
+              <div className="estrellas-promedio">
+                {renderEstrellas(Math.round(calcularPromedioCalificacion()))}
+              </div>
+              <span className="total-resenas">({reseñas.length} reseña{reseñas.length !== 1 ? 's' : ''})</span>
+            </div>
+          )}
+        </div>
+
+        {user && (
+          <div className="escribir-resena">
+            {!mostrandoFormulario ? (
+              <button 
+                className="btn-escribir-resena"
+                onClick={() => setMostrandoFormulario(true)}
+              >
+                ✍️ Escribir una reseña
+              </button>
+            ) : (
+              <div className="formulario-resena">
+                <h3>Escribe tu reseña</h3>
+                
+                <div className="calificacion-selector">
+                  <label>Calificación:</label>
+                  <div className="estrellas-selector">
+                    {[1, 2, 3, 4, 5].map(num => (
+                      <button
+                        key={num}
+                        type="button"
+                        className={`estrella-btn ${num <= nuevaReseña.calificacion ? 'activa' : ''}`}
+                        onClick={() => setNuevaReseña({...nuevaReseña, calificacion: num})}
+                      >
+                        ⭐
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <textarea
+                  value={nuevaReseña.texto}
+                  onChange={(e) => setNuevaReseña({...nuevaReseña, texto: e.target.value})}
+                  placeholder="Comparte tu experiencia con este producto..."
+                  rows={4}
+                  className="textarea-resena"
+                />
+
+                <div className="botones-resena">
+                  <button onClick={enviarReseña} className="btn-enviar">
+                    📤 Enviar Reseña
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setMostrandoFormulario(false);
+                      setNuevaReseña({ texto: '', calificacion: 5 });
+                    }}
+                    className="btn-cancelar"
+                  >
+                    ❌ Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="lista-resenas">
+          {loadingReseñas ? (
+            <div className="loading-resenas">Cargando reseñas...</div>
+          ) : reseñas.length === 0 ? (
+            <div className="sin-resenas">
+              <p>Aún no hay reseñas para este producto.</p>
+              <p>¡Sé el primero en compartir tu experiencia!</p>
+            </div>
+          ) : (
+            reseñas.map((reseña) => (
+              <div key={reseña.id} className="resena-item">
+                <div className="resena-header">
+                  <div className="usuario-info">
+                    <div className="usuario-avatar-container">
+                      {reseña.usuario_profile_image ? (
+                        <img 
+                          src={reseña.usuario_profile_image} 
+                          alt={`Perfil de ${reseña.usuario_username || reseña.usuario_email}`}
+                          className="usuario-avatar"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : (
+                        <div className="usuario-avatar-default">
+                          {(reseña.usuario_username || reseña.usuario_email).charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div className="usuario-avatar-fallback" style={{display: 'none'}}>
+                        {(reseña.usuario_username || reseña.usuario_email).charAt(0).toUpperCase()}
+                      </div>
+                    </div>
+                    <div className="usuario-datos">
+                      <span className="usuario-nombre">
+                        {reseña.usuario_username || reseña.usuario_email}
+                      </span>
+                      <div className="estrellas-resena">
+                        {renderEstrellas(reseña.calificacion)}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="fecha-resena">
+                    {new Date(reseña.creado).toLocaleDateString('es-ES', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </span>
+                </div>
+                <div className="resena-texto">
+                  {reseña.texto}
+                </div>
+              </div>
+            ))
           )}
         </div>
       </div>

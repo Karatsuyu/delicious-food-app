@@ -49,6 +49,17 @@ export const CartProvider = ({ children }) => {
     }
   }, [user?.id]); // Recargar cuando cambie el usuario
 
+  // Escuchar evento para limpiar carrito tras pago exitoso
+  useEffect(() => {
+    const handler = () => {
+      setCartItems([]);
+      const cartKey = getCartKey();
+      try { localStorage.setItem(cartKey, JSON.stringify([])); } catch (_) {}
+    };
+    window.addEventListener('clear-local-cart', handler);
+    return () => window.removeEventListener('clear-local-cart', handler);
+  }, [user?.id]);
+
   // Limpiar carrito cuando el usuario cierre sesión
   useEffect(() => {
     if (!user) {

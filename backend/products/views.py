@@ -2,9 +2,11 @@ from rest_framework import viewsets, permissions, generics, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.views import APIView
 from django.db.models import Sum, Count, Q, F
-from .models import Producto, Ingrediente, Combo, ComboPersonalizado
-from .serializers import ProductoSerializer, IngredienteSerializer, ComboSerializer, ComboPersonalizadoSerializer
+from django.http import JsonResponse
+from .models import Producto, Ingrediente, Combo, ComboPersonalizado, ProductoPersonalizado
+from .serializers import ProductoSerializer, IngredienteSerializer, ComboSerializer, ComboPersonalizadoSerializer, ProductoPersonalizadoSerializer
 from orders.models import PedidoItem, Pedido
 
 class ProductoViewSet(viewsets.ReadOnlyModelViewSet):
@@ -34,10 +36,101 @@ class ComboPersonalizadoViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return ComboPersonalizado.objects.filter(usuario=self.request.user)
+        # Mostrar SOLO los combos personalizados PAGADOS del usuario
+        return ComboPersonalizado.objects.filter(
+            usuario=self.request.user,
+            is_paid=True
+        ).prefetch_related('combopersonalizadoproducto_set__producto')
 
     def perform_create(self, serializer):
         serializer.save(usuario=self.request.user)
+
+    @action(detail=False, methods=['post'])
+    def marcar_todos_pagados(self, request):
+        """Marca todos los combos personalizados del usuario autenticado como pagados.
+        Útil para corregir estados cuando el webhook/confirmación no se ejecutó.
+        """
+        from django.utils import timezone
+        usuario = request.user
+        combos = ComboPersonalizado.objects.filter(usuario=usuario)
+        count = 0
+        for combo in combos:
+            if not combo.is_paid:
+                combo.is_paid = True
+                if not combo.paid_at:
+                    combo.paid_at = timezone.now()
+                combo.save(update_fields=["is_paid", "paid_at"])
+                count += 1
+        return Response({"ok": True, "actualizados": count})
+
+    @action(detail=False, methods=['get'])
+    def debug_info(self, request):
+        """Debug endpoint para analizar todos los combos del usuario."""
+        usuario = request.user
+        combos = ComboPersonalizado.objects.filter(usuario=usuario).order_by('id')
+        
+        debug_data = []
+        for combo in combos:
+            productos_relacionados = combo.combopersonalizadoproducto_set.all()
+            
+            productos_info = []
+            total_calculado = 0
+            for cp in productos_relacionados:
+                precio_producto = float(cp.producto.precio)
+                cantidad = int(cp.cantidad)
+                subtotal = precio_producto * cantidad
+                total_calculado += subtotal
+                productos_info.append({
+                    'nombre': cp.producto.nombre,
+                    'precio': precio_producto,
+                    'cantidad': cantidad,
+                    'subtotal': subtotal,
+                    'imagen_seleccionada': cp.imagen_seleccionada
+                })
+            
+            combo_info = {
+                'id': combo.id,
+                'nombre': combo.nombre,
+                'precio_total_guardado': float(combo.precio_total or 0),
+                'precio_total_calculado': total_calculado,
+                'es_pagado': combo.is_paid,
+                'publicado': combo.publicado,
+                'fecha_creacion': combo.creado_en.isoformat(),
+                'productos_count': productos_relacionados.count(),
+                'productos': productos_info,
+                'problema': 'sin_productos' if productos_relacionados.count() == 0 else (
+                    'precio_cero' if total_calculado == 0 else (
+                        'precio_diferente' if float(combo.precio_total or 0) != total_calculado else 'ok'
+                    )
+                )
+            }
+            debug_data.append(combo_info)
+        
+        return Response(debug_data)
+
+    @action(detail=False, methods=['post'])
+    def fix_all_combos(self, request):
+        """Corrige todos los combos del usuario recalculando precios desde sus productos."""
+        usuario = request.user
+        combos = ComboPersonalizado.objects.filter(usuario=usuario)
+        
+        corregidos = 0
+        for combo in combos:
+            productos_relacionados = combo.combopersonalizadoproducto_set.all()
+            
+            if productos_relacionados.count() > 0:
+                # Recalcular precio
+                total_real = 0
+                for cp in productos_relacionados:
+                    total_real += float(cp.producto.precio) * int(cp.cantidad)
+                
+                # Actualizar solo si es diferente
+                if float(combo.precio_total or 0) != total_real:
+                    combo.precio_total = total_real
+                    combo.save(update_fields=['precio_total'])
+                    corregidos += 1
+        
+        return Response({"ok": True, "corregidos": corregidos})
 
 class ComboPersonalizadoCreateView(generics.CreateAPIView):
     serializer_class = ComboPersonalizadoSerializer
@@ -51,18 +144,25 @@ class ComboPersonalizadoListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return ComboPersonalizado.objects.filter(usuario=self.request.user)
+        return ComboPersonalizado.objects.filter(usuario=self.request.user, is_paid=True)
 
 class ComboPersonalizadoPublicosView(generics.ListAPIView):
     """Vista para listar combos personalizados publicados para que otros usuarios los compren"""
     serializer_class = ComboPersonalizadoSerializer
     permission_classes = [permissions.AllowAny]
-    queryset = ComboPersonalizado.objects.filter(publicado=True).order_by('-veces_comprado', '-creado_en')
+    authentication_classes = []  # Permitir acceso sin autenticación
+    
+    def get_queryset(self):
+        return ComboPersonalizado.objects.filter(
+            publicado=True
+        ).prefetch_related('combopersonalizadoproducto_set__producto').order_by('-veces_comprado', '-creado_en')
     
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context['request'] = self.request
         return context
+    
+
 
 
 # ========== VISTAS DE ADMINISTRACIÓN ==========
@@ -174,4 +274,120 @@ class AdminEstadisticasView(generics.RetrieveAPIView):
             },
             'productos_por_categoria': list(productos_por_categoria)
         })
+
+
+class ProductoPersonalizadoViewSet(viewsets.ModelViewSet):
+    serializer_class = ProductoPersonalizadoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Mostrar TODOS los productos personalizados del usuario (pagados y no pagados)
+        # Los usuarios deben poder ver sus propias creaciones antes y después del pago
+        return ProductoPersonalizado.objects.filter(
+            usuario=self.request.user
+        ).prefetch_related('ingredientes', 'producto_base')
+
+    def perform_create(self, serializer):
+        # Log para debuggear el precio
+        precio_recibido = self.request.data.get('precio_total')
+        print(f"💰 Precio recibido del frontend: {precio_recibido}")
+        
+        producto = serializer.save(usuario=self.request.user)
+        print(f"💾 Precio guardado en BD: {producto.precio_total}")
+        
+        # 🎯 GARANTIZAR INGREDIENTES: Todos los productos personalizados deben tener ingredientes
+        # para que se muestren correctamente en la página de productos de la comunidad
+        try:
+            ingredientes_enviados = self.request.data.get('ingredientes', [])
+            ingredientes_asignados = 0
+            
+            if ingredientes_enviados and isinstance(ingredientes_enviados, list):
+                # Si se enviaron ingredientes específicos desde el frontend, usarlos
+                from .models import Ingrediente, ProductoPersonalizadoIngrediente
+                for ingrediente_id in ingredientes_enviados:
+                    try:
+                        ingrediente = Ingrediente.objects.get(id=ingrediente_id)
+                        rel, created = ProductoPersonalizadoIngrediente.objects.get_or_create(
+                            producto_personalizado=producto,
+                            ingrediente=ingrediente
+                        )
+                        if created:
+                            ingredientes_asignados += 1
+                    except (Ingrediente.DoesNotExist, ValueError):
+                        continue
+                print(f"🧄 Ingredientes específicos asignados: {ingredientes_asignados}")
+            
+            # Si no se asignaron ingredientes o fueron muy pocos, agregar ingredientes por defecto
+            if ingredientes_asignados == 0:
+                from .models import Ingrediente, ProductoPersonalizadoIngrediente
+                ingredientes_default = Ingrediente.objects.all()[:4]  # Primeros 4 ingredientes comunes
+                for ingrediente in ingredientes_default:
+                    rel, created = ProductoPersonalizadoIngrediente.objects.get_or_create(
+                        producto_personalizado=producto,
+                        ingrediente=ingrediente
+                    )
+                    if created:
+                        ingredientes_asignados += 1
+                print(f"🧄 Ingredientes por defecto asignados: {ingredientes_asignados}")
+                
+        except Exception as e:
+            print(f"⚠️ Error asignando ingredientes automáticamente: {e}")
+            # Si hay un error, no fallar la creación del producto
+        
+        return producto
+
+    @action(detail=False, methods=['post'])
+    def marcar_todos_pagados(self, request):
+        """Marca todos los productos personalizados del usuario autenticado como pagados.
+        Útil para corregir estados cuando el webhook/confirmación no se ejecutó.
+        """
+        from django.utils import timezone
+        productos_actualizados = ProductoPersonalizado.objects.filter(
+            usuario=request.user,
+            is_paid=False
+        ).update(is_paid=True, paid_at=timezone.now())
+        
+        return Response({
+            'message': f'Se marcaron {productos_actualizados} productos personalizados como pagados'
+        })
+
+    @action(detail=False, methods=['get'])
+    def debug_info(self, request):
+        """Debug endpoint para analizar todos los productos del usuario."""
+        productos_todos = ProductoPersonalizado.objects.filter(usuario=request.user)
+        productos_pagados = productos_todos.filter(is_paid=True)
+        productos_pendientes = productos_todos.filter(is_paid=False)
+        
+        return Response({
+            'usuario': request.user.username,
+            'total_productos': productos_todos.count(),
+            'productos_pagados': productos_pagados.count(),
+            'productos_pendientes': productos_pendientes.count(),
+            'productos_lista': [
+                {
+                    'id': p.id,
+                    'nombre': p.nombre_personalizado,
+                    'precio': str(p.precio_total),
+                    'is_paid': p.is_paid,
+                    'paid_at': p.paid_at,
+                    'stripe_session_id': p.stripe_session_id
+                }
+                for p in productos_todos
+            ]
+        })
+
+
+class ProductoPersonalizadoPublicosView(generics.ListAPIView):
+    serializer_class = ProductoPersonalizadoSerializer
+    permission_classes = [permissions.AllowAny]
+    
+    def get_queryset(self):
+        # Mostrar solo productos personalizados que están publicados Y pagados
+        return ProductoPersonalizado.objects.filter(
+            publicado=True,
+            is_paid=True
+        ).select_related('usuario', 'producto_base').prefetch_related('ingredientes').order_by('-creado_en')
+
+
+
 

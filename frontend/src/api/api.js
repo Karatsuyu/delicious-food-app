@@ -1,8 +1,9 @@
 import axios from "axios";
 
 // Base URLs centralizados para reuso
-export const API_BASE_URL = "http://127.0.0.1:8000/api/";
-export const API_ORIGIN = API_BASE_URL.replace(/\/?api\/?$/i, "");
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
+export const API_BASE_URL = `${BACKEND_URL}/api/`;
+export const API_ORIGIN = BACKEND_URL;
 
 // Convierte una ruta /media/... o relativa en URL absoluta al backend
 export const absolutizeMediaUrl = (url) => {
@@ -136,10 +137,21 @@ export const productService = {
   // Obtener combos personalizados públicos
   getCombosPublicos: async () => {
     try {
-      const response = await api.get('productos/combos-personalizados/publicos/');
+      const response = await api.get('combos-publicos/');
       return response.data;
     } catch (error) {
       console.error('Error obteniendo combos públicos:', error);
+      throw error;
+    }
+  },
+
+  // Obtener productos personalizados públicos
+  getProductosPersonalizadosPublicos: async () => {
+    try {
+      const response = await api.get('productos-publicos/');
+      return response.data;
+    } catch (error) {
+      console.error('Error obteniendo productos personalizados públicos:', error);
       throw error;
     }
   }

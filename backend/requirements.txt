@@ -10,4 +10,8 @@ python-dotenv==1.1.1
 sqlparse==0.5.3
 typing_extensions==4.15.0
 tzdata==2025.2
-mercadopago==2.2.3
+stripe==10.6.0
+dj-database-url==2.2.0
+whitenoise==6.8.2
+gunicorn==23.0.0
+python-decouple==3.8

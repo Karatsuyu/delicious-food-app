@@ -63,6 +63,9 @@ class AddCustomComboToCartAPIView(APIView):
             try:
                 prod_id = int(pd.get('producto'))
                 cantidad = int(pd.get('cantidad', 1))
+                imagen_seleccionada = pd.get('imagen_seleccionada', '')
+                # 🔑 USAR PRECIO ENVIADO DESDE FRONTEND (MÁS PRECISO)
+                precio_frontend = pd.get('precio_actual')
             except Exception:
                 continue
             if cantidad <= 0:
@@ -71,8 +74,21 @@ class AddCustomComboToCartAPIView(APIView):
                 prod = Producto.objects.get(id=prod_id)
             except Producto.DoesNotExist:
                 continue
-            ComboPersonalizadoProducto.objects.create(combo=combo, producto=prod, cantidad=cantidad)
-            total += prod.precio * cantidad
+            
+            # Usar precio del frontend si está disponible, sino usar precio actual de BD
+            precio_usar = float(precio_frontend) if precio_frontend is not None else float(prod.precio)
+            
+            print(f"[DEBUG] Creando ComboPersonalizadoProducto: combo={combo.id}, producto={prod.id}({prod.nombre}), cantidad={cantidad}, precio_frontend={precio_frontend}, precio_usar={precio_usar}")
+            combo_producto = ComboPersonalizadoProducto.objects.create(
+                combo=combo, 
+                producto=prod, 
+                cantidad=cantidad,
+                precio_unitario=precio_usar,  # 🔑 USAR PRECIO DEL FRONTEND
+                imagen_seleccionada=imagen_seleccionada,
+                precio_al_agregar=precio_usar  # 🔑 GUARDAR EL MISMO PRECIO
+            )
+            print(f"[DEBUG] ComboPersonalizadoProducto creado con ID: {combo_producto.id}")
+            total += precio_usar * cantidad
 
         combo.precio_total = total
         combo.save()
@@ -238,6 +254,15 @@ class PedidoViewSet(viewsets.ModelViewSet):
         
         response_serializer = PedidoSerializer(pedido)
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+class ClearCartAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        carrito = Carrito.objects.filter(usuario=request.user).first()
+        if carrito:
+            carrito.items.all().delete()
+        return Response({'ok': True, 'cleared': True})
 
     @action(detail=True, methods=['patch'])
     def actualizar_estado(self, request, pk=None):

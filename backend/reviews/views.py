@@ -5,6 +5,7 @@ from django.db.models import Avg
 from .models import Review
 from .serializers import ReviewSerializer, ReviewCreateSerializer
 from products.models import Producto
+from orders.models import Pedido, PedidoItem, Estado
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
@@ -22,8 +23,33 @@ class ReviewViewSet(viewsets.ModelViewSet):
             return ReviewCreateSerializer
         return ReviewSerializer
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
     def perform_create(self, serializer):
-        serializer.save(usuario=self.request.user)
+        # Verificar que el usuario haya comprado el producto
+        producto_id = serializer.validated_data['producto'].id
+        usuario = self.request.user
+        
+        # Buscar si existe algún pedido del usuario con este producto
+        # (más flexible - no requiere estado específico)
+        pedidos_usuario = Pedido.objects.filter(usuario=usuario)
+        
+        # Verificar si algún pedido del usuario contiene este producto
+        tiene_producto = PedidoItem.objects.filter(
+            pedido__in=pedidos_usuario,
+            producto_id=producto_id
+        ).exists()
+        
+        if not tiene_producto:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({
+                'error': 'Solo puedes reseñar productos que hayas comprado'
+            })
+        
+        serializer.save(usuario=usuario)
 
     def get_permissions(self):
         if self.action in ['update', 'partial_update', 'destroy']:

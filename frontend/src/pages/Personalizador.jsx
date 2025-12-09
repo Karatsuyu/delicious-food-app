@@ -1,10 +1,42 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { productService } from '../api/api';
+import api, { productService } from '../api/api';
 import { useCart } from '../context/CartContext';
 import './Personalizador.css';
-// Importar mapeo centralizado de imágenes para hamburguesas
-import { getHamburguesaIngredientImage, hamburguesaBaseImage } from '../utils/hamburguesaImageMap';
+// Importar imágenes para el mapeo de hamburguesas
+import aceitunasImg from '../assets/aceitunas.png';
+import baconImg from '../assets/bacon.png';
+import briocheImg from '../assets/brioche.png';
+import cebollaImg from '../assets/cebolla.png';
+import quesoImg from '../assets/queso.png';
+import carneBisonteImg from '../assets/carne de bisonte.png';
+import tomateImg from '../assets/tomate.png';
+import cerdoImg from '../assets/cerdo.png';
+import champiñonImg from '../assets/champiñon.png';
+import corderoImg from '../assets/cordero.png';
+import garbanzosImg from '../assets/garbanzos.png';
+import lechugaImg from '../assets/lechuga.png';
+import lentejasImg from '../assets/lentejas.png';
+import pepinoImg from '../assets/pepino.png';
+import madreImg from '../assets/madre.png';
+import moradaImg from '../assets/morada.png';
+import muffinImg from '../assets/muffin.png';
+import multigranoImg from '../assets/multigrano.png';
+import papaImg from '../assets/papa.png';
+import pavoImg from '../assets/pavo.png';
+import peperoniImg from '../assets/peperoni.png';
+import pretzelImg from '../assets/pretzel.png';
+import resImg from '../assets/res.png';
+import seitanImg from '../assets/seitan.png';
+import sesamoImg from '../assets/sesamo.png';
+import singlutenImg from '../assets/sin gluten.png';
+import venadoImg from '../assets/venado.png';
+import veganoImg from '../assets/vegano.png';
+import hamburguesaImg from '../assets/hamburguesa.png';
+import pizza1Img from '../assets/pizza1.png';
+import perroImg from '../assets/perro.png';
+import polloImg from '../assets/pollo.png';
+import postresImg from '../assets/postres1.png';
 
 
 
@@ -12,18 +44,85 @@ import { getHamburguesaIngredientImage, hamburguesaBaseImage } from '../utils/ha
 
 
 
+
+// Mapeo de ingredientes a imágenes (solo para hamburguesas)
+const ingredientImagesMap = {
+  // Panes
+  'pan brioche': briocheImg,
+  'pan clasico': sesamoImg,
+  'pan de papa': papaImg,
+  'pan pretzel': pretzelImg,
+  'pan masa madre': madreImg,
+  'pan multigrano': multigranoImg,
+  'pan muffin': muffinImg,
+  'pan sin gluten': singlutenImg,
+  'pan vegano': veganoImg,
+
+  // Carnes
+  'carne de res': resImg,
+  'carne de bisonte': carneBisonteImg,
+  'carne de pavo': pavoImg,
+  'carne de cordero': corderoImg,
+  'carne de venado': venadoImg,
+  'carne de cerdo': cerdoImg,
+  'carne de garbanzos vegana': garbanzosImg,
+  'carne de lentejas vegana': lentejasImg,
+  'carne de seitan': seitanImg,
+
+  // Ingredientes
+  'queso': quesoImg,
+  'tomate': tomateImg,
+  'lechuga': lechugaImg,
+  'cebolla': cebollaImg,
+  'pepperoni': peperoniImg,
+  'champiñones': champiñonImg,
+  'pepino': pepinoImg,
+  'bacon': baconImg,
+  'cebolla morada': moradaImg,
+  'aceitunas': aceitunasImg,
+};
 
 // Función helper para obtener la imagen de un ingrediente
-// Solo aplica el mapeo de hamburguesas si la categoría es "hamburguesas"
+// Solo aplica el mapeo si la categoría es "hamburguesas"
 const getIngredientImage = (ingredienteId, categoria) => {
-  // Si es hamburguesa, usar el mapeo centralizado
+  // Solo aplicar el mapeo si es para hamburguesas
   if (categoria === 'hamburguesas' || categoria === 'hamburguesa') {
-    return getHamburguesaIngredientImage(ingredienteId, categoria);
+    // Buscar en el mapeo específico
+    if (ingredientImagesMap[ingredienteId]) {
+      return ingredientImagesMap[ingredienteId];
+    }
+    // Fallback a imagen base de hamburguesa
+    return hamburguesaImg;
   }
   
   // Para otras categorías, retornar imagen base de hamburguesa como fallback
-  // (puedes extender esto para otras categorías en el futuro)
-  return hamburguesaBaseImage;
+  return hamburguesaImg;
+};
+
+// Función para obtener la imagen de la categoría para el carrito
+const getCategoryImage = (categoria) => {
+  const cat = categoria?.toLowerCase();
+  
+  // Usar imágenes representativas según la categoría
+  switch (cat) {
+    case 'hamburguesas':
+    case 'hamburguesa':
+      return hamburguesaImg;
+    case 'pizzas':
+    case 'pizza':
+      return pizza1Img;
+    case 'perros':
+    case 'perro':
+      return perroImg;
+    case 'pollo':
+    case 'alitas':
+      return polloImg;
+    case 'postres':
+    case 'postre':
+      return postresImg;
+    default:
+      return hamburguesaImg;
+  }
 };
 
 const Personalizador = () => {
@@ -38,7 +137,7 @@ const Personalizador = () => {
                     categoriaParam === 'postre' ? 'postres' : 
                     categoriaParam;
   
-  
+  // ✅ Estado actualizado: añadimos "pan", "masa" y "nombrePersonalizado"
   const [personalizacion, setPersonalizacion] = useState({
     tamaño: '',
     pan: '',
@@ -47,7 +146,8 @@ const Personalizador = () => {
     ingredientes: [],
     extras: [],
     cantidad: 1,
-    observaciones: ''
+    observaciones: '',
+    nombrePersonalizado: ''
   });
 
   // Estado para animaciones de ingredientes (imágenes cayendo)
@@ -99,7 +199,7 @@ const Personalizador = () => {
         prev.filter((ing) => ing.id !== animatedIngredient.id)
       );
       setStackedIngredients((prev) => [...prev, animatedIngredient]);
-    }, 2000);
+    }, 4000);
   };
 
   
@@ -436,17 +536,7 @@ const Personalizador = () => {
         }
       });
       
-      personalizacion.extras.forEach((extraId, index) => {
-        const extra = extrasDisponibles.find(e => e.id === extraId);
-        if (extra) {
-          capas.push({ 
-            tipo: 'extra', 
-            nombre: extra.nombre,
-            imagen: getIngredientImage(extraId, categoria),
-            zIndex: 4 + personalizacion.ingredientes.length + index
-          });
-        }
-      });
+
       
       if (personalizacion.pan) {
         const panNombre = pan.find(p => p.id === personalizacion.pan);
@@ -573,7 +663,9 @@ const Personalizador = () => {
       return 0;
     }
 
-    const precioBase = parseFloat(producto.precio) || 0;
+    // Para productos personalizados, no incluimos el precio base del producto
+    // Solo contamos los precios de los ingredientes, tamaños y extras seleccionados
+    const precioBase = 0; // Cambiado: era parseFloat(producto.precio) || 0;
     const precioTamaño = tamaños.find((t) => t.id === personalizacion.tamaño)
       ?.precio || 0;
 
@@ -683,20 +775,7 @@ const Personalizador = () => {
       }
     });
 
-    // Animar carne cayendo solo cuando se agrega
-    if (isAdding) {
-      const carne =
-        carnes.find((c) => c.id === carneId) ||
-        carnesPizza.find((c) => c.id === carneId);
-      if (carne) {
-        animateIngredient({
-          id: carneId,
-          tipo: 'carne',
-          nombre: carne.nombre,
-          imagen: getIngredientImage(carneId, categoria),
-        });
-      }
-    }
+    // Animación removida para carnes de pizza
   };
 
   const handleIngredienteToggle = (ingredienteId) => {
@@ -724,7 +803,7 @@ const Personalizador = () => {
         // Remover la animación después de que termine
         setTimeout(() => {
           setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
-        }, 2000);
+        }, 4000);
       }
     }
   };
@@ -739,24 +818,7 @@ const Personalizador = () => {
         : [...prev.extras, extraId]
     }));
 
-    // Activar animación solo cuando se agrega un extra
-    if (isAdding) {
-      const extra = extrasDisponibles.find(e => e.id === extraId);
-      if (extra) {
-        const animationId = `extra-${extraId}-${Date.now()}`;
-        setAnimatingIngredients(prev => [...prev, { 
-          id: animationId, 
-          nombre: extra.nombre, 
-          tipo: 'extra',
-          imagen: getIngredientImage(extraId, categoria)
-        }]);
-        
-        // Remover la animación después de que termine
-        setTimeout(() => {
-          setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
-        }, 2000);
-      }
-    }
+    // Animación removida para extras de hamburguesas
   };
 
   const handleCantidadChange = (cantidad) => {
@@ -770,216 +832,70 @@ const Personalizador = () => {
   // PIZZA
   const handleMasaChange = (masaId) => {
     setPersonalizacion(prev => ({ ...prev, masa: masaId }));
-    
-    const masa = masasPizza.find(m => m.id === masaId);
-    if (masa) {
-      const animationId = `masa-${masaId}-${Date.now()}`;
-      setAnimatingIngredients(prev => [...prev, { 
-        id: animationId, 
-        nombre: masa.nombre, 
-        tipo: 'masa',
-        imagen: getIngredientImage(masaId, categoria)
-      }]);
-      
-      setTimeout(() => {
-        setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
-      }, 2000);
-    }
+    // Animación removida
   };
 
   const handleQuesoChange = (quesoId) => {
     setPersonalizacion(prev => ({ ...prev, ingredientes: [quesoId] }));
-    
-    const queso = quesosPizza.find(q => q.id === quesoId);
-    if (queso) {
-      const animationId = `queso-${quesoId}-${Date.now()}`;
-      setAnimatingIngredients(prev => [...prev, { 
-        id: animationId, 
-        nombre: queso.nombre, 
-        tipo: 'queso',
-        imagen: getIngredientImage(quesoId, categoria)
-      }]);
-      
-      setTimeout(() => {
-        setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
-      }, 2000);
-    }
+    // Animación removida
   };
 
   // POLLO
   const handleTipoPolloChange = (tipoId) => {
     setPersonalizacion(prev => ({ ...prev, carnes: tipoId }));
-    
-    const tipo = tiposPollo.find(t => t.id === tipoId);
-    if (tipo) {
-      const animationId = `pollo-${tipoId}-${Date.now()}`;
-      setAnimatingIngredients(prev => [...prev, { 
-        id: animationId, 
-        nombre: tipo.nombre, 
-        tipo: 'pollo',
-        imagen: getIngredientImage(tipoId, categoria)
-      }]);
-      
-      setTimeout(() => {
-        setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
-      }, 2000);
-    }
+    // Animación removida
   };
 
   const handleSalsaPolloToggle = (salsaId) => {
-    const isAdding = !personalizacion.extras.includes(salsaId);
-    
     setPersonalizacion(prev => ({
       ...prev,
       extras: prev.extras.includes(salsaId)
         ? prev.extras.filter(id => id !== salsaId)
         : [...prev.extras, salsaId]
     }));
-
-    // Activar animación solo cuando se agrega una salsa
-    if (isAdding) {
-      const salsa = salsasPollo.find(s => s.id === salsaId);
-      if (salsa) {
-        const animationId = `salsa-${salsaId}-${Date.now()}`;
-        setAnimatingIngredients(prev => [...prev, { 
-          id: animationId, 
-          nombre: salsa.nombre, 
-          tipo: 'salsa',
-          imagen: getIngredientImage(salsaId, categoria)
-        }]);
-        
-        setTimeout(() => {
-          setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
-        }, 2000);
-      }
-    }
+    // Animación removida
   };
 
   // PERROS
   const handleTipoPerroChange = (tipoId) => {
     setPersonalizacion(prev => ({ ...prev, carnes: tipoId }));
-    
-    const tipo = tiposPerro.find(t => t.id === tipoId);
-    if (tipo) {
-      const animationId = `perro-${tipoId}-${Date.now()}`;
-      setAnimatingIngredients(prev => [...prev, { 
-        id: animationId, 
-        nombre: tipo.nombre, 
-        tipo: 'perro-base',
-        imagen: getIngredientImage(tipoId, categoria)
-      }]);
-      
-      setTimeout(() => {
-        setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
-      }, 2000);
-    }
+    // Animación removida
   };
 
   const handleComplementoPerroToggle = (compId) => {
-    const isAdding = !personalizacion.extras.includes(compId);
-    
     setPersonalizacion(prev => ({
       ...prev,
       extras: prev.extras.includes(compId)
         ? prev.extras.filter(id => id !== compId)
         : [...prev.extras, compId]
     }));
-
-    // Activar animación solo cuando se agrega un complemento
-    if (isAdding) {
-      const comp = complementosPerro.find(c => c.id === compId);
-      if (comp) {
-        const animationId = `comp-${compId}-${Date.now()}`;
-        setAnimatingIngredients(prev => [...prev, { 
-          id: animationId, 
-          nombre: comp.nombre, 
-          tipo: 'complemento',
-          imagen: getIngredientImage(compId, categoria)
-        }]);
-        
-        setTimeout(() => {
-          setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
-        }, 2000);
-      }
-    }
+    // Animación removida
   };
 
   const handleSalsaPerroToggle = (salsaId) => {
-    const isAdding = !personalizacion.extras.includes(salsaId);
-    
     setPersonalizacion(prev => ({
       ...prev,
       extras: prev.extras.includes(salsaId)
         ? prev.extras.filter(id => id !== salsaId)
         : [...prev.extras, salsaId]
     }));
-
-    // Activar animación solo cuando se agrega una salsa
-    if (isAdding) {
-      const salsa = salsasPerros.find(s => s.id === salsaId);
-      if (salsa) {
-        const animationId = `salsa-perro-${salsaId}-${Date.now()}`;
-        setAnimatingIngredients(prev => [...prev, { 
-          id: animationId, 
-          nombre: salsa.nombre, 
-          tipo: 'salsa',
-          imagen: getIngredientImage(salsaId, categoria)
-        }]);
-        
-        setTimeout(() => {
-          setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
-        }, 2000);
-      }
-    }
+    // Animación removida
   };
 
   // POSTRES
   const handleTipoPostreChange = (tipoId) => {
     setPersonalizacion(prev => ({ ...prev, carnes: tipoId }));
-    
-    const tipo = tiposPostre.find(t => t.id === tipoId);
-    if (tipo) {
-      const animationId = `postre-${tipoId}-${Date.now()}`;
-      setAnimatingIngredients(prev => [...prev, { 
-        id: animationId, 
-        nombre: tipo.nombre, 
-        tipo: 'postre-base',
-        imagen: getIngredientImage(tipoId, categoria)
-      }]);
-      
-      setTimeout(() => {
-        setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
-      }, 2000);
-    }
+    // Animación removida
   };
 
   const handleAgregadoPostreToggle = (agregadoId) => {
-    const isAdding = !personalizacion.extras.includes(agregadoId);
-    
     setPersonalizacion(prev => ({
       ...prev,
       extras: prev.extras.includes(agregadoId)
         ? prev.extras.filter(id => id !== agregadoId)
         : [...prev.extras, agregadoId]
     }));
-
-    // Activar animación solo cuando se agrega un agregado
-    if (isAdding) {
-      const agregado = agregadosPostre.find(a => a.id === agregadoId);
-      if (agregado) {
-        const animationId = `agregado-${agregadoId}-${Date.now()}`;
-        setAnimatingIngredients(prev => [...prev, { 
-          id: animationId, 
-          nombre: agregado.nombre, 
-          tipo: 'agregado',
-          imagen: getIngredientImage(agregadoId, categoria)
-        }]);
-        
-        setTimeout(() => {
-          setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
-        }, 2000);
-      }
-    }
+    // Animación removida
   };
   
   const handleVolver = () => {
@@ -992,37 +908,92 @@ const Personalizador = () => {
     }
   };
 
-  // ✅ Actualizado: usa calcularPrecio()
-  const agregarAlCarrito = () => {
+  // Función para abrir carrito y reiniciar personalizador
+  const abrirCarritoYReiniciar = () => {
+    // Reiniciar el estado del personalizador a sus valores iniciales
+    setPersonalizacion({
+      tamaño: '',
+      masa: '',
+      pan: '',
+      carnes: [],
+      ingredientes: [],
+      extras: [],
+      cantidad: 1,
+      observaciones: '',
+      nombrePersonalizado: ''
+    });
+    
+    // Reiniciar ingredientes apilados y animaciones
+    setStackedIngredients([]);
+    setAnimatingIngredients([]);
+    setZIndexCounter(0);
+    
+    // Abrir el modal del carrito pequeño usando el sistema original
+    window.dispatchEvent(new Event('open-cart-modal'));
+  };
+
+  // ✅ Actualizado: crea ProductoPersonalizado y usa calcularPrecio()
+  const agregarAlCarrito = async () => {
     if (!producto) return;
 
-    // Construir detalle legible de la "combinación" personalizada para mostrar en el carrito pequeño
-    const detalles = {
-      ...(personalizacion.tamaño && { tamaño: tamaños.find(t => t.id === personalizacion.tamaño)?.nombre || personalizacion.tamaño }),
-      ...(personalizacion.pan && { pan: personalizacion.pan }),
-      ...(personalizacion.masa && { masa: personalizacion.masa }),
-      ...(Array.isArray(personalizacion.carnes) && personalizacion.carnes.length > 0
-        ? { carnes: personalizacion.carnes }
-        : (personalizacion.carnes && typeof personalizacion.carnes === 'string'
-            ? { carnes: [personalizacion.carnes] }
-            : {})),
-      ...(Array.isArray(personalizacion.ingredientes) && personalizacion.ingredientes.length > 0 && { ingredientes: personalizacion.ingredientes }),
-      ...(Array.isArray(personalizacion.extras) && personalizacion.extras.length > 0 && { extras: personalizacion.extras }),
-      ...(personalizacion.observaciones && { observaciones: personalizacion.observaciones })
-    };
+    try {
+      // 1. Crear ProductoPersonalizado en el backend
+      const ingredientesSeleccionados = [
+        ...personalizacion.ingredientes,
+        ...personalizacion.extras,
+        ...(personalizacion.carnes ? (Array.isArray(personalizacion.carnes) ? personalizacion.carnes : [personalizacion.carnes]) : [])
+      ].filter(Boolean);
 
-    const productoParaCarrito = {
-      id: producto.id,
-      nombre: producto.nombre,
-      precio: calcularPrecio(),
-      imagen: producto.imagen,
-      cantidad: 1,
-      precioTotal: calcularPrecio(),
-      categoria: producto.categoria,
-      detalles
-    };
+      const productoPersonalizadoData = {
+        nombre_personalizado: personalizacion.nombrePersonalizado || `${producto.nombre} personalizado`,
+        producto_base: producto.id,
+        ingredientes: ingredientesSeleccionados,
+        precio_total: calcularPrecio()
+      };
 
-    addToCart(productoParaCarrito);
+      const response = await api.post('productos-personalizados/', productoPersonalizadoData);
+      const productoPersonalizadoCreado = response.data;
+
+      // 2. Construir detalle legible para mostrar en el carrito
+      const detalles = {
+        ...(personalizacion.nombrePersonalizado && { nombrePersonalizado: personalizacion.nombrePersonalizado }),
+        ...(personalizacion.tamaño && { tamaño: tamaños.find(t => t.id === personalizacion.tamaño)?.nombre || personalizacion.tamaño }),
+        ...(personalizacion.pan && { pan: personalizacion.pan }),
+        ...(personalizacion.masa && { masa: personalizacion.masa }),
+        ...(Array.isArray(personalizacion.carnes) && personalizacion.carnes.length > 0
+          ? { carnes: personalizacion.carnes }
+          : (personalizacion.carnes && typeof personalizacion.carnes === 'string'
+              ? { carnes: [personalizacion.carnes] }
+              : {})),
+        ...(Array.isArray(personalizacion.ingredientes) && personalizacion.ingredientes.length > 0 && { ingredientes: personalizacion.ingredientes }),
+        ...(Array.isArray(personalizacion.extras) && personalizacion.extras.length > 0 && { extras: personalizacion.extras }),
+        ...(personalizacion.observaciones && { observaciones: personalizacion.observaciones })
+      };
+
+      // 3. Agregar al carrito con el ID del producto personalizado
+      const productoParaCarrito = {
+        id: `producto-personalizado-${productoPersonalizadoCreado.id}`,
+        nombre: personalizacion.nombrePersonalizado || producto.nombre,
+        precio: calcularPrecio(),
+        imagen: getCategoryImage(categoria),
+        cantidad: 1,
+        precioTotal: calcularPrecio(),
+        categoria: producto.categoria,
+        detalles,
+        // IMPORTANTE: Agregar el ID para el flujo de pago
+        producto_personalizado_id: productoPersonalizadoCreado.id,
+        es_producto_personalizado: true
+      };
+
+      addToCart(productoParaCarrito);
+      
+      // ✅ NUEVO: Abrir carrito automáticamente y reiniciar personalizador
+      abrirCarritoYReiniciar();
+      
+    } catch (error) {
+      console.error('Error creando producto personalizado:', error);
+      alert('Error al agregar el producto personalizado. Inténtalo de nuevo.');
+    }
   };
 
   if (loading) {
@@ -1484,6 +1455,25 @@ const Personalizador = () => {
             <div className="precio-total">
               <span className="precio-label">Total:</span>
               <span className="precio-valor">${calcularPrecio().toFixed(0)}</span>
+            </div>
+
+            {/* Campo para nombre personalizado */}
+            <div className="nombre-personalizado-container">
+              <label htmlFor="nombrePersonalizado" className="nombre-label">
+                Nombre de tu creación:
+              </label>
+              <input
+                type="text"
+                id="nombrePersonalizado"
+                value={personalizacion.nombrePersonalizado}
+                onChange={(e) => setPersonalizacion({
+                  ...personalizacion,
+                  nombrePersonalizado: e.target.value
+                })}
+                placeholder="Ej: Mi Hamburguesa Especial"
+                className="nombre-input"
+                maxLength={50}
+              />
             </div>
 
             <button className="agregar-carrito-btn" onClick={agregarAlCarrito}>

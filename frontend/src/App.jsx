@@ -17,6 +17,7 @@ import ComboCrocanteDeluxe from './pages/ComboCrocanteDeluxe';
 import Personalizador from './pages/Personalizador';
 import Perfil from './pages/Perfil';
 import CrearCombo from './pages/CrearCombo';
+import ComboPersonalizadoDetalle from './pages/ComboPersonalizadoDetalle';
 import Checkout from './pages/Checkout';
 import PaymentResult from './pages/PaymentResult';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -24,6 +25,7 @@ import AdminRoute from './components/AdminRoute';
 import AdminPanel from './pages/AdminPanel';
 import AdminDashboard from './pages/AdminDashboard';
 import CombosPublicos from './pages/CombosPublicos';
+import ProductosPublicos from './pages/ProductosPublicos';
 import PerfilPublico from './pages/PerfilPublico';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -81,6 +83,14 @@ function App() {
                     </ProtectedRoute>
                   } 
                 />
+                <Route 
+                  path="/mis-combos/:id" 
+                  element={
+                    <ProtectedRoute>
+                      <ComboPersonalizadoDetalle />
+                    </ProtectedRoute>
+                  } 
+                />
                 {/* Rutas de administración */}
                 <Route 
                   path="/admin/productos" 
@@ -98,8 +108,9 @@ function App() {
                     </AdminRoute>
                   } 
                 />
-                {/* Rutas públicas de combos y perfiles */}
+                {/* Rutas públicas de combos, productos y perfiles */}
                 <Route path="/combos-publicos" element={<CombosPublicos />} />
+                <Route path="/productos-publicos" element={<ProductosPublicos />} />
                 <Route path="/perfil/:userId" element={<PerfilPublico />} />
               </Routes>
             </main>
