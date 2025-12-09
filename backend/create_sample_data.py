@@ -12,7 +12,7 @@ from decimal import Decimal
 user, created = User.objects.get_or_create(
     username='admin',
     defaults={
-        'email': 'admin@deliciousfood.com',
+        'email': 'admin@gmail.com',
         'first_name': 'Admin',
         'last_name': 'User',
         'is_staff': True,

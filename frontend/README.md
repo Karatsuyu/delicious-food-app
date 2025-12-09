@@ -1,118 +1,117 @@
-# Delicious Food App - Frontend
 
-Frontend de **Delicious Food App** construido con React 19, Vite y React Router DOM.
 
-## 🚀 Quick Start
+# delicious-food-app — Frontend (React + Vite)
 
-### Instalación
+Este repositorio contiene la aplicación frontend (React + Vite) del proyecto "delicious-food-app".  
+Este README está organizado de forma paralela al README del backend para facilitar la puesta en marcha y la integración.
 
-```bash
-# Instalar dependencias
-npm install
+## Contenido
+- Descripción
+- Requisitos
+- Instalación (desarrollo)
+- Variables de entorno
+- Scripts útiles
+- Estructura relevante del proyecto
+- Uso de assets (imágenes)
+- Conectar con el backend
+- Pruebas
+- Despliegue
+- Contribuir
+- Licencia
 
-# Iniciar servidor de desarrollo
-npm run dev
-```
+## Descripción
+Frontend en React + Vite que permite personalizar y pedir productos (hamburguesas, pizzas, pollo, perros, postres). Consume la API del backend para productos, carrito y órdenes.
 
-Abre `http://localhost:5173` en tu navegador.
+## Requisitos
+- Node.js 18+ (recomendado)
+- npm o yarn
+- Backend corriendo o acceso a la URL pública de la API
 
-### Requisitos Previos
+## Instalación (desarrollo)
+En una terminal (Windows PowerShell/CMD) dentro de la carpeta `frontend`:
 
-- Node.js 18+ y npm
-- Backend Django corriendo en `http://127.0.0.1:8000`
+1. Instalar dependencias:
+   - npm:
+     npm install
+   - yarn:
+     yarn
 
-## 📚 Documentación
+2. Crear archivo de variables de entorno (ejemplo):
+   - Crea `.env` en `frontend/` con:
+     VITE_API_URL=http://localhost:8000/api
 
-### [📖 DOCUMENTACION.md](DOCUMENTACION.md) - Documentación Completa
-Documentación técnica completa del frontend:
-- Stack tecnológico
-- Estructura del proyecto
-- Componentes y páginas
-- Context API
-- Servicios API
-- Rutas y navegación
-- Flujos de usuario
+3. Ejecutar aplicación en modo desarrollo:
+   - npm:
+     npm run dev
+   - yarn:
+     yarn dev
 
-### [📑 INDICE.md](INDICE.md) - Índice de Documentación
-Índice completo con referencias rápidas y guías.
+La app abrirá en http://localhost:5173 (u otro puerto asignado por Vite).
 
-## 🛠️ Scripts Disponibles
+## Variables de entorno
+- VITE_API_URL — URL base del backend (ej: http://localhost:8000/api).  
+Asegúrate de usar el prefijo VITE_ para que Vite exponga la variable al frontend.
 
-| Comando | Descripción |
-|---------|-------------|
-| `npm run dev` | Inicia servidor de desarrollo (Vite) |
-| `npm run build` | Construye la aplicación para producción |
-| `npm run preview` | Previsualiza la build de producción |
-| `npm run lint` | Ejecuta ESLint para verificar código |
+Ejemplo de `.env`:
+VITE_API_URL=http://localhost:8000/api
 
-## 🏗️ Stack Tecnológico
+## Scripts útiles
+- npm run dev — iniciar servidor de desarrollo (HMR)
+- npm run build — generar build de producción (dist)
+- npm run preview — previsualizar build localmente
+- npm test — ejecutar tests (si existen)
+- npm run lint — correr linters (si están configurados)
 
-- **React 19.1.1** - Biblioteca JavaScript para UI
-- **Vite 7.1.2** - Build tool y servidor de desarrollo
-- **React Router DOM 7.9.4** - Enrutamiento
-- **Axios 1.12.2** - Cliente HTTP para API
+(Usar yarn equivalentes reemplazando `npm run` por `yarn`.)
 
-## 📁 Estructura del Proyecto
+## Estructura relevante
+- src/
+  - assets/ — imágenes (ingredientes, panes, etc.)
+  - api/ — clientes de API (conexión al backend)
+  - components/ — componentes reutilizables
+  - pages/ — páginas (Personalizador, Home, AdminDashboard, etc.)
+  - context/ — contextos React (carrito, usuario)
+  - styles/ — estilos globales / css
+- public/ — archivos estáticos
 
-```
-frontend/
-├── src/
-│   ├── api/              # Servicios API
-│   ├── assets/           # Imágenes y recursos
-│   ├── components/       # Componentes reutilizables
-│   ├── context/          # Context API (Auth, Cart)
-│   ├── pages/            # Páginas/Vistas
-│   ├── utils/            # Utilidades
-│   ├── App.jsx           # Componente raíz
-│   └── main.jsx          # Punto de entrada
-```
+## Uso de assets (imágenes)
+- Coloca imágenes en `src/assets/` y usa imports relativos en componentes:
+  import nombreImg from '../assets/nombre-de-imagen.png'
+- Normaliza nombres (sin espacios preferible, ejemplo: `carne-de-bisonte.png`) o importa con el nombre real que tengas en la carpeta.
+- Para los ingredientes del personalizador se utiliza un mapeo en `Personalizador.jsx` — actualiza ese map si agregas más imágenes.
 
-## 🎯 Características Principales
+## Conectar con el backend
+- Asegúrate de que el backend esté corriendo y que `VITE_API_URL` apunte a la ruta correcta.
+- Si el backend corre en otra máquina, usa `http://IP:PUERTO/api` y ajusta CORS en el backend.
 
-- ✅ **Carrito por usuario**: Cada usuario tiene su propio carrito guardado en localStorage
-- ✅ **Personalización de productos**: Sistema completo de personalización por categoría
-- ✅ **Panel de administración**: CRUD completo de productos con subida de imágenes
-- ✅ **Combos públicos**: Usuarios pueden publicar y ver combos de la comunidad
-- ✅ **Rutas protegidas**: Control de acceso con `ProtectedRoute` y `AdminRoute`
-- ✅ **Autenticación JWT**: Integración completa con backend Django
+## Pruebas
+- Si existen tests: npm test
+- Para agregar pruebas unitarias, usar Jest + React Testing Library (sugerido).
 
-## 🔗 Integración con Backend
+## Despliegue
+- Generar build:
+  npm run build
+- Subir la carpeta `dist/` al servicio de hosting (Netlify, Vercel, Surge, S3 + CloudFront, etc.).  
+- Asegurar que `VITE_API_URL` en producción apunte al backend desplegado.
 
-El frontend se comunica con el backend Django a través de una API REST:
+## Crear administrador / Dashboard (notas)
+- Existe una página `AdminDashboard` en `src/pages/AdminDashboard.jsx` (si la añadiste).
+- Para persistir creación/edición de productos integra los endpoints del backend (POST/PUT/DELETE) y autenticación (token/usuario admin).
+- Para mostrar "producto más vendido" el backend debería exponer estadísticas; el frontend consume esa ruta.
 
-- **URL Base**: `http://127.0.0.1:8000/api/`
-- **Autenticación**: JWT tokens (access + refresh)
-- **Configuración**: Ver `src/api/api.js`
+## Contribuir
+1. Hacer fork y branch con descripción clara.
+2. Abrir PR con cambios y pruebas.
+3. Mantener estilo de código y pasar linters.
 
-## 📖 Más Información
+## Recursos útiles
+- Backend README: revisar `../backend/README.md` para detalles de API, endpoints y autenticación.
+- Documentación Vite: https://vitejs.dev
+- React: https://reactjs.org
 
-Para documentación completa, ver:
-- [DOCUMENTACION.md](DOCUMENTACION.md) - Documentación técnica completa
-- [INDICE.md](INDICE.md) - Índice y referencias rápidas
+## Contacto
+Para dudas sobre este frontend, abrir issue en el repositorio o contactar al mantenedor del proyecto.
 
-## 🚨 Troubleshooting
-
-### "CORS request blocked"
-- Verificar que el backend esté corriendo
-- Verificar configuración de CORS en backend
-- Verificar `API_BASE_URL` en `src/api/api.js`
-
-### "Token expired"
-- El interceptor debería refrescar automáticamente
-- Si falla, redirige a login
-- Verificar que los tokens se guarden en localStorage
-
-### "Carrito no se guarda"
-- Verificar que el usuario esté autenticado
-- Verificar localStorage en DevTools
-- Verificar que `user.id` esté disponible
-
-## 📞 Soporte
-
-Para más información, consulta la [documentación completa](DOCUMENTACION.md).
-
----
-
-**Versión:** 1.0.0  
-**Última Actualización:** Diciembre 2024
+## Licencia
+Especificar la licencia del proyecto (ej: MIT) o añadir archivo LICENSE en la raíz.
 

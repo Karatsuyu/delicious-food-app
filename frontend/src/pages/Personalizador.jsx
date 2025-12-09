@@ -3,36 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { productService } from '../api/api';
 import { useCart } from '../context/CartContext';
 import './Personalizador.css';
-// Importar imágenes para el mapeo de hamburguesas
-import aceitunasImg from '../assets/aceitunas.png';
-import baconImg from '../assets/bacon.png';
-import briocheImg from '../assets/brioche.png';
-import cebollaImg from '../assets/cebolla.png';
-import quesoImg from '../assets/queso.png';
-import carneBisonteImg from '../assets/carne de bisonte.png';
-import tomateImg from '../assets/tomate.png';
-import cerdoImg from '../assets/cerdo.png';
-import champiñonImg from '../assets/champiñon.png';
-import corderoImg from '../assets/cordero.png';
-import garbanzosImg from '../assets/garbanzos.png';
-import lechugaImg from '../assets/lechuga.png';
-import lentejasImg from '../assets/lentejas.png';
-import pepinoImg from '../assets/pepino.png';
-import madreImg from '../assets/madre.png';
-import moradaImg from '../assets/morada.png';
-import muffinImg from '../assets/muffin.png';
-import multigranoImg from '../assets/multigrano.png';
-import papaImg from '../assets/papa.png';
-import pavoImg from '../assets/pavo.png';
-import peperoniImg from '../assets/peperoni.png';
-import pretzelImg from '../assets/pretzel.png';
-import resImg from '../assets/res.png';
-import seitanImg from '../assets/seitan.png';
-import sesamoImg from '../assets/sesamo.png';
-import singlutenImg from '../assets/sin gluten.png';
-import venadoImg from '../assets/venado.png';
-import veganoImg from '../assets/vegano.png';
-import hamburguesaImg from '../assets/hamburguesa.png';
+// Importar mapeo centralizado de imágenes para hamburguesas
+import { getHamburguesaIngredientImage, hamburguesaBaseImage } from '../utils/hamburguesaImageMap';
 
 
 
@@ -40,59 +12,18 @@ import hamburguesaImg from '../assets/hamburguesa.png';
 
 
 
-
-// Mapeo de ingredientes a imágenes (solo para hamburguesas)
-const ingredientImagesMap = {
-  // Panes
-  'pan brioche': briocheImg,
-  'pan clasico': sesamoImg,
-  'pan de papa': papaImg,
-  'pan pretzel': pretzelImg,
-  'pan masa madre': madreImg,
-  'pan multigrano': multigranoImg,
-  'pan muffin': muffinImg,
-  'pan sin gluten': singlutenImg,
-  'pan vegano': veganoImg,
-
-  // Carnes
-  'carne de res': resImg,
-  'carne de bisonte': carneBisonteImg,
-  'carne de pavo': pavoImg,
-  'carne de cordero': corderoImg,
-  'carne de venado': venadoImg,
-  'carne de cerdo': cerdoImg,
-  'carne de garbanzos vegana': garbanzosImg,
-  'carne de lentejas vegana': lentejasImg,
-  'carne de seitan': seitanImg,
-
-  // Ingredientes
-  'queso': quesoImg,
-  'tomate': tomateImg,
-  'lechuga': lechugaImg,
-  'cebolla': cebollaImg,
-  'pepperoni': peperoniImg,
-  'champiñones': champiñonImg,
-  'pepino': pepinoImg,
-  'bacon': baconImg,
-  'cebolla morada': moradaImg,
-  'aceitunas': aceitunasImg,
-};
 
 // Función helper para obtener la imagen de un ingrediente
-// Solo aplica el mapeo si la categoría es "hamburguesas"
+// Solo aplica el mapeo de hamburguesas si la categoría es "hamburguesas"
 const getIngredientImage = (ingredienteId, categoria) => {
-  // Solo aplicar el mapeo si es para hamburguesas
+  // Si es hamburguesa, usar el mapeo centralizado
   if (categoria === 'hamburguesas' || categoria === 'hamburguesa') {
-    // Buscar en el mapeo específico
-    if (ingredientImagesMap[ingredienteId]) {
-      return ingredientImagesMap[ingredienteId];
-    }
-    // Fallback a imagen base de hamburguesa
-    return hamburguesaImg;
+    return getHamburguesaIngredientImage(ingredienteId, categoria);
   }
   
   // Para otras categorías, retornar imagen base de hamburguesa como fallback
-  return hamburguesaImg;
+  // (puedes extender esto para otras categorías en el futuro)
+  return hamburguesaBaseImage;
 };
 
 const Personalizador = () => {
@@ -107,7 +38,7 @@ const Personalizador = () => {
                     categoriaParam === 'postre' ? 'postres' : 
                     categoriaParam;
   
-  // ✅ Estado actualizado: añadimos "pan" y "masa"
+  
   const [personalizacion, setPersonalizacion] = useState({
     tamaño: '',
     pan: '',
@@ -168,7 +99,7 @@ const Personalizador = () => {
         prev.filter((ing) => ing.id !== animatedIngredient.id)
       );
       setStackedIngredients((prev) => [...prev, animatedIngredient]);
-    }, 4000);
+    }, 2000);
   };
 
   
@@ -505,7 +436,17 @@ const Personalizador = () => {
         }
       });
       
-
+      personalizacion.extras.forEach((extraId, index) => {
+        const extra = extrasDisponibles.find(e => e.id === extraId);
+        if (extra) {
+          capas.push({ 
+            tipo: 'extra', 
+            nombre: extra.nombre,
+            imagen: getIngredientImage(extraId, categoria),
+            zIndex: 4 + personalizacion.ingredientes.length + index
+          });
+        }
+      });
       
       if (personalizacion.pan) {
         const panNombre = pan.find(p => p.id === personalizacion.pan);
@@ -742,7 +683,20 @@ const Personalizador = () => {
       }
     });
 
-    // Animación removida para carnes de pizza
+    // Animar carne cayendo solo cuando se agrega
+    if (isAdding) {
+      const carne =
+        carnes.find((c) => c.id === carneId) ||
+        carnesPizza.find((c) => c.id === carneId);
+      if (carne) {
+        animateIngredient({
+          id: carneId,
+          tipo: 'carne',
+          nombre: carne.nombre,
+          imagen: getIngredientImage(carneId, categoria),
+        });
+      }
+    }
   };
 
   const handleIngredienteToggle = (ingredienteId) => {
@@ -770,7 +724,7 @@ const Personalizador = () => {
         // Remover la animación después de que termine
         setTimeout(() => {
           setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
-        }, 4000);
+        }, 2000);
       }
     }
   };
@@ -785,7 +739,24 @@ const Personalizador = () => {
         : [...prev.extras, extraId]
     }));
 
-    // Animación removida para extras de hamburguesas
+    // Activar animación solo cuando se agrega un extra
+    if (isAdding) {
+      const extra = extrasDisponibles.find(e => e.id === extraId);
+      if (extra) {
+        const animationId = `extra-${extraId}-${Date.now()}`;
+        setAnimatingIngredients(prev => [...prev, { 
+          id: animationId, 
+          nombre: extra.nombre, 
+          tipo: 'extra',
+          imagen: getIngredientImage(extraId, categoria)
+        }]);
+        
+        // Remover la animación después de que termine
+        setTimeout(() => {
+          setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
+        }, 2000);
+      }
+    }
   };
 
   const handleCantidadChange = (cantidad) => {
@@ -799,70 +770,216 @@ const Personalizador = () => {
   // PIZZA
   const handleMasaChange = (masaId) => {
     setPersonalizacion(prev => ({ ...prev, masa: masaId }));
-    // Animación removida
+    
+    const masa = masasPizza.find(m => m.id === masaId);
+    if (masa) {
+      const animationId = `masa-${masaId}-${Date.now()}`;
+      setAnimatingIngredients(prev => [...prev, { 
+        id: animationId, 
+        nombre: masa.nombre, 
+        tipo: 'masa',
+        imagen: getIngredientImage(masaId, categoria)
+      }]);
+      
+      setTimeout(() => {
+        setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
+      }, 2000);
+    }
   };
 
   const handleQuesoChange = (quesoId) => {
     setPersonalizacion(prev => ({ ...prev, ingredientes: [quesoId] }));
-    // Animación removida
+    
+    const queso = quesosPizza.find(q => q.id === quesoId);
+    if (queso) {
+      const animationId = `queso-${quesoId}-${Date.now()}`;
+      setAnimatingIngredients(prev => [...prev, { 
+        id: animationId, 
+        nombre: queso.nombre, 
+        tipo: 'queso',
+        imagen: getIngredientImage(quesoId, categoria)
+      }]);
+      
+      setTimeout(() => {
+        setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
+      }, 2000);
+    }
   };
 
   // POLLO
   const handleTipoPolloChange = (tipoId) => {
     setPersonalizacion(prev => ({ ...prev, carnes: tipoId }));
-    // Animación removida
+    
+    const tipo = tiposPollo.find(t => t.id === tipoId);
+    if (tipo) {
+      const animationId = `pollo-${tipoId}-${Date.now()}`;
+      setAnimatingIngredients(prev => [...prev, { 
+        id: animationId, 
+        nombre: tipo.nombre, 
+        tipo: 'pollo',
+        imagen: getIngredientImage(tipoId, categoria)
+      }]);
+      
+      setTimeout(() => {
+        setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
+      }, 2000);
+    }
   };
 
   const handleSalsaPolloToggle = (salsaId) => {
+    const isAdding = !personalizacion.extras.includes(salsaId);
+    
     setPersonalizacion(prev => ({
       ...prev,
       extras: prev.extras.includes(salsaId)
         ? prev.extras.filter(id => id !== salsaId)
         : [...prev.extras, salsaId]
     }));
-    // Animación removida
+
+    // Activar animación solo cuando se agrega una salsa
+    if (isAdding) {
+      const salsa = salsasPollo.find(s => s.id === salsaId);
+      if (salsa) {
+        const animationId = `salsa-${salsaId}-${Date.now()}`;
+        setAnimatingIngredients(prev => [...prev, { 
+          id: animationId, 
+          nombre: salsa.nombre, 
+          tipo: 'salsa',
+          imagen: getIngredientImage(salsaId, categoria)
+        }]);
+        
+        setTimeout(() => {
+          setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
+        }, 2000);
+      }
+    }
   };
 
   // PERROS
   const handleTipoPerroChange = (tipoId) => {
     setPersonalizacion(prev => ({ ...prev, carnes: tipoId }));
-    // Animación removida
+    
+    const tipo = tiposPerro.find(t => t.id === tipoId);
+    if (tipo) {
+      const animationId = `perro-${tipoId}-${Date.now()}`;
+      setAnimatingIngredients(prev => [...prev, { 
+        id: animationId, 
+        nombre: tipo.nombre, 
+        tipo: 'perro-base',
+        imagen: getIngredientImage(tipoId, categoria)
+      }]);
+      
+      setTimeout(() => {
+        setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
+      }, 2000);
+    }
   };
 
   const handleComplementoPerroToggle = (compId) => {
+    const isAdding = !personalizacion.extras.includes(compId);
+    
     setPersonalizacion(prev => ({
       ...prev,
       extras: prev.extras.includes(compId)
         ? prev.extras.filter(id => id !== compId)
         : [...prev.extras, compId]
     }));
-    // Animación removida
+
+    // Activar animación solo cuando se agrega un complemento
+    if (isAdding) {
+      const comp = complementosPerro.find(c => c.id === compId);
+      if (comp) {
+        const animationId = `comp-${compId}-${Date.now()}`;
+        setAnimatingIngredients(prev => [...prev, { 
+          id: animationId, 
+          nombre: comp.nombre, 
+          tipo: 'complemento',
+          imagen: getIngredientImage(compId, categoria)
+        }]);
+        
+        setTimeout(() => {
+          setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
+        }, 2000);
+      }
+    }
   };
 
   const handleSalsaPerroToggle = (salsaId) => {
+    const isAdding = !personalizacion.extras.includes(salsaId);
+    
     setPersonalizacion(prev => ({
       ...prev,
       extras: prev.extras.includes(salsaId)
         ? prev.extras.filter(id => id !== salsaId)
         : [...prev.extras, salsaId]
     }));
-    // Animación removida
+
+    // Activar animación solo cuando se agrega una salsa
+    if (isAdding) {
+      const salsa = salsasPerros.find(s => s.id === salsaId);
+      if (salsa) {
+        const animationId = `salsa-perro-${salsaId}-${Date.now()}`;
+        setAnimatingIngredients(prev => [...prev, { 
+          id: animationId, 
+          nombre: salsa.nombre, 
+          tipo: 'salsa',
+          imagen: getIngredientImage(salsaId, categoria)
+        }]);
+        
+        setTimeout(() => {
+          setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
+        }, 2000);
+      }
+    }
   };
 
   // POSTRES
   const handleTipoPostreChange = (tipoId) => {
     setPersonalizacion(prev => ({ ...prev, carnes: tipoId }));
-    // Animación removida
+    
+    const tipo = tiposPostre.find(t => t.id === tipoId);
+    if (tipo) {
+      const animationId = `postre-${tipoId}-${Date.now()}`;
+      setAnimatingIngredients(prev => [...prev, { 
+        id: animationId, 
+        nombre: tipo.nombre, 
+        tipo: 'postre-base',
+        imagen: getIngredientImage(tipoId, categoria)
+      }]);
+      
+      setTimeout(() => {
+        setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
+      }, 2000);
+    }
   };
 
   const handleAgregadoPostreToggle = (agregadoId) => {
+    const isAdding = !personalizacion.extras.includes(agregadoId);
+    
     setPersonalizacion(prev => ({
       ...prev,
       extras: prev.extras.includes(agregadoId)
         ? prev.extras.filter(id => id !== agregadoId)
         : [...prev.extras, agregadoId]
     }));
-    // Animación removida
+
+    // Activar animación solo cuando se agrega un agregado
+    if (isAdding) {
+      const agregado = agregadosPostre.find(a => a.id === agregadoId);
+      if (agregado) {
+        const animationId = `agregado-${agregadoId}-${Date.now()}`;
+        setAnimatingIngredients(prev => [...prev, { 
+          id: animationId, 
+          nombre: agregado.nombre, 
+          tipo: 'agregado',
+          imagen: getIngredientImage(agregadoId, categoria)
+        }]);
+        
+        setTimeout(() => {
+          setAnimatingIngredients(prev => prev.filter(anim => anim.id !== animationId));
+        }, 2000);
+      }
+    }
   };
   
   const handleVolver = () => {
