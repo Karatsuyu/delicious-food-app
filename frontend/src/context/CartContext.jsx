@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AuthContext } from './AuthContext';
+import { useNotification } from './NotificationContext';
 
 const CartContext = createContext();
 
@@ -13,6 +14,7 @@ export const useCart = () => {
 
 export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
+  const { showSuccess } = useNotification();
   const [cartItems, setCartItems] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -107,9 +109,9 @@ export const CartProvider = ({ children }) => {
         ];
       }
     });
-    // Abrir el popup del carrito (no el lateral) al agregar
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('open-cart-modal'));
+    // Mostrar notificación de agregado, sin abrir el carrito
+    if (showSuccess) {
+      showSuccess('Producto agregado', message || 'Producto agregado al carrito');
     }
     return message || 'Producto agregado al carrito';
   };

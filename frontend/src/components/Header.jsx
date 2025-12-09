@@ -144,20 +144,50 @@ function Header() {
         <aside className={`side-menu ${isMenuOpen ? 'open' : ''}`}>
           <button className="close-btn" onClick={toggleMenu}>✕</button>
           <ul className="side-menu-list">
-            <Link to="/menu?categoria=hamburguesas" className="side-menu-link">
+            <Link
+              to="/menu?categoria=hamburguesas"
+              className="side-menu-link"
+              onClick={() => setIsMenuOpen(false)}
+            >
               <span className="menu-emoji">🍽️</span>
               Productos
             </Link>
             <li>
-              <Link to="/combos-publicos" className="side-menu-link">
+              <Link
+                to="/combos-publicos"
+                className="side-menu-link"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 <span className="menu-emoji">🍔🍟</span>
                 Combos de la Comunidad
               </Link>
             </li>
             <li>
-              <Link to="/productos-publicos" className="side-menu-link">
+              <Link
+                to="/productos-publicos"
+                className="side-menu-link"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 <span className="menu-emoji">✨🍴</span>
                 Productos de la Comunidad
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/crear-combo"
+                className="side-menu-link side-menu-cta"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                💡 ¿Deseas agregar tu combo?
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/personalizador/hamburguesas"
+                className="side-menu-link side-menu-cta"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                ✨ Agrega tu producto
               </Link>
             </li>
           </ul>

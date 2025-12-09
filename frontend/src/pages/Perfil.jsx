@@ -703,8 +703,8 @@ function Perfil() {
                                       </div>
                                     )}
                                     
-                                    {/* Botón para dejar reseña solo en productos normales */}
-                                    {item.original_product_id && item.item_type !== 'combo_personalizado' && item.item_type !== 'producto_personalizado' && (() => {
+                                    {/* Botón para dejar reseña solo en productos normales y usuarios no admin */}
+                                    {item.original_product_id && item.item_type !== 'combo_personalizado' && item.item_type !== 'producto_personalizado' && !user?.is_staff && (() => {
                                       const productoIdBD = productIdMapping[item.original_product_id] || parseInt(item.original_product_id);
                                       const yaResenado = resenasUsuario.some(resena => 
                                         resena.producto === productoIdBD

@@ -202,11 +202,19 @@ function CombosPublicos() {
       <div className="combos-header">
         <h1>🍔 Combos Personalizados de la Comunidad</h1>
         <p>Descubre las creaciones de otros usuarios</p>
+        <div className="combos-cta">
+          <Link to="/crear-combo" className="cta-agrega-tuyo">
+            ¿Deseas agregar el tuyo?
+          </Link>
+        </div>
       </div>
 
       {combos.length === 0 ? (
         <div className="combos-empty">
           <p>No hay combos publicados aún. ¡Sé el primero en compartir tu creación!</p>
+          <Link to="/crear-combo" className="cta-agrega-tuyo">
+            ¿Deseas agregar el tuyo?
+          </Link>
         </div>
       ) : (
         <div className="combos-grid">

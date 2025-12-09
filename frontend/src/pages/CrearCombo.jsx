@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api, { productService, absolutizeMediaUrl } from '../api/api';
 import './CrearCombo.css';
 import { useCart } from '../context/CartContext';
+import { useNotification } from '../context/NotificationContext';
 import combosIcon from '../assets/combos.png';
 // Imágenes por categoría (idénticas a las usadas en Menu.jsx) para sincronizar visual y precios
 import hamburguesa1 from '../assets/hamburguesa1.png';
@@ -72,6 +73,7 @@ const TITULOS = {
 function CrearCombo() {
   const navigate = useNavigate();
   const { addToCart, cartItems, updateCartItem } = useCart();
+  const { showSuccess } = useNotification();
   const { id: editId } = useParams();
   const [original, setOriginal] = useState({ nombre: '', seleccion: {} });
   const [originalList, setOriginalList] = useState([]); // snapshot directo de item.items si existe
@@ -351,7 +353,6 @@ function CrearCombo() {
       originalList.forEach(it => { mapSel[Number(it.id)] = Number(it.cantidad) || 1; });
       setSeleccion(mapSel);
     }
-    try { window.dispatchEvent(new CustomEvent('open-cart-modal')); } catch {}
   };
 
   // Fallback: si no logramos guardar snapshot original, y ya hay selección cargada, usarla como original
@@ -431,7 +432,6 @@ function CrearCombo() {
           isCustomCombo: true,
           items: itemsDetalle
         }));
-        try { window.dispatchEvent(new CustomEvent('open-cart-modal')); } catch {}
       } else {
         // Modo creación: crear un nuevo ítem en el carrito
         cartItemId = `combo-${Date.now()}`;
@@ -465,6 +465,10 @@ function CrearCombo() {
       if (!editId) {
         setNombre('');
         setSeleccion({});
+      }
+
+      if (showSuccess) {
+        showSuccess('Agregado al carrito', 'Tu combo fue agregado al carrito.');
       }
     } catch (e) {
       console.error('Error agregando combo:', e);

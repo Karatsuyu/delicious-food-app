@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api, { productService } from '../api/api';
 import { useCart } from '../context/CartContext';
 import './Personalizador.css';
+import { useNotification } from '../context/NotificationContext';
 // Importar imágenes para el mapeo de hamburguesas
 import aceitunasImg from '../assets/aceitunas.png';
 import baconImg from '../assets/bacon.png';
@@ -129,6 +130,7 @@ const Personalizador = () => {
   const { categoria: categoriaParam } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { showSuccess } = useNotification();
   const [producto, setProducto] = useState(null);
   const [loading, setLoading] = useState(true);
   
@@ -377,15 +379,15 @@ const Personalizador = () => {
 
   // === PIZZAS ===
   const masasPizza = [
-    { id: 'tradicional', nombre: 'Masa Tradicional', precio: 0 },
-    { id: 'fina', nombre: 'Masa Fina', precio: 800 },
-    { id: 'gruesa', nombre: 'Masa Gruesa', precio: 800 },
+    { id: 'tradicional', nombre: 'Masa Tradicional', precio: 800 },
+    { id: 'fina', nombre: 'Masa Fina', precio:1000},
+    { id: 'gruesa', nombre: 'Masa Gruesa', precio: 1200 },
     { id: 'sin_gluten', nombre: 'Masa Sin Gluten', precio: 1500 },
-    { id: 'integral', nombre: 'Masa Integral', precio: 1000 },
+    { id: 'integral', nombre: 'Masa Integral', precio: 1800 },
   ];
 
   const tamaños = [
-    { id: 'pequeño', nombre: 'Pequeño', precio: 0 },
+    { id: 'pequeño', nombre: 'Pequeño', precio: 3000},
     { id: 'mediano', nombre: 'Mediano', precio: 3500 },
     { id: 'grande', nombre: 'Grande', precio: 5000 }
   ];
@@ -423,11 +425,11 @@ const Personalizador = () => {
 
   // === PERROS CALIENTES ===
   const tiposPerro = [
-    { id: 'clasico', nombre: 'Clásico', precio: 0 },
-    { id: 'ranchero', nombre: 'Ranchero', precio: 800 },
-    { id: 'hawaiano', nombre: 'Hawaiano', precio: 800 },
-    { id: 'tocineta', nombre: 'Con tocineta', precio: 1000 },
-    { id: 'vegetariano', nombre: 'Vegetariano', precio: 500 },
+    { id: 'clasico', nombre: 'Clásico', precio: 1000 },
+    { id: 'ranchero', nombre: 'Ranchero', precio: 1200 },
+    { id: 'hawaiano', nombre: 'Hawaiano', precio: 1400 },
+    { id: 'tocineta', nombre: 'Con tocineta', precio: 1600 },
+    { id: 'vegetariano', nombre: 'Vegetariano', precio: 1900 },
   ];
 
   const complementosPerro = [
@@ -919,8 +921,8 @@ const Personalizador = () => {
     }
   };
 
-  // Función para abrir carrito y reiniciar personalizador
-  const abrirCarritoYReiniciar = () => {
+  // Función para reiniciar personalizador
+  const reiniciarPersonalizador = () => {
     // Reiniciar el estado del personalizador a sus valores iniciales
     setPersonalizacion({
       tamaño: '',
@@ -938,9 +940,6 @@ const Personalizador = () => {
     setStackedIngredients([]);
     setAnimatingIngredients([]);
     setZIndexCounter(0);
-    
-    // Abrir el modal del carrito pequeño usando el sistema original
-    window.dispatchEvent(new Event('open-cart-modal'));
   };
 
   // ✅ Actualizado: crea ProductoPersonalizado y usa calcularPrecio()
@@ -998,8 +997,11 @@ const Personalizador = () => {
 
       addToCart(productoParaCarrito);
       
-      // ✅ NUEVO: Abrir carrito automáticamente y reiniciar personalizador
-      abrirCarritoYReiniciar();
+      // ✅ Notificar y reiniciar personalizador
+      if (showSuccess) {
+        showSuccess('Agregado al carrito', 'Tu producto personalizado fue agregado.');
+      }
+      reiniciarPersonalizador();
       
     } catch (error) {
       console.error('Error creando producto personalizado:', error);

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminService } from '../api/api';
 import { useAuth } from '../context/AuthContext';
@@ -21,6 +21,7 @@ function AdminPanel() {
     imagen: null
   });
   const [imagenPreview, setImagenPreview] = useState(null);
+  const formRef = useRef(null);
 
   useEffect(() => {
     // Verificar si el usuario es administrador
@@ -68,6 +69,15 @@ function AdminPanel() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productos, editingProduct]);
+
+  // Cuando se abre el formulario (nuevo o edición), desplazarse automáticamente hacia él
+  useEffect(() => {
+    if (showForm && formRef.current) {
+      requestAnimationFrame(() => {
+        formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }, [showForm, editingProduct]);
 
   const loadProductos = async () => {
     try {
@@ -313,7 +323,7 @@ function AdminPanel() {
       {error && <div className="admin-error">{error}</div>}
 
       {showForm && (
-        <div className="admin-form-container">
+        <div className="admin-form-container" ref={formRef}>
           <h2>{editingProduct ? 'Editar Producto' : 'Nuevo Producto'}</h2>
           <form onSubmit={handleSubmit} className="admin-form">
             <div className="form-group">

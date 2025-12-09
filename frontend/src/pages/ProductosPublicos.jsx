@@ -197,6 +197,11 @@ function ProductosPublicos() {
         <p className="productos-subtitle">
           Descubre las creaciones únicas de nuestra comunidad
         </p>
+        <div className="productos-cta">
+          <Link to="/personalizador/hamburguesas" className="cta-agrega-tuyo">
+            Agrega el tuyo
+          </Link>
+        </div>
       </div>
 
       {productos.length === 0 ? (
@@ -205,8 +210,8 @@ function ProductosPublicos() {
             <h3>¡Sé el primero!</h3>
             <p>Aún no hay productos personalizados publicados.</p>
             <p>¡Crea y comparte tu primera creación!</p>
-            <Link to="/menu" className="crear-producto-btn">
-              Crear Mi Producto
+            <Link to="/personalizador/hamburguesas" className="cta-agrega-tuyo">
+              Agrega el tuyo
             </Link>
           </div>
         </div>

@@ -11,6 +11,7 @@
   background: linear-gradient(135deg, #F28c1e 0%, #e8413d 100%);
   border-radius: 15px;
   color: white;
+  position: relative;
 }
 
 .combos-header h1 {
@@ -23,6 +24,34 @@
 .combos-header p {
   color: rgba(255, 255, 255, 0.9);
   font-size: 1.1rem;
+}
+
+.combos-cta {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cta-agrega-tuyo {
+  display: inline-block !important;
+  padding: 14px 28px;
+  background: white !important;
+  color: #e8413d !important;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-decoration: none !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  border: 2px solid white;
+}
+
+.cta-agrega-tuyo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  background: #fff7f0 !important;
+  color: #e8413d !important;
 }
 
 .combos-loading,

@@ -34,9 +34,9 @@ import './App.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <NotificationProvider>
+    <NotificationProvider>
+      <AuthProvider>
+        <CartProvider>
           <Router>
           <div className="app">
             <Header />
@@ -120,10 +120,10 @@ function App() {
             {/* Carrito como overlay global */}
             <Carrito />
           </div>
-        </Router>
-        </NotificationProvider>
-      </CartProvider>
-    </AuthProvider>
+          </Router>
+        </CartProvider>
+      </AuthProvider>
+    </NotificationProvider>
   );
 }
 

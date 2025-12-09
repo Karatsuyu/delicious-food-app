@@ -691,6 +691,11 @@ const tiposPollo = {
       return;
     }
 
+    if (user?.is_staff) {
+      alert('Solo los clientes pueden dejar reseñas.');
+      return;
+    }
+
     if (!nuevaReseña.texto.trim()) {
       alert('Por favor escribe un comentario');
       return;
@@ -870,7 +875,7 @@ const tiposPollo = {
           )}
         </div>
 
-        {user && (
+        {user && !isAdmin && (
           <div className="escribir-resena">
             {!mostrandoFormulario ? (
               <button 
@@ -893,7 +898,7 @@ const tiposPollo = {
                         className={`estrella-btn ${num <= nuevaReseña.calificacion ? 'activa' : ''}`}
                         onClick={() => setNuevaReseña({...nuevaReseña, calificacion: num})}
                       >
-                        ⭐
+                    ★
                       </button>
                     ))}
                   </div>

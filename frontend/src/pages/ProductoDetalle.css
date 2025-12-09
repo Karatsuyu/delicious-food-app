@@ -247,16 +247,23 @@
 }
 
 .estrella-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 26px;
   cursor: pointer;
-  color: #ddd;
-  transition: color 0.2s ease;
+  color: #e0e0e0;
+  transition: color 0.2s ease, transform 0.1s ease;
+  padding: 4px 6px;
 }
 
 .estrella-btn.activa {
   color: #FFD700;
+}
+
+.estrella-btn:hover {
+  color: #ffce3a;
+  transform: translateY(-1px);
 }
 
 .estrella-btn:hover {
