@@ -958,7 +958,11 @@ const Personalizador = () => {
         nombre_personalizado: personalizacion.nombrePersonalizado || `${producto.nombre} personalizado`,
         producto_base: producto.id,
         ingredientes: ingredientesSeleccionados,
-        precio_total: calcularPrecio()
+        precio_total: calcularPrecio(),
+        // Agregar información de imagen local para que se muestre correctamente en el perfil público
+        local_product_id: producto.id,
+        local_product_name: producto.nombre,
+        local_product_image: getCategoryImage(categoria)
       };
 
       const response = await api.post('productos-personalizados/', productoPersonalizadoData);

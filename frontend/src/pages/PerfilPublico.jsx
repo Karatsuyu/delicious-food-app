@@ -68,11 +68,16 @@ function PerfilPublico() {
   };
 
   const handleAddToCart = (combo) => {
+    const firstProduct = combo.productos_detalle?.[0];
+    const imagenCombo = firstProduct?.imagen && firstProduct.imagen !== 'null' && !firstProduct.imagen.includes('null')
+      ? firstProduct.imagen
+      : getCategoryImage(firstProduct?.categoria);
+
     const productoData = {
       id: `combo-personalizado-${combo.id}`,
       nombre: combo.nombre || `Combo de ${perfil?.usuario?.username || 'Usuario'}`,
       precio: parseFloat(combo.precio_total),
-      imagen: combo.productos_detalle?.[0]?.imagen || null,
+      imagen: imagenCombo,
       es_personalizable: false,
       combo_personalizado_id: combo.id
     };
@@ -84,7 +89,7 @@ function PerfilPublico() {
       id: `producto-personalizado-${producto.id}`,
       nombre: producto.nombre_personalizado || `Producto de ${perfil?.usuario?.username || 'Usuario'}`,
       precio: parseFloat(producto.precio_total),
-      imagen: getCategoryImage(producto.producto_base?.categoria) || producto.producto_base?.imagen,
+      imagen: producto.local_product_image || producto.producto_base?.imagen || getCategoryImage(producto.producto_base?.categoria),
       es_personalizable: false,
       producto_personalizado_id: producto.id
     };
@@ -170,9 +175,17 @@ function PerfilPublico() {
                       {combo.productos_detalle.map((prod, idx) => (
                         <div key={idx} className="producto-item">
                           <img
-                            src={prod.imagen ? absolutizeMediaUrl(prod.imagen) : getCategoryImage(prod.categoria)}
+                            src={
+                              prod.imagen && prod.imagen !== 'null' && !prod.imagen.includes('null') 
+                                ? absolutizeMediaUrl(prod.imagen) 
+                                : getCategoryImage(prod.categoria)
+                            }
                             alt={prod.nombre}
                             className="producto-mini-img"
+                            onError={(e) => {
+                              // Fallback si la imagen no carga
+                              e.target.src = getCategoryImage(prod.categoria);
+                            }}
                           />
                           <span>{prod.nombre} x{prod.cantidad}</span>
                         </div>
@@ -227,11 +240,11 @@ function PerfilPublico() {
                   <p className="producto-base-label">Basado en:</p>
                   <div className="producto-base-item">
                     <img
-                      src={getCategoryImage(producto.producto_base?.categoria) || producto.producto_base?.imagen || defaultAvatar}
-                      alt={producto.producto_base?.nombre}
+                      src={producto.local_product_image || producto.producto_base?.imagen || getCategoryImage(producto.producto_base?.categoria) || defaultAvatar}
+                      alt={producto.local_product_name || producto.producto_base?.nombre}
                       className="producto-mini-img"
                     />
-                    <span>{producto.producto_base?.nombre}</span>
+                    <span>{producto.local_product_name || producto.producto_base?.nombre}</span>
                   </div>
                 </div>
 

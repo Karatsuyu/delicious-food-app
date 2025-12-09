@@ -173,7 +173,8 @@ class ComboPersonalizadoSerializer(serializers.ModelSerializer):
                 'precio': precio_mostrar,  # Precio al momento de compra
                 'imagen': imagen_url,
                 'imagen_seleccionada': combo_producto.imagen_seleccionada,
-                'cantidad': combo_producto.cantidad
+                'cantidad': combo_producto.cantidad,
+                'categoria': combo_producto.producto.categoria  # Agregar categoría para getCategoryImage
             })
         
         return productos_data
