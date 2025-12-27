@@ -1,0 +1,277 @@
+.combos-publicos-page {
+  max-width: 1200px;
+  margin: 100px auto 0 auto; /* Aumentado margen superior de 0 a 100px */
+  padding: 20px;
+}
+
+.combos-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 30px 20px;
+  background: linear-gradient(135deg, #F28c1e 0%, #e8413d 100%);
+  border-radius: 15px;
+  color: white;
+  position: relative;
+}
+
+.combos-header h1 {
+  color: white;
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.combos-header p {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
+}
+
+.combos-cta {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cta-agrega-tuyo {
+  display: inline-block !important;
+  padding: 14px 28px;
+  background: white !important;
+  color: #e8413d !important;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-decoration: none !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  border: 2px solid white;
+}
+
+.cta-agrega-tuyo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  background: #fff7f0 !important;
+  color: #e8413d !important;
+}
+
+.combos-loading,
+.combos-error,
+.combos-empty {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2rem;
+}
+
+.combos-error {
+  color: #f44336;
+  background: #ffebee;
+  border-radius: 5px;
+}
+
+.combos-empty {
+  color: #999;
+  background: #f5f5f5;
+  border-radius: 5px;
+}
+
+.combos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 25px;
+}
+
+.combo-card-publico {
+  background: white;
+  border-radius: 15px;
+  border: 2px solid transparent;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.combo-card-publico:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(242, 140, 30, 0.3);
+  border: 2px solid #F28c1e;
+}
+
+.combo-header-publico {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: linear-gradient(135deg, #F28c1e 0%, #e8413d 100%);
+  color: white;
+}
+
+.combo-creator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.creator-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 2px solid white;
+  object-fit: cover;
+}
+
+.creator-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.creator-name {
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.creator-username {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.combo-badge {
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(10px);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.combo-content {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.combo-nombre-publico {
+  margin: 0;
+  color: #333;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.combo-productos {
+  margin: 10px 0;
+}
+
+.productos-label {
+  font-weight: bold;
+  color: #666;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.productos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.producto-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background: linear-gradient(135deg, #fff8f5 0%, #fef4f0 100%);
+  border: 1px solid rgba(242, 140, 30, 0.2);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.producto-item:hover {
+  border-color: rgba(242, 140, 30, 0.4);
+  transform: translateX(5px);
+}
+
+.producto-mini-img {
+  width: 45px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(242, 140, 30, 0.3);
+}
+
+.combo-precio-publico {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #F28c1e;
+  margin: 10px 0;
+}
+
+.combo-fecha {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.combo-actions-publico {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.btn-ver-perfil,
+.btn-agregar-carrito {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.btn-ver-perfil {
+  background: linear-gradient(135deg, #F28c1e 0%, #e8413d 100%);
+  color: white;
+}
+
+.btn-ver-perfil:hover {
+  background: linear-gradient(135deg, #e8413d 0%, #F28c1e 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(242, 140, 30, 0.3);
+}
+
+.btn-agregar-carrito {
+  background: white;
+  color: #F28c1e;
+  border: 2px solid #F28c1e;
+}
+
+.btn-agregar-carrito:hover {
+  background: #F28c1e;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(242, 140, 30, 0.3);
+}
+
+@media (max-width: 768px) {
+  .combos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .combo-header-publico {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .combo-actions-publico {
+    flex-direction: column;
+  }
+}
+

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 import './Register.css';
 
 function Register() {
   const navigate = useNavigate();
+  const { register } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -41,33 +42,13 @@ function Register() {
     setLoading(true);
     setError('');
 
-    try {
-      const response = await axios.post(
-        'http://localhost:8000/api/users/register/',
-        formData
-      );
-      
-      alert(response.data.message || '¡Registro exitoso! Por favor inicia sesión');
+    const result = await register(formData);
+    
+    if (result.success) {
+      alert(result.data?.message || '¡Registro exitoso! Por favor inicia sesión');
       navigate('/login');
-    } catch (err) {
-      console.error('Error:', err.response?.data);
-      
-      // Manejar diferentes tipos de errores
-      if (err.response?.data) {
-        const errorData = err.response.data;
-        if (errorData.username) {
-          setError(`Usuario: ${errorData.username[0]}`);
-        } else if (errorData.email) {
-          setError(`Email: ${errorData.email[0]}`);
-        } else if (errorData.password) {
-          setError(`Contraseña: ${errorData.password[0]}`);
-        } else {
-          setError(errorData.detail || 'Error al registrarse. Intenta nuevamente.');
-        }
-      } else {
-        setError('Error de conexión. Verifica que el servidor esté corriendo.');
-      }
-      
+    } else {
+      setError(result.message || 'Error al registrarse');
       setLoading(false);
     }
   };

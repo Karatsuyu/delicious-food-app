@@ -1,16 +1,26 @@
 from rest_framework import generics, permissions, status, viewsets
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import check_password
 from .serializers import (
+    CustomTokenObtainPairSerializer,
     UserSerializer, 
     UserRegistrationSerializer, 
     UserProfileUpdateSerializer,
-    ChangePasswordSerializer
+    ChangePasswordSerializer,
+    PurchaseHistorySerializer
 )
+from .models import Profile, PurchaseHistory
+from .serializers import ProfileSerializer
 
 User = get_user_model()
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    """Vista personalizada que permite login con email o username"""
+    serializer_class = CustomTokenObtainPairSerializer
 
 class UserRegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -36,9 +46,16 @@ class UserRegistrationView(generics.CreateAPIView):
 class UserProfileView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     def get_object(self):
         return self.request.user
+
+    def retrieve(self, request, *args, **kwargs):
+        """Retornar perfil del usuario autenticado con todos los campos incluyendo is_staff"""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
@@ -233,22 +250,165 @@ class UserViewSet(viewsets.ModelViewSet):
             'message': f'Cuenta de {user.email} reactivada exitosamente'
         })
 
+    @action(detail=True, methods=['get'])
+    def perfil_publico(self, request, pk=None):
+        """Obtener perfil público de un usuario con sus combos y productos personalizados publicados"""
+        try:
+            usuario = self.get_object()
+            from products.models import ComboPersonalizado, ProductoPersonalizado
+            from products.serializers import ComboPersonalizadoSerializer, ProductoPersonalizadoSerializer
+            from django.db.models import Sum
+            
+            # Obtener combos publicados del usuario
+            combos_publicados = ComboPersonalizado.objects.filter(
+                usuario=usuario,
+                publicado=True
+            ).order_by('-veces_comprado', '-creado_en')
+            
+            # Obtener productos personalizados publicados del usuario
+            productos_personalizados_publicados = ProductoPersonalizado.objects.filter(
+                usuario=usuario,
+                publicado=True
+            ).order_by('-veces_comprado', '-creado_en')
+            
+            # Estadísticas del usuario
+            total_combos_creados = ComboPersonalizado.objects.filter(usuario=usuario).count()
+            total_combos_publicados = combos_publicados.count()
+            total_veces_comprados = combos_publicados.aggregate(
+                total=Sum('veces_comprado')
+            )['total'] or 0
+            
+            total_productos_creados = ProductoPersonalizado.objects.filter(usuario=usuario).count()
+            total_productos_publicados = productos_personalizados_publicados.count()
+            total_productos_veces_comprados = productos_personalizados_publicados.aggregate(
+                total=Sum('veces_comprado')
+            )['total'] or 0
+            
+            combos_serializer = ComboPersonalizadoSerializer(
+                combos_publicados, 
+                many=True, 
+                context={'request': request}
+            )
+            
+            productos_serializer = ProductoPersonalizadoSerializer(
+                productos_personalizados_publicados, 
+                many=True, 
+                context={'request': request}
+            )
+            
+            # Construir URL absoluta para la imagen de perfil
+            profile_image_url = None
+            if usuario.profile_image:
+                try:
+                    profile_image_url = request.build_absolute_uri(usuario.profile_image.url)
+                except:
+                    profile_image_url = usuario.profile_image.url if usuario.profile_image else None
+            
+            return Response({
+                'usuario': {
+                    'id': usuario.id,
+                    'username': usuario.username,
+                    'first_name': usuario.first_name,
+                    'last_name': usuario.last_name,
+                    'profile_image': profile_image_url,
+                    'date_joined': usuario.date_joined
+                },
+                'estadisticas': {
+                    'total_combos_creados': total_combos_creados,
+                    'total_combos_publicados': total_combos_publicados,
+                    'total_veces_comprados': total_veces_comprados,
+                    'total_productos_creados': total_productos_creados,
+                    'total_productos_publicados': total_productos_publicados,
+                    'total_productos_veces_comprados': total_productos_veces_comprados
+                },
+                'combos_publicados': combos_serializer.data,
+                'productos_personalizados_publicados': productos_serializer.data
+            })
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
     @action(detail=False, methods=['get'])
     def estadisticas(self, request):
         """Obtener estadísticas del usuario"""
         user = request.user
-        from orders.models import Pedido
+        from orders.models import Pedido, PedidoItem
         from reviews.models import Review
+        from products.models import ComboPersonalizado
+        from django.db.models import Sum
         
         pedidos_count = Pedido.objects.filter(usuario=user).count()
         reviews_count = Review.objects.filter(usuario=user).count()
+        
+        # Estadísticas de combos personalizados
+        combos_personalizados = ComboPersonalizado.objects.filter(usuario=user)
+        combos_publicados = combos_personalizados.filter(publicado=True).count()
+        total_veces_comprados = combos_personalizados.aggregate(
+            total=Sum('veces_comprado')
+        )['total'] or 0
+        
+        # Calcular puntos ganados por ventas de combos personalizados
+        # Buscar todos los pedidos que compraron combos del usuario
+        items_vendidos = PedidoItem.objects.filter(
+            combo_personalizado__usuario=user,
+            combo_personalizado__publicado=True
+        )
+        puntos_ganados_ventas = 0
+        for item in items_vendidos:
+            valor_compra = float(item.precio_unitario * item.cantidad)
+            puntos_ganados_ventas += int(valor_compra * 0.40)
+        
+        # Total gastado en pedidos
+        total_gastado = Pedido.objects.filter(usuario=user).aggregate(
+            total=Sum('total')
+        )['total'] or 0
         
         return Response({
             'usuario': user.username,
             'email': user.email,
             'puntos': user.points,
+            'puntos_ganados_ventas': puntos_ganados_ventas,
             'fecha_registro': user.date_joined,
             'total_pedidos': pedidos_count,
             'total_reviews': reviews_count,
+            'total_gastado': float(total_gastado),
+            'combos_personalizados_creados': combos_personalizados.count(),
+            'combos_publicados': combos_publicados,
+            'total_veces_comprados': total_veces_comprados,
             'cuenta_activa': user.is_active
         })
+
+    @action(detail=False, methods=['get'])
+    def purchase_history(self, request):
+        """Obtener historial de compras del usuario"""
+        user = request.user
+        purchases = PurchaseHistory.objects.filter(buyer=user)
+        serializer = PurchaseHistorySerializer(purchases, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get']) 
+    def points_balance(self, request):
+        """Obtener balance de puntos del usuario"""
+        user = request.user
+        return Response({
+            'points': user.points,
+            'username': user.username
+        })
+
+    @action(detail=False, methods=['patch'])
+    def update_profile(self, request):
+        """Actualizar información básica del perfil del usuario"""
+        user = request.user
+        serializer = UserProfileUpdateSerializer(user, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Pedido, PedidoItem, CarritoItem, Carrito, Estado
-from products.serializers import ProductoSerializer, ComboSerializer
+from products.serializers import ProductoSerializer, ComboSerializer, ComboPersonalizadoSerializer
 
 class EstadoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,10 +37,11 @@ class PedidoCreateSerializer(serializers.ModelSerializer):
 class CarritoItemSerializer(serializers.ModelSerializer):
     producto = ProductoSerializer(read_only=True)
     combo = ComboSerializer(read_only=True)
+    combo_personalizado = ComboPersonalizadoSerializer(read_only=True)
     
     class Meta:
         model = CarritoItem
-        fields = ['id', 'producto', 'combo', 'cantidad', 'precio_total']
+    fields = ['id', 'producto', 'combo', 'combo_personalizado', 'cantidad', 'precio_total']
 
 class CarritoSerializer(serializers.ModelSerializer):
     items = CarritoItemSerializer(many=True, read_only=True)

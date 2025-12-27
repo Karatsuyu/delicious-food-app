@@ -1,20 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Great+Vibes&family=Dancing+Script&family=Satisfy&family=Allura&family=Sacramento&family=Alex+Brush&family=Cookie&family=Parisienne&family=Marck+Script&display=swap');
+
+/* ===========================================
+   HOME - CONFIGURACIÓN RESPONSIVA
+   =========================================== */
+
 .home {
   margin: 0;
   padding: 0;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
+
+/* ===========================================
+   BANNER SECTION - RESPONSIVE
+   =========================================== */
 
 .banner-section {
-  margin-top: 0;
+  margin-top: 72px; /* Exactamente la altura del header */
   padding-top: 0;
-}
-
-.banner-section{
-  margin-top: -20px;
-}
-
-body {
-  margin: 0;
-  padding: 0;
 }
 
 .banner-container {
@@ -22,6 +26,7 @@ body {
   width: 100%;
   height: 400px;
   overflow: hidden;
+
 }
 
 .banner-slide {
@@ -40,6 +45,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  max-width: 100%;
 }
 
 .banner-arrow {
@@ -68,6 +74,7 @@ body {
   bottom: 15px;
   left: 50%;
   transform: translateX(-50%);
+
 }
 
 .dot {
@@ -75,20 +82,27 @@ body {
   height: 12px;
   margin: 0 4px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgb(253, 253, 253);
   cursor: pointer;
   display: inline-block;
 }
 
 .dot.active {
   background: white;
+  transform: scale(1.2);
 }
 
+/* ===========================================
+   CATEGORIES SECTION - RESPONSIVE
+   =========================================== */
 
 .categories-section {
   background: white;
-  padding: 30px 40px;
+  padding: 20px 15px;
   margin-bottom: 20px;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 .categories-container {
@@ -117,6 +131,8 @@ body {
   font-size: 50px;
   display: block;
   margin-bottom: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .category-item p {
@@ -156,57 +172,44 @@ body {
 .section-title-custom {
   display: inline-block;
   font-family: 'Pacifico', cursive;
-  font-weight: bold;
   padding: 10px 25px;
   border-radius: 15px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.2);
   border: none;
   cursor: pointer;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
-  transition: all 0.3s ease;
   color: #F28c1e;
-
 }
 
-.customize-description {
-  font-size: 14px;
-  margin-bottom: 25px;
-  font-family: 'Pacifico', cursive;
-  padding: 10px 25px;
-}
 
 .categories-container1 {
   display: flex;
-  justify-content: center;
   align-items: flex-start;
-  gap: 2rem; /* separa las categorías */
   flex-wrap: nowrap;
   text-align: center;
+  font-family: 'Pacifico', cursive;
 }
 
 /* ====== HAMBURGUESAS ====== */
 .category-item1 {
   text-decoration: none;
   text-align: center;
-  cursor: pointer;
   transition: transform 0.3s;
   color: #e8413d;
   position: relative;
   left: 0px;
-  top: -2px; /* ajusta la posición del bloque */
+  top: -40px; /* ajusta la posición del bloque */
 }
 
 .hamburguesa-img {
-  width: 350px;
+  width: 500px;
   height: auto;
   display: block;
-  margin: 0 auto;
   border-radius: 15px;
   transition: transform 0.25s ease;
 }
 
 .category-item1 p {
-  margin-top: 8px; /* distancia entre imagen y texto */
+  margin-top: -70px; /* distancia entre imagen y texto */
   font-weight: bold;
   color: #e8413d;
 }
@@ -218,12 +221,13 @@ body {
   cursor: pointer;
   color: #e8413d;
   position: relative;
-  left: -0px;
-  top: -2px; /* sube el texto */
+  left: 0px;
+  top: -40px; /* sube el texto */
+  font-weight: bold;
 }
 
 .pizza-img {
-  width: 350px;
+  width: 500px; /* puedes ajustar libremente este valor */
   height: auto;
   display: block;
   margin: 0 auto;
@@ -232,9 +236,10 @@ body {
 }
 
 .category-item2 p {
-  margin-top: 8px;
+  margin-top: -70px; /* distancia entre imagen y texto */
   font-weight: bold;
   color: #e8413d;
+  font-size: 18px;
 }
 
 /* ====== POLLO ====== */
@@ -244,12 +249,13 @@ body {
   cursor: pointer;
   color: #e8413d;
   position: relative;
-  top: -2px;
+  top: -40px;
   left: 0px; 
+  font-weight: bold;
 }
 
 .pollo-img {
-  width: 350px;
+  width: 500px;
   height: auto;
   display: block;
   margin: 0 auto;
@@ -258,9 +264,10 @@ body {
 }
 
 .category-item3 p {
-  margin-top: 8px;
+  margin-top: -70px;
   font-weight: bold;
   color: #e8413d;
+  font-size: 18px;
 }
 
 /* ====== PERRO ====== */
@@ -270,12 +277,12 @@ body {
   cursor: pointer;
   color: #e8413d;
   position: relative;
-  top: -2px;
+  top: -40px;
   left: 0px;
 }
 
 .perro-img {
-  width: 350px;
+  width: 500px;
   height: auto;
   display: block;
   margin: 0 auto;
@@ -284,9 +291,10 @@ body {
 }
 
 .category-item4 p {
-  margin-top: 8px;
+  margin-top: -70px;
   font-weight: bold;
   color: #e8413d;
+  font-size: 18px;
 }
 
 /* ====== POSTRES ====== */
@@ -296,12 +304,12 @@ body {
   cursor: pointer;
   color: #e8413d;
   position: relative;
-  top: -2px;
+  top: -40px;
   left: 0px;
 }
 
 .postre-img {
-  width: 350px;
+  width: 500px;
   height: auto;
   display: block;
   margin: 0 auto;
@@ -310,19 +318,324 @@ body {
 }
 
 .category-item5 p {
-  margin-top: 8px;
+  margin-top: -70px;
   font-weight: bold;
   color: #e8413d;
+  font-size: 18px;
 }
 
-/* ====== RESPONSIVE ====== */
+/* 🔹 Ajuste para que las imágenes estén más juntas sin usar gap */
+.category-item1,
+.category-item2,
+.category-item3,
+.category-item4,
+.category-item5 {
+  margin-right: -140px; 
+}
+
+.category-item5 {
+  margin-right: 0;
+}
+
+/* 🔹 Hover sin fondo blanco */
+.category-item1:hover,
+.category-item2:hover,
+.category-item3:hover,
+.category-item4:hover,
+.category-item5:hover {
+  transform: translateY(-5px);
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+
+.category-item1:hover p,
+.category-item2:hover p,
+.category-item3:hover p,
+.category-item4:hover p,
+.category-item5:hover p {
+  color: #F28c1e; 
+}
+
+
+body, html {
+  background-color: #ffffff !important;
+}
+
+footer, .footer {
+  background-color: #ffffff !important;
+}
+
+/* ===================== Reseñas ===================== */
+.reviews-section { padding:42px 28px 60px; background:#fff; }
+.reviews-title-inline { margin:0 0 18px 4px; color:#F28c1e; }
+.reviews-carousel { position:relative; overflow:hidden; width:100%; }
+.reviews-track { display:flex; gap:26px; scroll-behavior:smooth; padding:4px 4px 10px; }
+.review-card { flex:0 0 340px; position:relative; display:grid; grid-template-columns:72px 1fr; align-items:center; gap:14px; background:#fff; border-radius:14px; padding:18px 22px 20px; box-shadow:0 12px 20px -8px rgba(0,0,0,0.30); border:1px solid rgba(0,0,0,0.05); transition: all 0.3s ease; }
+
+.review-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 25px -8px rgba(0,0,0,0.40);
+}
+
+.review-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #f2b84d;
+}
+
+.review-avatar-fallback {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #F28c1e, #FF8C00);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 24px;
+  border: 3px solid #f2b84d;
+}
+
+.review-body { display:flex; flex-direction:column }
+.review-header { display:flex; align-items:center; justify-content:space-between }
+.review-stars { color:#f1a20b; font-size:18px }
+.review-text { margin:8px 0 4px 0; font-family: 'Pacifico', cursive; color:#000; font-size:18px }
+.review-product { margin:0 0 8px 0; font-size:14px; color:#F28c1e; font-weight:600 }
+.review-underline { height:4px; width:70%; background:#e8413d; border-radius:2px }
+
+.review-logo { position:absolute; right:12px; top:10px; width:52px; height:auto; opacity:0.95 }
+
+/* carousel arrows */
+.reviews-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 5;
+}
+.reviews-arrow.left { left: 8px }
+.reviews-arrow.right { right: 8px }
+
+@media (max-width: 900px) {
+  .review-card { flex:0 0 300px }
+}
+
+@media (max-width: 520px) {
+  .review-card { flex:0 0 85%; }
+}
+
+/* ========== Marquee infinito para Reseñas ========== */
+.reviews-marquee {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  gap: var(--reviews-gap, 26px);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+
+@media (max-width: 900px) {
+  .review-card { flex:0 0 300px }
+}
+
+@media (max-width: 520px) {
+  .review-card { flex:0 0 85%; }
+}
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.reviews-marquee-group {
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  gap: var(--reviews-gap, 26px);
+  min-width: 100%;
+  animation: reviews-scroll var(--reviews-duration, 35s) linear infinite;
+}
+
+@keyframes reviews-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(-100% - var(--reviews-gap, 26px))); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reviews-marquee-group { animation: none; }
+}
+
+/* ========================================= 
+   MOBILE RESPONSIVE (Solo para móvil - no afecta PC)
+   ========================================= */
 @media (max-width: 768px) {
-  .hamburguesa-img,
-  .pizza-img,
-  .pollo-img,
-  .perro-img,
-  .postre-img {
-    width: 60%;
-    max-width: 240px;
+  
+  /* Home container mobile */
+  .home {
+    margin: 0 !important;
+    padding-top: 70px !important; /* Reservar espacio del header fijo */
   }
+
+  /* Banner - sin offsets conflictivos */
+  .banner-section {
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+    position: relative;
+    z-index: 1;
+    height: 300px !important; /* Altura fija para evitar interferencia */
+    overflow: hidden; /* Evitar desbordamiento */
+  }
+
+  .banner-container {
+    height: 300px; /* Altura óptima para móvil */
+    width: 100%;
+    overflow: hidden;
+    position: relative; /* Contener elementos hijos */
+    z-index: 1; /* Z-index bajo para no interferir */
+  }
+
+  .banner-slide {
+    height: 300px !important; /* Altura fija para evitar desbordamiento */
+    width: 100%;
+    top: 0; left: 0; right: 0;
+    position: absolute; /* Posicionamiento absoluto dentro del contenedor */
+    overflow: hidden; /* Evitar que se desborde */
+  }
+
+  .banner-image {
+    height: 100%;
+    width: 100%;
+    object-fit: contain; /* Mostrar imagen completa sin cortes */
+    object-position: top center !important; /* Alinear la imagen al tope para quitar franja blanca */
+    display: block;
+  }
+  
+  .banner-arrow {
+    font-size: 1.2rem; /* Más pequeño para móvil */
+    padding: 0.3rem;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 15% !important; /* Subir aún más las flechas */
+    transform: translateY(-50%) !important; /* Ajuste perfecto al centro */
+  }
+  
+  .banner-arrow.left {
+    left: 8px;
+  }
+  
+  .banner-arrow.right {
+    right: 8px;
+  }
+  
+  .banner-dots {
+    bottom: 8px;
+  }
+  
+  .dot {
+    width: 8px;
+    height: 8px;
+    margin: 0 3px;
+  }
+  
+  /* Categories ajustes para móvil - casi debajo del carrusel */
+  .categories-section {
+    padding: 0px 10px !important; /* Eliminar padding superior */
+    text-align: center; /* Centrar la sección completa */
+    margin: 0 !important;
+    margin-top: -120px !important; /* Subir mucho más para que quede casi debajo del carrusel */
+    padding-top: 0px !important; /* Sin padding superior */
+    position: relative; /* Para que esté por encima del banner */
+    z-index: 10; /* Z-index alto para que los clics funcionen */
+    pointer-events: auto; /* Asegurar que sea clicable */
+  }
+  
+  .section-title-custom {
+    display: block; /* Para que el centrado funcione */
+    margin: 0 auto 20px auto; /* Centrado y margen inferior */
+    text-align: center;
+  }
+  
+  .categories-container1 {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .category-item1, .category-item2, .category-item3, .category-item4, .category-item5 {
+    margin-right: 0; /* Quitar margin negativo en móvil */
+    margin-bottom: 20px;
+    width: 100%;
+    text-align: center;
+    top: 0; /* Resetear posición para móvil */
+    position: relative; /* Resetear position */
+  }
+  
+  .hamburguesa-img, .pizza-img, .pollo-img, .perro-img, .postre-img {
+    width: 90%; /* Tamaño consistente para móvil */
+    max-width: 280px; /* Máximo más pequeño */
+    height: auto;
+    margin: 0 auto; /* Centrado */
+    display: block; /* Para que el centrado funcione */
+  }
+  
+  /* Específico para hamburguesas para que se vea igual */
+  .hamburguesa-img {
+    width: 90%;
+    max-width: 280px;
+    height: auto;
+  }
+  
+  .category-item1 p, .category-item2 p, .category-item3 p, .category-item4 p, .category-item5 p {
+    margin-top: -25px; /* Overlap consistente en móvil */
+    font-size: 16px;
+    font-weight: bold;
+    position: relative;
+  }
+  
+  /* Reviews ajustes para móvil */
+  .reviews-section {
+    padding: 20px 10px;
+  }
+  
+  .review-card {
+    flex: 0 0 85%; /* Más ancho para móvil */
+    min-width: 280px;
+  }
+  
+  .review-avatar {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .review-text {
+    font-size: 16px;
+  }
+  
+  /* Sección view-all para móvil */
+  .view-all-container {
+    padding: 20px 10px;
+  }
+  
+  .btn-view-all {
+    padding: 10px 30px;
+    font-size: 14px;
+  }
+  
+  /* Featured section para móvil */
+  .featured-section {
+    padding: 15px 10px;
+  }
+  
 }

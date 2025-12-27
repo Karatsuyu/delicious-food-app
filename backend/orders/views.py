@@ -11,7 +11,7 @@ from .serializers import (
     CarritoSerializer, 
     EstadoSerializer
 )
-from products.models import Producto, Ingrediente
+from products.models import Producto, Ingrediente, ComboPersonalizado, ComboPersonalizadoProducto
 from decimal import Decimal
 
 class AgregarCarritoAPIView(APIView):
@@ -35,6 +35,78 @@ class AgregarCarritoAPIView(APIView):
         item.precio_total = precio * cantidad
         item.save()
         return Response({'ok': True, 'item_id': item.id})
+
+
+class AddCustomComboToCartAPIView(APIView):
+    """Agregar un combo personalizado (on-the-fly) como un solo ítem al carrito.
+    Body esperado:
+      {
+        "nombre": "Mi combo",
+        "productos": [{"producto": <id>, "cantidad": 1}, ...]
+      }
+    Calcula precio con precios actuales de Producto y crea un ComboPersonalizado temporal ligado al usuario.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        nombre = (request.data.get('nombre') or '').strip() or None
+        productos_data = request.data.get('productos', [])
+        if not productos_data or not isinstance(productos_data, list):
+            return Response({'error': 'Debes seleccionar al menos un producto'}, status=400)
+
+        # Crear combo personalizado efímero (no publicado)
+        combo = ComboPersonalizado.objects.create(usuario=user, nombre=nombre or 'Mi combo', precio_total=0, publicado=False)
+
+        total = 0
+        for pd in productos_data:
+            try:
+                prod_id = int(pd.get('producto'))
+                cantidad = int(pd.get('cantidad', 1))
+                imagen_seleccionada = pd.get('imagen_seleccionada', '')
+                # 🔑 USAR PRECIO ENVIADO DESDE FRONTEND (MÁS PRECISO)
+                precio_frontend = pd.get('precio_actual')
+            except Exception:
+                continue
+            if cantidad <= 0:
+                continue
+            try:
+                prod = Producto.objects.get(id=prod_id)
+            except Producto.DoesNotExist:
+                continue
+            
+            # Usar precio del frontend si está disponible, sino usar precio actual de BD
+            precio_usar = float(precio_frontend) if precio_frontend is not None else float(prod.precio)
+            
+            print(f"[DEBUG] Creando ComboPersonalizadoProducto: combo={combo.id}, producto={prod.id}({prod.nombre}), cantidad={cantidad}, precio_frontend={precio_frontend}, precio_usar={precio_usar}")
+            combo_producto = ComboPersonalizadoProducto.objects.create(
+                combo=combo, 
+                producto=prod, 
+                cantidad=cantidad,
+                precio_unitario=precio_usar,  # 🔑 USAR PRECIO DEL FRONTEND
+                imagen_seleccionada=imagen_seleccionada,
+                precio_al_agregar=precio_usar  # 🔑 GUARDAR EL MISMO PRECIO
+            )
+            print(f"[DEBUG] ComboPersonalizadoProducto creado con ID: {combo_producto.id}")
+            total += precio_usar * cantidad
+
+        combo.precio_total = total
+        combo.save()
+
+        # Agregar al carrito como un único item apuntando al combo_personalizado
+        carrito, _ = Carrito.objects.get_or_create(usuario=user)
+        item = CarritoItem.objects.create(
+            carrito=carrito,
+            combo_personalizado=combo,
+            cantidad=1,
+            precio_total=total
+        )
+        return Response({
+            'ok': True,
+            'carrito_item_id': item.id,
+            'combo_id': combo.id,
+            'total': float(total)
+        })
     
 
 from .models import Carrito, Pedido
@@ -120,15 +192,50 @@ class PedidoViewSet(viewsets.ModelViewSet):
             **serializer.validated_data
         )
         
-        # Crear PedidoItems desde CarritoItems
+        # Crear PedidoItems desde CarritoItems y otorgar puntos si es combo personalizado publicado
+        from products.models import ComboPersonalizado
+        from django.contrib.auth import get_user_model
+        
+        User = get_user_model()
+        
         for carrito_item in carrito.items.all():
-            PedidoItem.objects.create(
+            pedido_item = PedidoItem.objects.create(
                 pedido=pedido,
                 producto=carrito_item.producto,
                 combo=carrito_item.combo,
+                combo_personalizado=carrito_item.combo_personalizado if hasattr(carrito_item, 'combo_personalizado') else None,
                 cantidad=carrito_item.cantidad,
-                precio_unitario=carrito_item.precio_total / carrito_item.cantidad
+                precio_unitario=carrito_item.precio_total / carrito_item.cantidad if carrito_item.cantidad > 0 else 0
             )
+            
+            # Si es un combo personalizado publicado, otorgar puntos al creador
+            if hasattr(carrito_item, 'combo_personalizado') and carrito_item.combo_personalizado:
+                combo_personalizado = carrito_item.combo_personalizado
+                if combo_personalizado.publicado and combo_personalizado.usuario != user:
+                    # Calcular puntos: 40% del valor de la compra
+                    valor_compra = float(carrito_item.precio_total)
+                    puntos_ganados = int(valor_compra * 0.40)
+                    
+                    # Otorgar puntos al creador del combo
+                    creador = combo_personalizado.usuario
+                    creador.points += puntos_ganados
+                    creador.save()
+                    
+                    # Incrementar contador de veces comprado
+                    combo_personalizado.veces_comprado += carrito_item.cantidad
+                    combo_personalizado.save()
+                    
+                    # Crear notificación al creador
+                    try:
+                        from notifications.models import Notificacion
+                        estado_info, _ = Estado.objects.get_or_create(descripcion='Información')
+                        Notificacion.objects.create(
+                            usuario=creador,
+                            mensaje=f"¡Has ganado {puntos_ganados} puntos! Alguien compró tu combo personalizado '{combo_personalizado.nombre}' por ${valor_compra:,.0f}.",
+                            estado=estado_info
+                        )
+                    except ImportError:
+                        pass
         
         # Limpiar carrito
         carrito.items.all().delete()
@@ -147,6 +254,15 @@ class PedidoViewSet(viewsets.ModelViewSet):
         
         response_serializer = PedidoSerializer(pedido)
         return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+class ClearCartAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        carrito = Carrito.objects.filter(usuario=request.user).first()
+        if carrito:
+            carrito.items.all().delete()
+        return Response({'ok': True, 'cleared': True})
 
     @action(detail=True, methods=['patch'])
     def actualizar_estado(self, request, pk=None):

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import ProductCard from '../components/ProductCard';
+import { Link, useNavigate } from 'react-router-dom';
+
 import banner1 from '../assets/banner1.png';
 import banner2 from '../assets/banner2.png';
 import banner3 from '../assets/banner3.png';
@@ -11,17 +11,72 @@ import pollo from '../assets/pollo.png';
 import perro from '../assets/perro.png';
 import postre from '../assets/postre.png';
 import './Home.css';
+import logo from '../assets/logo.png';
+import api from '../api/api';
+import { useRef } from 'react';
 
 function Home() {
   const [productos, setProductos] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate();
+  const carouselRef = useRef(null);
+  const [reviews, setReviews] = useState([]);
 
-  const banners = [banner1, banner2, banner3, banner4];
+  // Mapeo inverso: de ID de BD a ID local para navegación
+  const productIdToLocalMapping = {
+    1: 'hamburguesa1',
+    13: 'hamburguesa2',
+    14: 'hamburguesa3',
+    15: 'hamburguesa4',
+    16: 'hamburguesa5',
+    17: 'hamburguesa6',
+    18: 'hamburguesa7',
+    19: 'hamburguesa8',
+    2: 'pizza1',
+    6: 'pizza2',
+    20: 'pizza3',
+    21: 'pizza4',
+    22: 'pizza5',
+    23: 'pizza6',
+    24: 'pizza7',
+    25: 'pizza8',
+    3: 'pollo1',
+    26: 'pollo2',
+    27: 'pollo3',
+    28: 'pollo4',
+    29: 'pollo5',
+    30: 'pollo6',
+    4: 'perro1',
+    31: 'perro2',
+    32: 'perro3',
+    42: 'perro4',
+    43: 'perro5',
+    63: 'perro6',
+    5: 'postres1',
+    44: 'postres2',
+    45: 'postres3',
+    46: 'postres4',
+    47: 'postres5',
+    48: 'postres6',
+    49: 'postres7',
+    50: 'postres8',
+    64: 'postres9',
+    65: 'postres10',
+    66: 'postres11'
+  };
+
+  // Mapear cada banner a un combo específico
+  const banners = [
+    { path: '/combo-bbq-crispy', img: banner1, titulo: 'COMBO BBQ CRISPY' },
+    { path: '/combo-clasico-bacon', img: banner2, titulo: 'COMBO CLASICO BACON' },
+    { path: '/combo-pepperoni-lovers', img: banner3, titulo: 'COMBO PEPPERONI LOVERS' },
+    { path: '/combo-crocante-deluxe', img: banner4, titulo: 'COMBO CROCANTE DELUXE' },
+  ];
 
   // 🔹 Cambio automático del carrusel
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % banners.length);
+  setCurrentSlide((prev) => (prev + 1) % banners.length);
     }, 4000); // cada 4 segundos
     return () => clearInterval(interval);
   }, [banners.length]);
@@ -31,41 +86,79 @@ function Home() {
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length);
   const goToSlide = (index) => setCurrentSlide(index);
 
+  // Obtener reseñas desde el backend (no quemadas)
+  useEffect(() => {
+    let mounted = true;
+    const fetchReviews = async () => {
+      try {
+        const resp = await fetch('http://127.0.0.1:8000/api/reviews/', {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        const data = await resp.json();
+        if (!mounted) return;
+        // Mostrar las primeras 20 reseñas para el carrusel
+        setReviews(Array.isArray(data) ? data.slice(0, 20) : []);
+      } catch (err) {
+        console.error('Error cargando reseñas:', err);
+        setReviews([]);
+      }
+    };
+    fetchReviews();
+    return () => { mounted = false; };
+  }, []);
+
+  const scrollReviews = (direction = 'next') => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const card = el.querySelector('.review-card');
+    if (!card) return;
+    const style = window.getComputedStyle(card);
+    const gap = parseInt(style.marginRight || 20, 10) || 20;
+    const width = card.offsetWidth + gap;
+    const delta = direction === 'next' ? width : -width;
+    el.scrollBy({ left: delta, behavior: 'smooth' });
+  };
+
   return (
     <div className="home">
 
       {/* Banner principal */}
       <section className="banner-section">
-        <div className="banner-container">
+        <div className="banner-container" onClick={() => navigate(banners[currentSlide].path)} style={{cursor:'pointer'}}>
           {banners.map((banner, index) => (
             <div
               key={index}
               className={`banner-slide ${index === currentSlide ? 'active' : ''}`}
+              role="button"
+              aria-label={`Ver ${banner.titulo}`}
+              style={{ pointerEvents: index === currentSlide ? 'auto' : 'none' }}
             >
               <img
-                src={banner}
+                src={banner.img}
                 alt={`Banner ${index + 1}`}
                 className="banner-image"
               />
             </div>
           ))}
 
-          <button className="banner-arrow left" onClick={prevSlide}>‹</button>
-          <button className="banner-arrow right" onClick={nextSlide}>›</button>
+          <button className="banner-arrow left" onClick={(e)=>{e.stopPropagation(); prevSlide();}}>‹</button>
+          <button className="banner-arrow right" onClick={(e)=>{e.stopPropagation(); nextSlide();}}>›</button>
 
           <div className="banner-dots">
             {banners.map((_, index) => (
               <span
                 key={index}
                 className={`dot ${index === currentSlide ? 'active' : ''}`}
-                onClick={() => goToSlide(index)}
+                onClick={(e)=>{e.stopPropagation(); goToSlide(index);}}
               ></span>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Categorías */}
+  {/* Categorías */}
       <section className="categories-section">
         <div className="categories-container">
           <Link to="/menu?categoria=hamburguesas" className="category-item">
@@ -102,33 +195,142 @@ function Home() {
       {/* Personaliza tu pedido */}
       <section className="customize-section">
         <h2 className="section-title-custom">Personaliza tu pedido!</h2>
-        <p className="customize-description">
-          Crea tu producto ideal eligiendo cada ingrediente!
-        </p>
-
         <div className="categories-container1">
-          <Link to="/menu?categoria=hamburguesas" className="category-item1">
+          <Link to="/personalizador/hamburguesas" className="category-item1">
               <img src={hamburguesa}  alt="Hamburguesa" className="hamburguesa-img" />
-              <p>Hamburguesas</p>
+              <p>HAMBURGUESAS</p>
           </Link>
-          <Link to="/menu?categoria=pizzas" className="category-item2">
+          <Link to="/personalizador/pizzas" className="category-item2">
               <img src={pizza}  alt="Pizza" className="pizza-img" />
-              <p>Pizzas</p>
+              <p>PIZZAS</p>
             </Link>
-            <Link to="/menu?categoria=pollo" className="category-item3">
+            <Link to="/personalizador/pollo" className="category-item3">
               <img src={pollo}  alt="Pollo" className="pollo-img" />
-              <p>Pollo</p>
+              <p>POLLO</p>
             </Link>
-            <Link to="/menu?categoria=perros" className="category-item4">
+            <Link to="/personalizador/perro" className="category-item4">
               <img src={perro}  alt="Perro" className="perro-img" />
-              <p>Perros</p>
+              <p>PERROS</p>
             </Link>
-            <Link to="/menu?categoria=postres" className="category-item5">
+            <Link to="/personalizador/postre" className="category-item5">
               <img src={postre}  alt="Postre" className="postre-img" />
-              <p>Postres</p>
+              <p>POSTRES</p>
           </Link> 
         </div>
      </section>
+
+      {/* Reseñas (Marquee infinito estilo solicitado) */}
+      <section className="reviews-section">
+        <h2 className="section-title-custom reviews-title-inline">Reseñas</h2>
+        {reviews && reviews.length > 0 ? (
+          <div
+            className="reviews-marquee"
+            style={{ '--reviews-duration': `${Math.max(24, reviews.length * 4)}s` }}
+          >
+            <div className="reviews-marquee-group">
+              {reviews.map((r) => {
+                const rating = r.calificacion || 5;
+                const text = r.texto || '';
+                const userName = r.usuario_username || r.usuario_email || 'Usuario';
+                const avatar = r.usuario_profile_image;
+                const localProductId = productIdToLocalMapping[r.producto];
+                
+                return (
+                  <article 
+                    key={`g1-${r.id}`} 
+                    className="review-card"
+                    onClick={() => localProductId && navigate(`/producto/${localProductId}`)}
+                    style={{ cursor: localProductId ? 'pointer' : 'default' }}
+                  >
+                    {avatar ? (
+                      <img 
+                        className="review-avatar" 
+                        src={avatar} 
+                        alt={`Foto de perfil de ${userName}`}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : (
+                      <div className="review-avatar review-avatar-fallback">
+                        {userName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="review-avatar review-avatar-fallback" style={{display: 'none'}}>
+                      {userName.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="review-body">
+                      <div className="review-header">
+                        <div className="review-stars" aria-label={`${rating} estrellas`}>
+                          {Array.from({ length: rating }).map(() => '★').join('')}
+                          {Array.from({ length: 5 - rating }).map(() => '☆').join('')}
+                        </div>
+                      </div>
+                      <p className="review-text">{text}</p>
+                      <p className="review-product">{r.producto_nombre}</p>
+                      <div className="review-underline" />
+                    </div>
+                    <img className="review-logo" src={logo} alt="Logo Delicious Food" />
+                  </article>
+                );
+              })}
+            </div>
+            {/* Segunda copia para efecto infinito */}
+            <div className="reviews-marquee-group" aria-hidden="true">
+              {reviews.map((r) => {
+                const rating = r.calificacion || 5;
+                const text = r.texto || '';
+                const userName = r.usuario_username || r.usuario_email || 'Usuario';
+                const avatar = r.usuario_profile_image;
+                const localProductId = productIdToLocalMapping[r.producto];
+                
+                return (
+                  <article 
+                    key={`g2-${r.id}`} 
+                    className="review-card"
+                    onClick={() => localProductId && navigate(`/producto/${localProductId}`)}
+                    style={{ cursor: localProductId ? 'pointer' : 'default' }}
+                  >
+                    {avatar ? (
+                      <img 
+                        className="review-avatar" 
+                        src={avatar} 
+                        alt={`Foto de perfil de ${userName}`}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
+                      />
+                    ) : (
+                      <div className="review-avatar review-avatar-fallback">
+                        {userName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="review-avatar review-avatar-fallback" style={{display: 'none'}}>
+                      {userName.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="review-body">
+                      <div className="review-header">
+                        <div className="review-stars" aria-label={`${rating} estrellas`}>
+                          {Array.from({ length: rating }).map(() => '★').join('')}
+                          {Array.from({ length: 5 - rating }).map(() => '☆').join('')}
+                        </div>
+                      </div>
+                      <p className="review-text">{text}</p>
+                      <p className="review-product">{r.producto_nombre}</p>
+                      <div className="review-underline" />
+                    </div>
+                    <img className="review-logo" src={logo} alt="Logo Delicious Food" />
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <p style={{ padding: '12px', color: '#666' }}>No hay reseñas disponibles todavía.</p>
+        )}
+      </section>
 
     </div>
   );

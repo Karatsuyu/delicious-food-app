@@ -1,13 +1,13 @@
 .header {
   position: fixed;
-  height: 88px;
+  height: 72px; /* reducido para dejar contenido más cerca */
   background-color: #fcf8ec;
   align-items: center;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 9000;
 }
 
 .header-container {
@@ -25,19 +25,19 @@
   position: relative;
 }
 
-.logo-image {
-  height: 150px;
-  width: auto;
-  object-fit: contain;
-  position: relative;
-  top: -35px;
-  left: 0px;
-}
-
 .logo-container {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.logo-image {
+  height: 120px; /* ajustado para el nuevo header */
+  width: auto;
+  object-fit: contain;
+  position: relative;
+  top: -28px; /* mantener alineación visual */
+  left: 0px;
 }
 
 .lupa-image {
@@ -165,6 +165,33 @@
   position: relative;
 }
 
+.cart-icon {
+  position: relative;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #FF6B00;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  animation: bounce 0.3s ease;
+}
+
+@keyframes bounce {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
 .auth-buttons {
   display: flex;
   gap: 10px;
@@ -193,7 +220,7 @@
   background: white;
   color: #e8413d;
   top: -35px;
-  left: 0px;  
+  left: 0px;
   position: relative;
   font-weight: bold;
 }
@@ -204,24 +231,92 @@
 }
 
 .btn-user {
-  background: #e8413d;
-  color: white;
+  background: #ffffff;
+  color: #f28c1e;
 }
 
-/* Responsive */
+/* ========================================= 
+   MOBILE RESPONSIVE (Solo para móvil - no afecta PC)
+   ========================================= */
 @media (max-width: 768px) {
   .header {
-    padding: 15px 20px;
+    height: 70px; /* Más altura para acomodar elementos */
+    padding: 8px 10px; /* Menos padding lateral */
+    display: flex;
+    align-items: center; /* Centrar verticalmente todo el header */
+  }
+  
+  .header-container {
+    padding: 5px 10px; /* Menos padding para móvil */
+    align-items: center;
+    display: flex;
+    width: 100%;
+    height: 100%;
+  }
+
+  .logo-container {
+    justify-content: flex-start; /* Alineado a la izquierda */
+    margin-left: -5px; /* Más a la izquierda */
+    display: flex;
+    align-items: center; /* Centrar verticalmente logo y menú */
+  }
+
+  .logo-image {
+    height: 85px; /* Logo aún más grande para móvil */
+    top: 0px; /* Centrado verticalmente */
+    left: -5px; /* Más pegado al menú lateral */
   }
 
   .menu-icon {
     display: block;
+    font-size: 24px; /* Ligeramente más grande */
+    top: 0px; /* Centrado verticalmente igual que logo */
+    left: 0px; /* Más a la izquierda */
+    position: relative;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 100%; /* Ocupar toda la altura del header */
+  }
+
+  .lupa-image {
+    height: 35px; /* Mismo tamaño que carrito */
+    top: 0px; /* Centrado verticalmente */
+  }
+
+  .carrito-image {
+    height: 35px; /* Mismo tamaño que lupa */
+    top: 0px; /* Centrado verticalmente */
+  }
+
+  .icon-btn {
+    top: 0px; /* Centrado verticalmente */
+  }
+
+  .auth-buttons {
+    flex-direction: row; /* Botones en la misma línea */
+    gap: 5px;
+    align-items: center;
+  }
+
+  .btn-register {
+    display: none; /* Ocultar botón de registrar solo en móvil */
+  }
+
+  .btn-signin {
+    top: 0px; /* Centrado verticalmente con los iconos */
+    padding: 5px 10px; /* Más compacto */
+    font-size: 12px;
+    white-space: nowrap; /* No romper texto */
   }
 
   .nav-menu {
     display: none;
     position: absolute;
-    top: 70px;
+    top: 70px; /* Ajustado al height del header móvil */
     left: 0;
     right: 0;
     background: white;
@@ -236,6 +331,7 @@
 
   .auth-buttons {
     flex-direction: column;
+    gap: 8px;
   }
 }
 
@@ -249,7 +345,7 @@
   background-color: #fff;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
   transition: left 0.3s ease;
-  z-index: 2000;
+  z-index: 6000; /* por encima de otros elementos */
   padding: 20px;
   overflow-y: auto;
 }
@@ -289,6 +385,30 @@
   align-items: center;
 }
 
+.side-menu-cta {
+  margin-top: 6px;
+  background: linear-gradient(135deg, #F28c1e 0%, #e8413d 100%);
+  color: white !important;
+  padding: 12px 14px;
+  border-radius: 12px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  width: 100%;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.side-menu-cta:hover {
+  background: linear-gradient(135deg, #ff9f3a 0%, #f25a52 100%);
+  color: white !important;
+  transform: translateY(-1px);
+}
+
+.menu-emoji {
+  font-size: 1.2rem;
+  margin-right: 8px;
+  display: inline-block;
+}
+
 .side-menu-list li {
   font-size: 18px;
   margin:25px 0;
@@ -314,7 +434,7 @@
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.4);
-  z-index: 1000;
+  z-index: 5000; /* debajo del menú pero sobre el contenido */
 }
 
 .side-menu-overlay.show {
@@ -332,4 +452,126 @@
   height: 30px;
   margin-right: 8px;
   vertical-align: middle;
+}
+
+
+.user-menu {
+  display: flex;
+  align-items: center; /* centra verticalmente */
+  justify-content: space-between;
+  padding: 10px 30px;
+  font-weight: bold;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: -80px; /* súbelos un poco visualmente */
+}
+
+.btn btn-user {
+  background-color: #f28c1e;
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn btn-user:hover {
+  background-color: #f28c1e;
+  color: white;
+}
+
+.btn-logout {
+  background-color: #fff;
+  color: #e8413d;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: bold;
+}
+
+.btn-logout:hover {
+  background-color: #e8413d;
+  color: white;
+}
+
+/* === Avatar del usuario en el header === */
+.avatar-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(135deg, #f28c1e, #e8413d);
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+}
+
+/* === Botones de administración === */
+.admin-links {
+  display: flex;
+  gap: 8px;
+  margin: 0 5px;
+}
+
+.btn-admin {
+  background: #9C27B0;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+/* ===========================================
+   HEADER RESPONSIVE MEDIA QUERIES
+   =========================================== */
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header {
+    padding: 15px 20px;
+  }
+
+  .menu-icon {
+    display: block;
+  }
+
+  .nav-menu {
+    display: none;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    background: white;
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-menu.active {
+    display: flex;
+  }
+
+  .auth-buttons {
+    flex-direction: column;
+  }
 }

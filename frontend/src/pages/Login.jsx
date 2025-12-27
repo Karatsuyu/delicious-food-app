@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 import './Login.css';
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: ''
   });
   const [error, setError] = useState('');
@@ -25,20 +26,12 @@ function Login() {
     setLoading(true);
     setError('');
 
-    try {
-      const response = await axios.post(
-        'http://localhost:8000/api/users/login/',
-        formData
-      );
-      
-      // Guardar token (lo haremos con Context más adelante)
-      localStorage.setItem('token', response.data.access);
-      localStorage.setItem('refresh', response.data.refresh);
-      
-      alert('Login exitoso!');
+    const result = await login(formData.username, formData.password);
+    
+    if (result.success) {
       navigate('/');
-    } catch (err) {
-      setError(err.response?.data?.detail || 'Error al iniciar sesión');
+    } else {
+      setError(result.message || 'Error al iniciar sesión');
       setLoading(false);
     }
   };
@@ -60,14 +53,14 @@ function Login() {
 
           <form onSubmit={handleSubmit} className="login-form">
             <div className="form-group">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="username">Usuario o Email</label>
               <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
                 onChange={handleChange}
-                placeholder="tu@email.com"
+                placeholder="usuario o tu@email.com"
                 required
               />
             </div>

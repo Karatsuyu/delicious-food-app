@@ -141,3 +141,4 @@ document.querySelectorAll('.product-card, .review-card').forEach(card => {
     card.style.transition = 'opacity 0.5s, transform 0.5s';
     observer.observe(card);
 });
+

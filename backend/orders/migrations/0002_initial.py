@@ -7,48 +7,10 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    initial = True
-
+    # Esta migración se ha convertido en NO-OP para evitar duplicados de columnas.
+    # Los campos ya se crean correctamente en 0001_initial.
     dependencies = [
         ('orders', '0001_initial'),
-        ('products', '0001_initial'),
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
-    operations = [
-        migrations.AddField(
-            model_name='carrito',
-            name='usuario',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
-        ),
-        migrations.AddField(
-            model_name='carritoitem',
-            name='carrito',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='items', to='orders.carrito'),
-        ),
-        migrations.AddField(
-            model_name='carritoitem',
-            name='combo',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='products.combo'),
-        ),
-        migrations.AddField(
-            model_name='carritoitem',
-            name='ingredientes',
-            field=models.ManyToManyField(blank=True, to='products.ingrediente'),
-        ),
-        migrations.AddField(
-            model_name='carritoitem',
-            name='producto',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='products.producto'),
-        ),
-        migrations.AddField(
-            model_name='pedido',
-            name='items',
-            field=models.ManyToManyField(to='orders.carritoitem'),
-        ),
-        migrations.AddField(
-            model_name='pedido',
-            name='usuario',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
-        ),
-    ]
+    operations = []

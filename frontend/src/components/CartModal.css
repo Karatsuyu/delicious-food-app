@@ -1,0 +1,207 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Great+Vibes&family=Dancing+Script&family=Satisfy&family=Allura&family=Sacramento&family=Alex+Brush&family=Cookie&family=Parisienne&family=Marck+Script&display=swap');
+
+
+.cart-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0; /* cubrir desde el borde izquierdo */
+  width: 100vw;
+  height: 100vh;
+  background-color: transparent; /* Sin fondo oscuro */
+  z-index: 5000; /* por encima del header y otros elementos */
+}
+
+.cart-modal-content {
+  background: white;
+  border-radius: 12px;
+  border: 2px solid #f28c1e; /* borde naranja como los botones */
+  padding: 28px 26px 24px; /* reducido para acercar el contenido al icono */
+  width: 450px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: -4px auto; /* menos desplazamiento vertical */
+  position: relative;
+  z-index: 6000; /* sobre el overlay */
+}
+
+.cart-modal-icon-img {
+  width: 50px;
+  height: auto;
+  display: block;
+  margin: 0 auto 1px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.cart-modal-icon-img:hover {
+  opacity: 1;
+}
+
+.cart-modal-title {
+  font-family: 'Pacifico', cursive;
+  font-size: 20px;
+  font-weight: 100;
+  color: #bababaf7;
+  margin: 5px 0 4px;
+  
+}
+
+.cart-modal-message {
+  font-family: 'Open', cursive;
+  font-size: 16px;
+  color: #bababaf7;
+  margin-bottom: 11px;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.cart-modal-button {
+  background: #f28c1e;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  border: none;
+  border-radius: 24px;
+  padding: 8px 22px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  max-width: 240px;
+  transition: background 0.2s;
+  box-shadow: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.4;
+  margin-top: 8px;
+}
+
+.cart-modal-button.secondary {
+  background: #fff;
+  color: #f28c1e;
+  border: 1px solid #f28c1e;
+}
+
+
+.cart-modal-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #999;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.cart-modal-close:hover {
+  color: #333;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .cart-modal-content {
+    width: 280px;
+    padding: 12px;
+  }
+
+  .cart-modal-title {
+    font-size: 14px;
+  }
+
+  .cart-modal-message {
+    font-size: 12px;
+  }
+
+  .cart-modal-button {
+    font-size: 12px;
+    padding: 6px 16px;
+  }
+}
+
+/* Lista de productos en el modal (sin cambiar tamaño del cuadro) */
+.cart-modal-items {
+  margin: 10px 0 10px;
+  max-height: 240px;
+  overflow-y: auto;
+  text-align: left;
+  width: 100%;
+}
+
+.cart-modal-item-wrap {
+  display: block;
+}
+
+.cart-modal-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 6px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.cart-modal-item:last-child {
+  border-bottom: none;
+}
+
+.cart-modal-item-img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 10px;
+  flex-shrink: 0;
+  background: #fff;
+}
+
+.cart-modal-item-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+
+.cart-modal-item-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-modal-item-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f28c1e;
+}
+
+.cart-modal-item.clickable { cursor: pointer; }
+.cart-modal-item-toggle { margin-left: 6px; color: #999; }
+.cart-modal-item-toggle.open { color: #f28c1e; }
+
+.cart-modal-item-details {
+  padding: 6px 6px 10px 70px; /* indent bajo la imagen */
+  background: #fff8f0;
+}
+
+.cart-modal-detail-list {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.cart-modal-detail-row {
+  font-size: 13px;
+  color: #555;
+  margin: 2px 0;
+}
+
+.cart-modal-message.resumen {
+  margin-top: 8px;
+}
